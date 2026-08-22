@@ -28,7 +28,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Admin Workspace"
+                android:text="TechFix Admin"
                 android:textColor="@color/navy_900"
                 android:textSize="20sp"
                 android:textStyle="bold" />
@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="staff@techfix.lk · TechFix Staff"
+                android:text="staff@techfix.lk · Administrator Portal"
                 android:textColor="@color/muted_text"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -94,7 +94,7 @@
                 android:orientation="vertical"
                 android:padding="@dimen/screen_padding">
 
-                <!-- Summary Stats Card -->
+                <!-- Summary Overview KPI Card -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -110,9 +110,9 @@
                             android:id="@+id/queueStatsTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Repair Queue Overview"
+                            android:text="Workshop Queue"
                             android:textColor="@color/navy_900"
-                            android:textSize="16sp"
+                            android:textSize="18sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -120,9 +120,20 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Tap any repair docket below to advance its workflow status."
+                            android:text="0 Active Repairs · 0 Completed"
                             android:textColor="@color/muted_text"
-                            android:textSize="12sp" />
+                            android:textSize="13sp" />
+
+                        <!-- Quick Search Input -->
+                        <EditText
+                            android:id="@+id/searchQueueInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="🔍 Search by Docket #, Device, or Issue..."
+                            android:inputType="text"
+                            android:maxLines="1" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -131,7 +142,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_16"
-                    android:text="Active Repair Dockets"
+                    android:layout_marginBottom="4dp"
+                    android:text="All Repair Dockets"
                     style="@style/Widget.TechFix.SectionTitle" />
 
                 <!-- Empty State -->
@@ -154,7 +166,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_8"
-                        android:text="No repairs in the queue"
+                        android:text="No repairs found"
                         android:textColor="@color/navy_900"
                         android:textSize="15sp"
                         android:textStyle="bold" />
@@ -165,7 +177,7 @@
                     android:id="@+id/appointmentList"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_8"
+                    android:layout_marginTop="@dimen/space_4"
                     android:nestedScrollingEnabled="false"
                     android:clipToPadding="false" />
 
@@ -185,7 +197,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Quick Update by Docket ID"
+                            android:text="Quick Status Update by ID"
                             style="@style/Widget.TechFix.SectionTitle" />
 
                         <EditText
@@ -194,7 +206,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:hint="Enter Appointment / Docket ID"
+                            android:hint="Enter Docket ID (e.g. 1)"
                             android:inputType="number" />
 
                         <Spinner
@@ -210,7 +222,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:text="Update Repair Status" />
+                            android:text="Apply Status Update" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -253,7 +265,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Select an existing repair service to modify its standard price."
+                            android:text="Select a repair service to change its price across the app:"
                             android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                         <Spinner
@@ -269,7 +281,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:hint="New price in LKR (e.g. 9500)"
+                            android:hint="New Price in LKR (e.g. 9500)"
                             android:inputType="numberDecimal" />
 
                         <Button
@@ -278,7 +290,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:text="Save Price Update" />
+                            android:text="Save Price Change" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -305,7 +317,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Add a new service offering to the customer repair catalog."
+                            android:text="Offer a new repair service in the store catalog:"
                             android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                         <EditText
@@ -314,7 +326,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:hint="Service Name (e.g. Water Damage Cleaning)" />
+                            android:hint="Service Name (e.g. Camera Lens Replacement)" />
 
                         <EditText
                             android:id="@+id/newServiceCategory"
@@ -330,7 +342,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:hint="Price in LKR (e.g. 5000)"
+                            android:hint="Standard Price in LKR (e.g. 7500)"
                             android:inputType="numberDecimal" />
 
                         <Button
@@ -339,7 +351,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:text="Publish New Service" />
+                            android:text="Publish Service to Store" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -375,14 +387,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Branch Technicians"
+                            android:text="Technician Duty &amp; Availability"
                             style="@style/Widget.TechFix.SectionTitle" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
-                            android:text="Toggle technician duty availability for customer auto-assignment:"
+                            android:text="Toggle technician status for job assignment:"
                             android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                         <Spinner
@@ -398,7 +410,60 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:text="Toggle Duty Status (Available / Busy)" />
+                            android:text="Toggle Status (Available / Busy)" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Add New Technician Card -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_16">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Register New Technician"
+                            style="@style/Widget.TechFix.SectionTitle" />
+
+                        <EditText
+                            android:id="@+id/newTechName"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Technician Full Name (e.g. Ravindu Perera)" />
+
+                        <EditText
+                            android:id="@+id/newTechBranch"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Branch (Colombo branch / Galle branch)" />
+
+                        <EditText
+                            android:id="@+id/newTechSkill"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Skill (Mobile phone / Laptop / computer)" />
+
+                        <Button
+                            android:id="@+id/addTechButton"
+                            style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Register Technician" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -420,13 +485,6 @@
                             android:layout_height="wrap_content"
                             android:text="Restock Workshop Parts"
                             style="@style/Widget.TechFix.SectionTitle" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Increase spare parts quantity for branch repairs:"
-                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                         <EditText
                             android:id="@+id/partInput"
@@ -473,20 +531,13 @@
                             android:text="Sample Repair Showcase"
                             style="@style/Widget.TechFix.SectionTitle" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Publish completed repair photos to showcase work in the app:"
-                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
-
                         <EditText
                             android:id="@+id/sampleTitleInput"
                             style="@style/Widget.TechFix.Input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:hint="Showcase Title (e.g. MacBook Liquid Damage Fixed)" />
+                            android:hint="Showcase Title (e.g. MacBook Display Restored)" />
 
                         <Button
                             android:id="@+id/addSampleButton"
@@ -494,7 +545,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_12"
-                            android:text="Attach Photo &amp; Publish" />
+                            android:text="Attach Photo &amp; Publish Showcase" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -554,7 +605,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Access Level: Staff / Workshop Administrator"
+                            android:text="Role: Head Workshop Administrator"
                             android:textColor="@color/techfix_blue"
                             android:textSize="13sp"
                             android:textStyle="bold" />
@@ -586,14 +637,14 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="System &amp; Branches"
+                            android:text="System &amp; Database Information"
                             style="@style/Widget.TechFix.SectionTitle" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="Branches: Colombo Branch, Galle Branch\nDatabase: SQLite v5 + Firebase Real-time Auth\nApp Version: 1.0 (TechFix Smart App)"
+                            android:text="• Primary Branches: Colombo Branch, Galle Branch\n• Local Storage: SQLite DB (techfix.db)\n• Cloud Sync: Firebase Auth &amp; Cloud Firestore\n• Environment: Android 14/15 Ready"
                             android:textColor="@color/muted_text"
                             android:textSize="13sp" />
                     </LinearLayout>

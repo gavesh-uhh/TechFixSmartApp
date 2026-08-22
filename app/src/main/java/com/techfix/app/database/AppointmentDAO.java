@@ -12,7 +12,6 @@ import java.util.List;
 
 public class AppointmentDAO {
     private static final String COLS = "id,user_id,device,problem,branch,status,service,price,technician,payment,time_slot,created_at,photo_uri";
-
     private final DatabaseHelper helper;
 
     public AppointmentDAO(DatabaseHelper helper) { this.helper = helper; }
@@ -20,12 +19,20 @@ public class AppointmentDAO {
     public long add(long userId, String device, String problem, String branch, String service,
                     double price, String technician, String timeSlot) {
         ContentValues v = new ContentValues();
-        v.put("user_id", userId); v.put("device", device); v.put("problem", problem); v.put("branch", branch);
-        v.put("status", AppointmentStatus.REQUEST_RECEIVED.label); v.put("service", service); v.put("price", price);
-        v.put("technician", technician); v.put("payment", PaymentStatus.PENDING.label);
-        v.put("time_slot", timeSlot == null ? "" : timeSlot); v.put("created_at", DatabaseHelper.now()); v.put("photo_uri", "");
+        v.put("user_id", userId);
+        v.put("device", device);
+        v.put("problem", problem);
+        v.put("branch", branch);
+        v.put("status", AppointmentStatus.REQUEST_RECEIVED.label);
+        v.put("service", service);
+        v.put("price", price);
+        v.put("technician", technician);
+        v.put("payment", PaymentStatus.PENDING.label);
+        v.put("time_slot", timeSlot == null ? "" : timeSlot);
+        v.put("created_at", DatabaseHelper.now());
+        v.put("photo_uri", "");
         long id = helper.getWritableDatabase().insert("appointments", null, v);
-        if (id > 0) addHistory(id, AppointmentStatus.REQUEST_RECEIVED.label, "Request submitted");
+        addHistory(id, AppointmentStatus.REQUEST_RECEIVED.label, "Appointment placed by customer");
         return id;
     }
 
@@ -45,6 +52,22 @@ public class AppointmentDAO {
         ContentValues v = new ContentValues(); v.put("status", status);
         helper.getWritableDatabase().update("appointments", v, "id=?", new String[]{String.valueOf(id)});
         addHistory(id, status, "Status updated by staff");
+    }
+
+    public void updateTechnician(long id, String technician) {
+        ContentValues v = new ContentValues(); v.put("technician", technician);
+        helper.getWritableDatabase().update("appointments", v, "id=?", new String[]{String.valueOf(id)});
+        addHistory(id, get(id) != null ? get(id).status : "", "Assigned to " + technician);
+    }
+
+    public void updatePrice(long id, double price) {
+        ContentValues v = new ContentValues(); v.put("price", price);
+        helper.getWritableDatabase().update("appointments", v, "id=?", new String[]{String.valueOf(id)});
+    }
+
+    public void delete(long id) {
+        helper.getWritableDatabase().delete("appointments", "id=?", new String[]{String.valueOf(id)});
+        helper.getWritableDatabase().delete("status_history", "appointment_id=?", new String[]{String.valueOf(id)});
     }
 
     public List<RepairStatus> statusHistory(long appointmentId) {
