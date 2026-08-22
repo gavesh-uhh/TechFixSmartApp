@@ -276,6 +276,33 @@ public class FirebaseSyncManager {
             firestore.collection("payments").document("pay_" + id).set(map, SetOptions.merge());
         }
         cpay.close();
+
+        // Push Branches
+        Cursor cb = db.rawQuery("SELECT id, name, city, latitude, longitude FROM branches", null);
+        while (cb.moveToNext()) {
+            long id = cb.getLong(0);
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", id);
+            map.put("name", cb.getString(1));
+            map.put("city", cb.getString(2));
+            map.put("latitude", cb.getDouble(3));
+            map.put("longitude", cb.getDouble(4));
+            firestore.collection("branches").document("branch_" + id).set(map, SetOptions.merge());
+        }
+        cb.close();
+
+        // Push Samples (Repair Showcase)
+        Cursor csm = db.rawQuery("SELECT id, title, service, imageUri FROM samples", null);
+        while (csm.moveToNext()) {
+            long id = csm.getLong(0);
+            Map<String, Object> map = new HashMap<>();
+            map.put("id", id);
+            map.put("title", csm.getString(1));
+            map.put("service", csm.getString(2));
+            map.put("imageUri", csm.getString(3));
+            firestore.collection("samples").document("sample_" + id).set(map, SetOptions.merge());
+        }
+        csm.close();
     }
 
     /**
@@ -401,6 +428,43 @@ public class FirebaseSyncManager {
             }
         } catch (Exception e) {
             Log.w(TAG, "Pull payments skipped: " + e.getMessage());
+        }
+
+        // Pull Branches
+        try {
+            QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("branches").get());
+            for (DocumentSnapshot doc : qs.getDocuments()) {
+                Long id = doc.getLong("id");
+                String name = doc.getString("name");
+                if (id == null || name == null) continue;
+                ContentValues v = new ContentValues();
+                v.put("id", id);
+                v.put("name", name);
+                v.put("city", doc.getString("city") != null ? doc.getString("city") : "");
+                v.put("latitude", doc.getDouble("latitude") != null ? doc.getDouble("latitude") : 0.0);
+                v.put("longitude", doc.getDouble("longitude") != null ? doc.getDouble("longitude") : 0.0);
+                db.insertWithOnConflict("branches", null, v, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Pull branches skipped: " + e.getMessage());
+        }
+
+        // Pull Samples (Repair Showcase)
+        try {
+            QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("samples").get());
+            for (DocumentSnapshot doc : qs.getDocuments()) {
+                Long id = doc.getLong("id");
+                String title = doc.getString("title");
+                if (id == null || title == null) continue;
+                ContentValues v = new ContentValues();
+                v.put("id", id);
+                v.put("title", title);
+                v.put("service", doc.getString("service") != null ? doc.getString("service") : "");
+                v.put("imageUri", doc.getString("imageUri") != null ? doc.getString("imageUri") : "");
+                db.insertWithOnConflict("samples", null, v, SQLiteDatabase.CONFLICT_REPLACE);
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Pull samples skipped: " + e.getMessage());
         }
     }
 }
