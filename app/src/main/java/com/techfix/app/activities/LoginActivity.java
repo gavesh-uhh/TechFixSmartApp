@@ -8,6 +8,10 @@ import android.view.View;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.techfix.app.database.DatabaseHelper;
 import com.techfix.app.database.UserDAO;
 import com.techfix.app.databinding.ActivityLoginBinding;
@@ -16,12 +20,15 @@ import com.techfix.app.models.UserRole;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
- * LoginActivity - Unified Authentication for Customers and Staff.
- * - Sign In: Email + Password
- * - Sign Up: Full Name + Phone Number + Email + Password
- * The system automatically detects the account role (Customer vs Staff) and redirects
- * to the appropriate dashboard workspace.
+ * LoginActivity - Firebase Authentication for TechFix Repair App.
+ * Features:
+ * - Sign In: Authenticates with FirebaseAuth (with offline SQLite fallback)
+ * - Sign Up: Registers account in FirebaseAuth and stores customer profile in Firestore & SQLite
+ * - Auto-detects user role (Customer vs Staff) and redirects to the appropriate dashboard
  */
 public class LoginActivity extends AppCompatActivity {
 
@@ -31,27 +38,44 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityLoginBinding binding;
     private Mode mode = Mode.SIGN_IN;
 
+    // Firebase instances
+    private FirebaseAuth firebaseAuth;
+    private FirebaseFirestore firestore;
+
+    // Local SQLite DAO & Session
+    private UserDAO userDAO;
+    private SessionManager session;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Check if user is already logged in
-        SessionManager session = new SessionManager(this);
+        // 1. Initialize session and DAOs
+        session = new SessionManager(this);
+        userDAO = new UserDAO(DatabaseHelper.getInstance(this));
+
+        // 2. Check if user is already logged in
         if (session.isLoggedIn()) {
             resumeSession(session);
             return;
         }
 
-        // 2. Inflate layout
+        // 3. Initialize Firebase
+        try {
+            firebaseAuth = FirebaseAuth.getInstance();
+            firestore = FirebaseFirestore.getInstance();
+        } catch (Exception ignored) {}
+
+        // 4. Inflate layout
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         WindowInsetsHelper.apply(binding.loginContent, binding.loginContent);
 
-        // 3. Setup click listeners
+        // 5. Setup click listeners
         binding.loginButton.setOnClickListener(this::submitAuthForm);
         binding.switchAuthButton.setOnClickListener(v -> switchMode(mode == Mode.SIGN_UP ? Mode.SIGN_IN : Mode.SIGN_UP));
 
-        // 4. Password strength watcher (for sign up)
+        // 6. Password strength watcher (for sign up)
         binding.passwordInput.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -67,7 +91,7 @@ public class LoginActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {}
         });
 
-        // 5. Initial view state
+        // 7. Initial view state
         switchMode(Mode.SIGN_IN);
     }
 
@@ -99,65 +123,177 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     /**
-     * Handles login / sign up submission.
-     * Authenticates user against SQLite database and automatically routes to Staff or Customer view.
+     * Handles login / sign up submission using Firebase Authentication.
      */
     private void submitAuthForm(View view) {
         String email = binding.emailInput.getText().toString().trim();
         String password = binding.passwordInput.getText().toString();
 
-        if (email.isEmpty() || password.isEmpty()) {
-            Snackbar.make(view, "Please enter your email and password", Snackbar.LENGTH_LONG).show();
+        if (email.isEmpty()) {
+            binding.emailInput.setError("Please enter your email address");
+            binding.emailInput.requestFocus();
             return;
         }
 
-        UserDAO userDAO = new UserDAO(DatabaseHelper.getInstance(this));
-        SessionManager session = new SessionManager(this);
+        if (password.isEmpty()) {
+            binding.passwordInput.setError("Please enter your password");
+            binding.passwordInput.requestFocus();
+            return;
+        }
 
         if (mode == Mode.SIGN_UP) {
-            // Customer Sign Up: Full name, Phone number, Email, Password
-            String fullName = binding.nameInput.getText().toString().trim();
-            String phone = binding.phoneInput.getText().toString().trim();
+            handleSignUpWithFirebase(view, email, password);
+        } else {
+            handleSignInWithFirebase(view, email, password);
+        }
+    }
 
-            if (fullName.isEmpty()) {
-                Snackbar.make(view, "Please enter your full name", Snackbar.LENGTH_LONG).show();
-                return;
-            }
+    /**
+     * Registers a new customer account using Firebase Authentication.
+     */
+    private void handleSignUpWithFirebase(View view, String email, String password) {
+        String fullName = binding.nameInput.getText().toString().trim();
+        String phone = binding.phoneInput.getText().toString().trim();
 
-            if (phone.isEmpty()) {
-                Snackbar.make(view, "Please enter your phone number", Snackbar.LENGTH_LONG).show();
-                return;
-            }
+        if (fullName.isEmpty()) {
+            binding.nameInput.setError("Please enter your full name");
+            binding.nameInput.requestFocus();
+            return;
+        }
 
-            if (password.length() < 4) {
-                Snackbar.make(view, "Password must be at least 4 characters", Snackbar.LENGTH_LONG).show();
-                return;
-            }
+        if (phone.isEmpty()) {
+            binding.phoneInput.setError("Please enter your phone number");
+            binding.phoneInput.requestFocus();
+            return;
+        }
 
+        if (password.length() < 6) {
+            binding.passwordInput.setError("Password must be at least 6 characters");
+            binding.passwordInput.requestFocus();
+            return;
+        }
+
+        binding.loginButton.setEnabled(false);
+        binding.loginButton.setText("Creating account...");
+
+        if (firebaseAuth != null) {
+            firebaseAuth.createUserWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+
+                            // Update Display Name in Firebase
+                            if (firebaseUser != null) {
+                                UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                                        .setDisplayName(fullName)
+                                        .build();
+                                firebaseUser.updateProfile(profileUpdates);
+
+                                // Save user profile to Firestore
+                                if (firestore != null) {
+                                    Map<String, Object> userMap = new HashMap<>();
+                                    userMap.put("uid", firebaseUser.getUid());
+                                    userMap.put("name", fullName);
+                                    userMap.put("email", email);
+                                    userMap.put("phone", phone);
+                                    userMap.put("role", "CUSTOMER");
+                                    userMap.put("createdAt", DatabaseHelper.now());
+
+                                    firestore.collection("users").document(firebaseUser.getUid()).set(userMap);
+                                }
+                            }
+
+                            // Also save to local SQLite for offline access
+                            userDAO.create(fullName, email, phone, password);
+                            User localUser = userDAO.findByEmail(email);
+                            long userId = (localUser != null) ? localUser.id : 1;
+
+                            session.start(userId, UserRole.CUSTOMER);
+                            openDashboard(UserRole.CUSTOMER);
+
+                        } else {
+                            binding.loginButton.setEnabled(true);
+                            binding.loginButton.setText("Create account");
+                            String error = (task.getException() != null) ? task.getException().getMessage() : "Sign up failed";
+                            Snackbar.make(view, error, Snackbar.LENGTH_LONG).show();
+                        }
+                    });
+        } else {
+            // Local fallback if Firebase is uninitialized
             boolean created = userDAO.create(fullName, email, phone, password);
             if (created) {
-                User newUser = userDAO.findByEmail(email);
-                UserRole role = (newUser != null && newUser.role != null) ? newUser.role : UserRole.CUSTOMER;
-                session.start(newUser.id, role);
-                openDashboard(role);
+                User localUser = userDAO.findByEmail(email);
+                long userId = (localUser != null) ? localUser.id : 1;
+                session.start(userId, UserRole.CUSTOMER);
+                openDashboard(UserRole.CUSTOMER);
             } else {
-                Snackbar.make(view, "Could not create account or email already registered", Snackbar.LENGTH_LONG).show();
+                binding.loginButton.setEnabled(true);
+                binding.loginButton.setText("Create account");
+                Snackbar.make(view, "Email is already registered", Snackbar.LENGTH_LONG).show();
             }
+        }
+    }
 
+    /**
+     * Signs in an existing customer or staff member using Firebase Authentication.
+     */
+    private void handleSignInWithFirebase(View view, String email, String password) {
+        binding.loginButton.setEnabled(false);
+        binding.loginButton.setText("Signing in...");
+
+        // Check if this is the staff account
+        boolean isStaffEmail = email.equalsIgnoreCase("staff@techfix.lk");
+
+        if (firebaseAuth != null) {
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                            String name = (firebaseUser != null && firebaseUser.getDisplayName() != null) ? firebaseUser.getDisplayName() : "Customer";
+
+                            // Ensure local user exists in SQLite
+                            User localUser = userDAO.findByEmail(email);
+                            if (localUser == null) {
+                                userDAO.create(name, email, "", password);
+                                localUser = userDAO.findByEmail(email);
+                            }
+
+                            UserRole role = (isStaffEmail || (localUser != null && localUser.role == UserRole.STAFF)) ? UserRole.STAFF : UserRole.CUSTOMER;
+                            long userId = (localUser != null) ? localUser.id : 1;
+
+                            session.start(userId, role);
+                            openDashboard(role);
+
+                        } else {
+                            // Check local SQLite credentials as fallback (e.g. for offline usage or seeded staff)
+                            if (userDAO.authenticate(email, password)) {
+                                User localUser = userDAO.findByEmail(email);
+                                UserRole role = (localUser != null && localUser.role != null) ? localUser.role : (isStaffEmail ? UserRole.STAFF : UserRole.CUSTOMER);
+                                long userId = (localUser != null) ? localUser.id : 1;
+
+                                session.start(userId, role);
+                                openDashboard(role);
+                            } else {
+                                binding.loginButton.setEnabled(true);
+                                binding.loginButton.setText("Sign in");
+                                String error = (task.getException() != null) ? task.getException().getMessage() : "Invalid email or password";
+                                Snackbar.make(view, error, Snackbar.LENGTH_LONG).show();
+                            }
+                        }
+                    });
         } else {
-            // Unified Sign In (Customer & Staff)
-            boolean isValid = userDAO.authenticate(email, password);
-            if (isValid) {
-                User user = userDAO.findByEmail(email);
-                UserRole role = (user != null && user.role != null) ? user.role : UserRole.CUSTOMER;
+            // Local fallback
+            if (userDAO.authenticate(email, password)) {
+                User localUser = userDAO.findByEmail(email);
+                UserRole role = (localUser != null && localUser.role != null) ? localUser.role : (isStaffEmail ? UserRole.STAFF : UserRole.CUSTOMER);
+                long userId = (localUser != null) ? localUser.id : 1;
 
-                // Start session with user ID and detected role
-                session.start(user.id, role);
-
-                // Automatically route based on role
+                session.start(userId, role);
                 openDashboard(role);
             } else {
-                Snackbar.make(view, "Incorrect email or password", Snackbar.LENGTH_LONG).show();
+                binding.loginButton.setEnabled(true);
+                binding.loginButton.setText("Sign in");
+                Snackbar.make(view, "Invalid email or password", Snackbar.LENGTH_LONG).show();
             }
         }
     }

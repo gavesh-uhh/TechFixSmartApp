@@ -2,9 +2,10 @@ package com.techfix.app.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.google.firebase.auth.FirebaseAuth;
 import com.techfix.app.models.UserRole;
 
-/** Persists the logged-in user across app restarts. */
+/** Persists the logged-in user across app restarts and manages Firebase Auth session. */
 public class SessionManager {
     private static final String PREFS = "techfix_session";
     private static final String KEY_USER_ID = "userId";
@@ -29,6 +30,10 @@ public class SessionManager {
         catch (Exception e) { return UserRole.CUSTOMER; }
     }
 
-    public void logout() { prefs.edit().clear().apply(); }
+    public void logout() {
+        try {
+            FirebaseAuth.getInstance().signOut();
+        } catch (Exception ignored) {}
+        prefs.edit().clear().apply();
+    }
 }
-
