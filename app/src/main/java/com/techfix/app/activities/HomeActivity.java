@@ -4,30 +4,38 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.techfix.app.R;
+import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.DatabaseHelper;
 import com.techfix.app.database.ServiceDAO;
 import com.techfix.app.database.SparePartDAO;
+import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.databinding.ActivityHomeBinding;
 import com.techfix.app.models.Service;
 import com.techfix.app.models.SparePart;
+import com.techfix.app.session.SessionManager;
+import com.techfix.app.util.Feedback;
 import com.techfix.app.util.WindowInsetsHelper;
 
 import java.util.List;
 
 /**
- * HomeActivity - Landing Page for TechFix Repair Shop.
+ * HomeActivity - Landing Page & Booking for TechFix Repair Shop.
  * TechFix is a newly established computer and mobile phone repair shop.
  * Features:
  * - Round category quick-filters (All, Phones, Computers, Screens, Batteries, Parts)
  * - Available repair services catalog with pricing in LKR
  * - In-stock replacement spare parts & components
- * - Branch locations with Google Maps navigation
- * - Bottom navigation bar
+ * - Bottom navigation: Store, Book Appointment, Branches, Account
+ * - Complete Book Appointment form with service type, device info, photo, and description
  */
 public class HomeActivity extends AppCompatActivity {
 
@@ -35,11 +43,29 @@ public class HomeActivity extends AppCompatActivity {
     private ActivityHomeBinding binding;
 
     // Database access objects
+    private DatabaseHelper dbHelper;
     private ServiceDAO serviceDAO;
     private SparePartDAO sparePartDAO;
+    private AppointmentDAO appointmentDAO;
+    private SessionManager session;
 
     // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES", "PARTS"
     private String currentCategory = "ALL";
+
+    // Attached device photo URI
+    private Uri selectedPhotoUri = null;
+
+    // Activity Result Launcher to pick/attach a photo of the broken device
+    private final ActivityResultLauncher<String> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
+                if (uri != null) {
+                    selectedPhotoUri = uri;
+                    binding.bookingPhotoPreview.setImageURI(uri);
+                    binding.photoPreviewContainer.setVisibility(View.VISIBLE);
+                    binding.photoStatusText.setText("Photo attached");
+                    binding.photoStatusText.setTextColor(getResources().getColor(R.color.success, null));
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,18 +76,186 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         WindowInsetsHelper.apply(binding.homeContent, binding.homeContent);
 
-        // 2. Initialize Database DAOs
-        DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
+        // 2. Initialize Database DAOs and Session
+        dbHelper = DatabaseHelper.getInstance(this);
         serviceDAO = new ServiceDAO(dbHelper);
         sparePartDAO = new SparePartDAO(dbHelper);
+        appointmentDAO = new AppointmentDAO(dbHelper);
+        session = new SessionManager(this);
 
         // 3. Setup UI components
         setupBranchButtons();
         setupBottomNavigation();
         setupRoundCategories();
+        setupBookingForm();
 
         // 4. Initial load of all available repair services and spare parts
         selectCategory("ALL");
+    }
+
+    /**
+     * Setup bottom navigation bar (Store, Book, Branches, Account).
+     */
+    private void setupBottomNavigation() {
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+
+        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_home_store) {
+                // Show Store Catalog Panel
+                showStorePanel();
+                binding.storePanel.smoothScrollTo(0, 0);
+                return true;
+
+            } else if (itemId == R.id.nav_home_book) {
+                // Show Book Appointment Form Panel
+                showBookAppointmentPanel();
+                return true;
+
+            } else if (itemId == R.id.nav_home_branches) {
+                // Show Store Catalog and scroll down to the branches section
+                showStorePanel();
+                binding.storePanel.post(() -> {
+                    int targetY = binding.branchesSectionTitle.getTop();
+                    binding.storePanel.smoothScrollTo(0, targetY);
+                });
+                return true;
+
+            } else if (itemId == R.id.nav_home_account) {
+                // Open Customer & Staff login / account screen
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+                return false;
+            }
+
+            return false;
+        });
+    }
+
+    /**
+     * Shows the Store Catalog panel and hides the Booking panel.
+     */
+    private void showStorePanel() {
+        binding.storePanel.setVisibility(View.VISIBLE);
+        binding.bookAppointmentPanel.setVisibility(View.GONE);
+        binding.topBarTitle.setText("TechFix Store");
+        binding.topBarSubtitle.setText("Computer & Mobile Phone Repairs");
+    }
+
+    /**
+     * Shows the Book Appointment panel and hides the Store Catalog panel.
+     */
+    private void showBookAppointmentPanel() {
+        binding.storePanel.setVisibility(View.GONE);
+        binding.bookAppointmentPanel.setVisibility(View.VISIBLE);
+        binding.topBarTitle.setText("Book Appointment");
+        binding.topBarSubtitle.setText("Repair request & device details");
+    }
+
+    /**
+     * Setup the Book Repair Appointment form with service dropdown, device info, photo picker, and submit button.
+     */
+    private void setupBookingForm() {
+        // 1. Setup Service Type Dropdown
+        List<String> serviceOptions = serviceDAO.all();
+        if (serviceOptions.isEmpty()) {
+            serviceOptions.add("Screen replacement · Rs 8500");
+            serviceOptions.add("Battery replacement · Rs 4500");
+            serviceOptions.add("Laptop diagnostics · Rs 3000");
+            serviceOptions.add("Operating system repair · Rs 6500");
+        }
+        ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
+        binding.bookingServiceSpinner.setAdapter(serviceAdapter);
+
+        // 2. Setup Device Category Dropdown
+        String[] deviceCategories = {"Mobile phone", "Laptop / computer", "Tablet", "Other smart device"};
+        ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, deviceCategories);
+        binding.bookingDeviceSpinner.setAdapter(deviceAdapter);
+
+        // 3. Setup Branch Dropdown
+        String[] branches = {"Colombo branch", "Galle branch"};
+        ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
+        binding.bookingBranchSpinner.setAdapter(branchAdapter);
+
+        // 4. Setup Attach Photo Button
+        binding.bookingPhotoButton.setOnClickListener(v -> {
+            photoPickerLauncher.launch("image/*");
+        });
+
+        // 5. Setup Remove Photo Button
+        binding.removePhotoButton.setOnClickListener(v -> {
+            selectedPhotoUri = null;
+            binding.bookingPhotoPreview.setImageURI(null);
+            binding.photoPreviewContainer.setVisibility(View.GONE);
+            binding.photoStatusText.setText("No photo attached");
+            binding.photoStatusText.setTextColor(getResources().getColor(R.color.muted_text, null));
+        });
+
+        // 6. Setup Submit Booking Button
+        binding.submitBookingButton.setOnClickListener(v -> submitAppointmentBooking());
+    }
+
+    /**
+     * Validates and submits the appointment booking to the SQLite database.
+     */
+    private void submitAppointmentBooking() {
+        String serviceSelection = (String) binding.bookingServiceSpinner.getSelectedItem();
+        String deviceCategory = (String) binding.bookingDeviceSpinner.getSelectedItem();
+        String deviceModel = binding.bookingModelInput.getText().toString().trim();
+        String problemDescription = binding.bookingProblemInput.getText().toString().trim();
+        String branch = (String) binding.bookingBranchSpinner.getSelectedItem();
+
+        // Validation
+        if (deviceModel.isEmpty()) {
+            binding.bookingModelInput.setError("Please enter your device model / brand");
+            binding.bookingModelInput.requestFocus();
+            return;
+        }
+
+        if (problemDescription.isEmpty()) {
+            binding.bookingProblemInput.setError("Please describe the problem or damage");
+            binding.bookingProblemInput.requestFocus();
+            return;
+        }
+
+        // Parse service name and price
+        String serviceName = serviceDAO.serviceName(serviceSelection != null ? serviceSelection : "Repair Service");
+        double price = serviceDAO.price(serviceSelection != null ? serviceSelection : "0");
+
+        // Combine device info: e.g. "Mobile phone (iPhone 13 Pro)"
+        String fullDeviceInfo = deviceCategory + " (" + deviceModel + ")";
+
+        // Get user ID (or default customer ID 1)
+        long userId = session.isLoggedIn() ? session.getUserId() : 1;
+
+        // Auto-assign available technician
+        String technician = new TechnicianDAO(dbHelper).availableFor(branch, deviceCategory);
+
+        // Insert into SQLite database
+        long appointmentId = appointmentDAO.add(userId, fullDeviceInfo, problemDescription, branch, serviceName, price, technician, "");
+
+        // Save attached photo URI if provided
+        if (selectedPhotoUri != null && appointmentId > 0) {
+            appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
+        }
+
+        // Show Success Dialog
+        new AlertDialog.Builder(this)
+                .setTitle("Appointment Booked!")
+                .setMessage("Your repair appointment #" + appointmentId + " has been booked successfully at " + branch + ".\n\nTechnician assigned: " + technician + "\nService: " + serviceName + " (Rs " + (long) price + ")")
+                .setPositiveButton("OK", (dialog, which) -> {
+                    // Reset form fields
+                    binding.bookingModelInput.setText("");
+                    binding.bookingProblemInput.setText("");
+                    selectedPhotoUri = null;
+                    binding.photoPreviewContainer.setVisibility(View.GONE);
+                    binding.photoStatusText.setText("No photo attached");
+
+                    // Switch back to Store panel
+                    binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+                })
+                .show();
     }
 
     /**
@@ -168,7 +362,6 @@ public class HomeActivity extends AppCompatActivity {
         binding.servicesContainer.removeAllViews();
 
         if ("PARTS".equals(filter)) {
-            // Hide repair services section when viewing spare parts only
             binding.servicesHeaderTitle.setVisibility(View.GONE);
             binding.servicesHeaderSubtitle.setVisibility(View.GONE);
             binding.servicesContainer.setVisibility(View.GONE);
@@ -179,7 +372,6 @@ public class HomeActivity extends AppCompatActivity {
         int count = 0;
 
         for (Service service : services) {
-            // Check if repair service matches filter
             if (!matchesFilter(service.name, service.category, filter)) {
                 continue;
             }
@@ -198,7 +390,7 @@ public class HomeActivity extends AppCompatActivity {
             nameText.setText(service.name);
             priceText.setText("Rs " + String.format("%,d", (long) service.price));
             categoryText.setText(service.category);
-            badgeText.setText("Available");
+            badgeText.setText("Book Now");
 
             if (service.requiredPart != null && !service.requiredPart.isEmpty()) {
                 partText.setText("Includes part: " + service.requiredPart);
@@ -208,10 +400,9 @@ public class HomeActivity extends AppCompatActivity {
                 partText.setVisibility(View.VISIBLE);
             }
 
-            // Click service -> open login / booking appointment flow
+            // Click service -> open Book Appointment panel directly
             itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
+                binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
             });
 
             binding.servicesContainer.addView(itemView);
@@ -258,9 +449,9 @@ public class HomeActivity extends AppCompatActivity {
                 statusBadge.setTextColor(getResources().getColor(R.color.error, null));
             }
 
+            // Click part -> open Book Appointment panel
             itemView.setOnClickListener(v -> {
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
+                binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
             });
 
             binding.partsContainer.addView(itemView);
@@ -300,36 +491,6 @@ public class HomeActivity extends AppCompatActivity {
     private void setupBranchButtons() {
         binding.colomboChip.setOnClickListener(v -> openLocationInMaps("6.9271,79.8612", "TechFix Colombo Branch"));
         binding.galleChip.setOnClickListener(v -> openLocationInMaps("6.0329,80.2168", "TechFix Galle Branch"));
-    }
-
-    /**
-     * Setup bottom navigation bar (Store, Branches, Account).
-     */
-    private void setupBottomNavigation() {
-        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
-
-        binding.bottomNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-
-            if (itemId == R.id.nav_home_store) {
-                binding.homeScrollView.smoothScrollTo(0, 0);
-                return true;
-
-            } else if (itemId == R.id.nav_home_branches) {
-                binding.homeScrollView.post(() -> {
-                    int targetY = binding.branchesSectionTitle.getTop();
-                    binding.homeScrollView.smoothScrollTo(0, targetY);
-                });
-                return true;
-
-            } else if (itemId == R.id.nav_home_account) {
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
-                return false;
-            }
-
-            return false;
-        });
     }
 
     /**
