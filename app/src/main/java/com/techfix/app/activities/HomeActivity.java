@@ -216,12 +216,9 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
 
             } else if (itemId == R.id.nav_home_branches) {
-                // Show Store Catalog and scroll down to the branches section
-                showStorePanel();
-                binding.storePanel.post(() -> {
-                    int targetY = binding.branchesSectionTitle.getTop();
-                    binding.storePanel.smoothScrollTo(0, targetY);
-                });
+                // Show Dedicated Store Branches Page
+                showBranchesPanel();
+                binding.branchesPanel.smoothScrollTo(0, 0);
                 return true;
 
             } else if (itemId == R.id.nav_home_account) {
@@ -239,6 +236,30 @@ public class HomeActivity extends AppCompatActivity {
 
             return false;
         });
+
+        setupBranchesPanel();
+    }
+
+    /**
+     * Setup click listeners for dedicated Branches page.
+     */
+    private void setupBranchesPanel() {
+        binding.btnColomboMap.setOnClickListener(v -> openLocationInMaps("6.9271,79.8612", "TechFix Repair Shop - Colombo Branch"));
+        binding.btnGalleMap.setOnClickListener(v -> openLocationInMaps("6.0535,80.2210", "TechFix Repair Shop - Galle Branch"));
+        binding.btnColomboBook.setOnClickListener(v -> selectBranchAndOpenBooking("Colombo branch"));
+        binding.btnGalleBook.setOnClickListener(v -> selectBranchAndOpenBooking("Galle branch"));
+    }
+
+    private void selectBranchAndOpenBooking(String branch) {
+        showBookAppointmentPanel();
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
+        int count = binding.bookingBranchSpinner.getAdapter() != null ? binding.bookingBranchSpinner.getAdapter().getCount() : 0;
+        for (int i = 0; i < count; i++) {
+            if (branch.equalsIgnoreCase(String.valueOf(binding.bookingBranchSpinner.getItemAtPosition(i)))) {
+                binding.bookingBranchSpinner.setSelection(i);
+                break;
+            }
+        }
     }
 
     /**
@@ -248,6 +269,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.storePanel.setVisibility(View.VISIBLE);
         binding.partsPanel.setVisibility(View.GONE);
         binding.bookAppointmentPanel.setVisibility(View.GONE);
+        binding.branchesPanel.setVisibility(View.GONE);
         binding.topBarTitle.setText("TechFix Store");
         binding.topBarSubtitle.setText("Computer & Mobile Phone Repairs");
     }
@@ -259,6 +281,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.storePanel.setVisibility(View.GONE);
         binding.partsPanel.setVisibility(View.VISIBLE);
         binding.bookAppointmentPanel.setVisibility(View.GONE);
+        binding.branchesPanel.setVisibility(View.GONE);
         binding.topBarTitle.setText("Workshop Spare Parts");
         binding.topBarSubtitle.setText("Live Inventory & Component Availability");
         loadAvailableParts();
@@ -271,8 +294,21 @@ public class HomeActivity extends AppCompatActivity {
         binding.storePanel.setVisibility(View.GONE);
         binding.partsPanel.setVisibility(View.GONE);
         binding.bookAppointmentPanel.setVisibility(View.VISIBLE);
+        binding.branchesPanel.setVisibility(View.GONE);
         binding.topBarTitle.setText("Book Appointment");
         binding.topBarSubtitle.setText("Repair request & device details");
+    }
+
+    /**
+     * Shows the Dedicated Store Branches panel and hides others.
+     */
+    private void showBranchesPanel() {
+        binding.storePanel.setVisibility(View.GONE);
+        binding.partsPanel.setVisibility(View.GONE);
+        binding.bookAppointmentPanel.setVisibility(View.GONE);
+        binding.branchesPanel.setVisibility(View.VISIBLE);
+        binding.topBarTitle.setText("Our Store Branches");
+        binding.topBarSubtitle.setText("Colombo & Galle Repair Centers");
     }
 
     /**
@@ -577,8 +613,8 @@ public class HomeActivity extends AppCompatActivity {
      * Setup Branch click listeners for Google Maps.
      */
     private void setupBranchButtons() {
-        binding.colomboChip.setOnClickListener(v -> openLocationInMaps("6.9271,79.8612", "TechFix Colombo Branch"));
-        binding.galleChip.setOnClickListener(v -> openLocationInMaps("6.0329,80.2168", "TechFix Galle Branch"));
+        binding.btnColomboMap.setOnClickListener(v -> openLocationInMaps("6.9271,79.8612", "TechFix Colombo Branch"));
+        binding.btnGalleMap.setOnClickListener(v -> openLocationInMaps("6.0329,80.2168", "TechFix Galle Branch"));
     }
 
     /**
