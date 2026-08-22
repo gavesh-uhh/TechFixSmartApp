@@ -2,11 +2,24 @@ package com.techfix.app.database;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import com.techfix.app.models.SparePart;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SparePartDAO {
     private final DatabaseHelper helper;
 
     public SparePartDAO(DatabaseHelper helper) { this.helper = helper; }
+
+    public List<SparePart> all() {
+        List<SparePart> list = new ArrayList<>();
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT id, name, quantity, branch FROM parts", null);
+        while (c.moveToNext()) {
+            list.add(new SparePart(c.getLong(0), c.getString(1), c.getInt(2), c.getString(3)));
+        }
+        c.close();
+        return list;
+    }
 
     public int quantity(String part, String branch) {
         Cursor c = helper.getReadableDatabase().rawQuery("SELECT quantity FROM parts WHERE name=? AND branch=?", new String[]{part, branch});

@@ -2,6 +2,7 @@ package com.techfix.app.database;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import com.techfix.app.models.Service;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,17 @@ public class ServiceDAO {
     private final DatabaseHelper helper;
 
     public ServiceDAO(DatabaseHelper helper) { this.helper = helper; }
+
+    public List<Service> list() {
+        List<Service> out = new ArrayList<>();
+        Cursor c = helper.getReadableDatabase().rawQuery(
+                "SELECT id, name, category, price, requiredPart FROM services ORDER BY category, name", null);
+        while (c.moveToNext()) {
+            out.add(new Service(c.getLong(0), c.getString(1), c.getString(2), c.getDouble(3), c.getString(4)));
+        }
+        c.close();
+        return out;
+    }
 
     public List<String> search(String query) {
         List<String> out = new ArrayList<>();
