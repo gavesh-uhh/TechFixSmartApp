@@ -108,8 +108,7 @@
                                 android:id="@+id/iconCatAll"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/ic_cat_all"
-                                app:tint="@color/white" />
+                                android:src="@drawable/ic_cat_all" />
                         </FrameLayout>
 
                         <TextView
@@ -309,12 +308,12 @@
                 android:paddingHorizontal="@dimen/space_16"
                 android:paddingTop="@dimen/space_16">
 
-                <!-- Available Repair Services Section Header -->
+                <!-- Available Devices & Products for Sale Section Header -->
                 <TextView
                     android:id="@+id/servicesHeaderTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Repair Services"
+                    android:text="Devices &amp; Products for Sale"
                     style="@style/Widget.TechFix.SectionTitle" />
 
                 <TextView
@@ -323,10 +322,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:layout_marginBottom="@dimen/space_8"
-                    android:text="Tap any repair service to book an appointment:"
+                    android:text="Phones, laptops, computers, and parts available to buy:"
                     android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
-                <!-- Dynamic Services Container (populated in HomeActivity) -->
+                <!-- Dynamic Devices Container (populated in HomeActivity) -->
                 <LinearLayout
                     android:id="@+id/servicesContainer"
                     android:layout_width="match_parent"
@@ -339,7 +338,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_16"
-                    android:text="In-Stock Spare Parts &amp; Items"
+                    android:text="Spare Parts &amp; Hardware"
                     style="@style/Widget.TechFix.SectionTitle" />
 
                 <TextView
@@ -348,7 +347,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:layout_marginBottom="@dimen/space_8"
-                    android:text="Available hardware parts at our repair counters:"
+                    android:text="Available hardware parts and accessories in stock:"
                     android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                 <!-- Dynamic Parts Container (populated in HomeActivity) -->
