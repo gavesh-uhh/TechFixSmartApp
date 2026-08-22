@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/customerRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/techfix_cloud">
+
+    <LinearLayout
+        android:id="@+id/customerHeader"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/screen_padding"
+        android:background="@drawable/bg_service_band">
+
+        <Button
+            android:id="@+id/logoutButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minWidth="0dp"
+            android:text="Log out"
+            android:textColor="@color/white" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TechFix"
+            android:textAppearance="@style/TextAppearance.TechFix.Label"
+            android:textColor="@color/white" />
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/dashboardTabs"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/white"
+        app:tabIndicatorColor="@color/techfix_blue"
+        app:tabSelectedTextColor="@color/techfix_blue_dark"
+        app:tabTextColor="@color/techfix_muted" />
+
+    <FrameLayout
+        android:id="@+id/dashboardContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+        <ScrollView
+            android:id="@+id/bookPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Book a repair"
+                    android:textAppearance="@style/TextAppearance.TechFix.Headline" />
+
+                <TextView
+                    android:id="@+id/connectionStatus"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_4"
+                    android:layout_marginBottom="24dp"
+                    android:text="Available offline"
+                    android:textAppearance="@style/TextAppearance.TechFix.Body"
+                    android:textColor="@color/techfix_muted" />
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <EditText
+                                android:id="@+id/serviceSearch"
+                                style="@style/Widget.TechFix.Input"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:hint="Search services"
+                                android:inputType="text"
+                                android:maxLines="1" />
+
+                            <Button
+                                android:id="@+id/searchButton"
+                                style="@style/Widget.TechFix.Secondary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="@dimen/space_8"
+                                android:minWidth="0dp"
+                                android:text="Search" />
+                        </LinearLayout>
+
+                        <Spinner
+                            android:id="@+id/deviceSpinner"
+                            style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" />
+
+                        <Spinner
+                            android:id="@+id/serviceSpinner"
+                            style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" />
+
+                        <EditText
+                            android:id="@+id/problemInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Describe the problem"
+                            android:inputType="textMultiLine"
+                            android:minLines="3"
+                            android:gravity="top" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/card_gap"
+                            android:orientation="horizontal">
+
+                            <Button
+                                android:id="@+id/bookButton"
+                                style="@style/Widget.TechFix.Filled"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:text="Book repair" />
+
+                            <Button
+                                android:id="@+id/cameraButton"
+                                style="@style/Widget.TechFix.Secondary"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="@dimen/space_8"
+                                android:text="Attach photo" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:id="@+id/repairsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Your repairs"
+                    android:textAppearance="@style/TextAppearance.TechFix.Headline" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_4"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/activeCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.TechFix.Body"
+                        android:textColor="@color/techfix_muted" />
+
+                    <Space
+                        android:layout_width="0dp"
+                        android:layout_height="1dp"
+                        android:layout_weight="1" />
+
+                    <TextView
+                        android:id="@+id/lastUpdated"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.TechFix.Body"
+                        android:textColor="@color/techfix_muted" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/emptyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_16"
+                    android:gravity="center"
+                    android:text="No repairs yet"
+                    android:textAppearance="@style/TextAppearance.TechFix.Body"
+                    android:textColor="@color/techfix_muted" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/repairList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:clipToPadding="false"
+                    android:paddingBottom="24dp"
+                    android:nestedScrollingEnabled="false" />
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <TextView
+                            style="@style/Widget.TechFix.SectionTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Payment" />
+
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:text="Card, cash or bank transfer at the counter."
+                            android:textAppearance="@style/TextAppearance.TechFix.Body"
+                            android:textColor="@color/techfix_muted" />
+
+                        <Button
+                            android:id="@+id/payButton"
+                            style="@style/Widget.TechFix.Filled"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Pay now" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </ScrollView>
+
+        <ScrollView
+            android:id="@+id/explorePanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
+
+                <TextView
+                    style="@style/Widget.TechFix.SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Catalog" />
+
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8">
+
+                    <TextView
+                        android:id="@+id/catalogText"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="@dimen/card_padding"
+                        android:textAppearance="@style/TextAppearance.TechFix.Body"
+                        android:textColor="@color/techfix_muted" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <TextView
+                    style="@style/Widget.TechFix.SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/section_gap"
+                    android:text="Sample repairs" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/sampleList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:nestedScrollingEnabled="false" />
+
+                <TextView
+                    style="@style/Widget.TechFix.SectionTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/section_gap"
+                    android:text="Our branches" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/branchList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:nestedScrollingEnabled="false" />
+            </LinearLayout>
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/loadingSkeleton"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:background="@color/techfix_cloud">
+
+            <View
+                android:layout_width="160dp"
+                android:layout_height="24dp"
+                android:background="@drawable/bg_field" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="@dimen/card_gap"
+                android:background="@drawable/bg_field" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="@dimen/card_gap"
+                android:background="@drawable/bg_field" />
+        </LinearLayout>
+    </FrameLayout>
+</LinearLayout>

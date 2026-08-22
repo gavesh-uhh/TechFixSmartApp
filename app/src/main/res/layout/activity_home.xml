@@ -1,0 +1,122 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/homeRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cloud">
+
+    <LinearLayout android:id="@+id/homeContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:clipToPadding="false">
+
+        <!-- Header band -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="64dp"
+            android:background="@drawable/bg_service_band"
+            android:orientation="vertical"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="@dimen/space_16">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TechFix"
+                android:textColor="@color/white"
+                style="@style/TextAppearance.TechFix.Label" />
+        </LinearLayout>
+
+        <!-- Body -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/space_16">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_24"
+                android:text="Your repairs, sorted."
+                android:textAppearance="@style/TextAppearance.TechFix.Headline" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_8"
+                android:text="Book, track and pay for repairs at our Colombo and Galle branches."
+                android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+            <Button android:id="@+id/continueButton"
+                style="@style/Widget.TechFix.Button.Filled"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_16"
+                android:text="Get started" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_24"
+                android:text="Visit us"
+                style="@style/Widget.TechFix.SectionTitle" />
+
+            <LinearLayout android:id="@+id/colomboChip"
+                style="@style/Widget.TechFix.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12"
+                android:minHeight="@dimen/touch_target"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="@dimen/space_16"
+                android:background="@color/white"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Colombo branch"
+                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="&#8250;"
+                    android:textColor="@color/muted_text"
+                    android:textAppearance="@style/TextAppearance.TechFix.Title" />
+            </LinearLayout>
+
+            <LinearLayout android:id="@+id/galleChip"
+                style="@style/Widget.TechFix.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_12"
+                android:minHeight="@dimen/touch_target"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="@dimen/space_16"
+                android:background="@color/white"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Galle branch"
+                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="&#8250;"
+                    android:textColor="@color/muted_text"
+                    android:textAppearance="@style/TextAppearance.TechFix.Title" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

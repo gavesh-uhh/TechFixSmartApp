@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/staffRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cloud"
+    android:orientation="vertical">
+
+    <LinearLayout android:id="@+id/staffHeader"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="@dimen/space_16"
+        android:background="@drawable/bg_service_band">
+
+        <TextView android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+            android:text="TechFix Staff" android:textColor="@color/white" android:textAppearance="@style/TextAppearance.TechFix.Label" />
+
+        <Button android:id="@+id/logoutButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content" android:layout_height="wrap_content"
+            android:text="Log out" android:textColor="@color/white" />
+    </LinearLayout>
+
+    <com.google.android.material.tabs.TabLayout android:id="@+id/staffTabs"
+        android:layout_width="match_parent" android:layout_height="48dp"
+        android:background="@color/white"
+        app:tabIndicatorColor="@color/navy_700"
+        app:tabSelectedTextColor="@color/navy_700"
+        app:tabTextColor="@color/muted_text" />
+
+    <FrameLayout android:id="@+id/staffContent"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+
+        <!-- TAB 1 · QUEUE -->
+        <ScrollView android:id="@+id/tabQueue"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:clipToPadding="false" android:padding="@dimen/screen_padding">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="Repair queue" android:textAppearance="@style/Widget.TechFix.SectionTitle" />
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_4"
+                    android:text="Tap a docket to change its stage." android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+                <androidx.recyclerview.widget.RecyclerView android:id="@+id/appointmentList"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:nestedScrollingEnabled="false" android:clipToPadding="false"
+                    android:paddingBottom="@dimen/space_24" />
+
+                <com.google.android.material.card.MaterialCardView style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="@dimen/card_padding">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Update by ID" android:textAppearance="@style/TextAppearance.TechFix.Label" android:textStyle="bold" />
+                        <EditText android:id="@+id/appointmentIdInput" style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:hint="Appointment ID" android:inputType="number" />
+                        <Spinner android:id="@+id/statusSpinner" style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" />
+                        <Button android:id="@+id/updateStatusButton" style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:text="Apply status" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- TAB 2 · SERVICES -->
+        <ScrollView android:id="@+id/tabServices"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:visibility="gone" android:clipToPadding="false" android:padding="@dimen/screen_padding">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+
+                <com.google.android.material.card.MaterialCardView style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="@dimen/card_padding">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Change a price" android:textAppearance="@style/TextAppearance.TechFix.Label" android:textStyle="bold" />
+                        <Spinner android:id="@+id/serviceSpinner" style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" />
+                        <EditText android:id="@+id/priceInput" style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:hint="New price (Rs)" android:inputType="numberDecimal" />
+                        <Button android:id="@+id/updatePriceButton" style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:text="Save price" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/card_gap">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="@dimen/card_padding">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Publish a new service" android:textAppearance="@style/TextAppearance.TechFix.Label" android:textStyle="bold" />
+                        <EditText android:id="@+id/newServiceName" style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:hint="Service name" />
+                        <EditText android:id="@+id/newServiceCategory" style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:hint="Category (Mobile phone / Laptop / computer)" />
+                        <EditText android:id="@+id/newServicePrice" style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:hint="Price (Rs)" android:inputType="numberDecimal" />
+                        <Button android:id="@+id/addServiceButton" style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:text="Publish service" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- TAB 3 · WORKSHOP -->
+        <ScrollView android:id="@+id/tabWorkshop"
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:visibility="gone" android:clipToPadding="false" android:padding="@dimen/screen_padding">
+            <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
+
+                <com.google.android.material.card.MaterialCardView style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent" android:layout_height="wrap_content">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="@dimen/card_padding">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Spare parts" android:textAppearance="@style/TextAppearance.TechFix.Label" android:textStyle="bold" />
+                        <EditText android:id="@+id/partInput" style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:hint="Part name" />
+                        <EditText android:id="@+id/branchInput" style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:hint="Branch name" />
+                        <Button android:id="@+id/restockButton" style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:text="Add stock" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/card_gap">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="@dimen/card_padding">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Technicians" android:textAppearance="@style/TextAppearance.TechFix.Label" android:textStyle="bold" />
+                        <Spinner android:id="@+id/techSpinner" style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" />
+                        <Button android:id="@+id/toggleTechButton" style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:text="Toggle availability" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/card_gap">
+                    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:orientation="vertical" android:padding="@dimen/card_padding">
+                        <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:text="Sample repair photo" android:textAppearance="@style/TextAppearance.TechFix.Label" android:textStyle="bold" />
+                        <EditText android:id="@+id/sampleTitleInput" style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:hint="Sample title (e.g. iPhone screen restore)" />
+                        <Button android:id="@+id/addSampleButton" style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent" android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" android:text="Capture and publish" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+        </ScrollView>
+    </FrameLayout>
+</LinearLayout>

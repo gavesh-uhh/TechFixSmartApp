@@ -1,0 +1,8 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.TechFixSmartApp" parent="Base.Theme.TechFixSmartApp">
+        <item name="android:navigationBarColor">@color/techfix_cloud</item>
+        <item name="android:statusBarColor">@color/techfix_cloud</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+</resources>

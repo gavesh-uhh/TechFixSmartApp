@@ -1,0 +1,135 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Base.Theme.TechFixSmartApp" parent="Theme.Material3.Light.NoActionBar">
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/on_primary</item>
+        <item name="colorPrimaryContainer">@color/primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/on_primary_container</item>
+        <item name="colorSecondary">@color/techfix_blue_dark</item>
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOutline">@color/outline</item>
+        <item name="colorError">@color/error</item>
+        <item name="android:colorBackground">@color/techfix_cloud</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:statusBarColor">@color/techfix_cloud</item>
+        <item name="android:navigationBarColor">@color/techfix_cloud</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
+        <item name="materialButtonStyle">@style/Widget.TechFix.Button.Filled</item>
+        <item name="textInputStyle">@style/Widget.TechFix.TextInput</item>
+        <item name="materialCardViewStyle">@style/Widget.TechFix.Card</item>
+        <item name="chipStyle">@style/Widget.TechFix.Chip</item>
+    </style>
+
+    <style name="Widget.TechFix.Button.Filled" parent="Widget.Material3.Button">
+        <item name="cornerRadius">16dp</item>
+        <item name="android:minHeight">52dp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="Widget.TechFix.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">16dp</item><item name="android:minHeight">52dp</item><item name="android:textAllCaps">false</item>
+    </style>
+
+    <style name="Widget.TechFix.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">16dp</item><item name="boxCornerRadiusTopEnd">16dp</item><item name="boxCornerRadiusBottomStart">16dp</item><item name="boxCornerRadiusBottomEnd">16dp</item><item name="boxStrokeColor">@color/primary</item><item name="errorTextColor">@color/error</item><item name="hintTextColor">@color/techfix_muted</item>
+    </style>
+
+    <style name="Widget.TechFix.Card" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">14dp</item><item name="cardElevation">2dp</item><item name="cardBackgroundColor">@color/surface</item><item name="strokeColor">@color/sky_200</item><item name="strokeWidth">1dp</item>
+    </style>
+
+    <style name="Widget.TechFix.Chip" parent="Widget.Material3.Chip.Assist">
+        <item name="chipCornerRadius">16dp</item><item name="chipBackgroundColor">@color/primary_container</item><item name="android:textColor">@color/on_primary_container</item>
+    </style>
+
+    <style name="TextAppearance.TechFix.Display" parent="TextAppearance.Material3.DisplaySmall"><item name="android:textColor">@color/techfix_ink</item><item name="android:fontFamily">@font/plex_sans</item><item name="android:textStyle">bold</item></style>
+    <style name="TextAppearance.TechFix.Headline" parent="TextAppearance.Material3.HeadlineMedium"><item name="android:textColor">@color/techfix_ink</item><item name="android:fontFamily">@font/plex_sans</item><item name="android:textStyle">bold</item></style>
+    <style name="TextAppearance.TechFix.Title" parent="TextAppearance.Material3.TitleLarge"><item name="android:textColor">@color/techfix_ink</item><item name="android:fontFamily">@font/plex_sans</item><item name="android:textStyle">bold</item></style>
+    <style name="TextAppearance.TechFix.Body" parent="TextAppearance.Material3.BodyMedium"><item name="android:textColor">@color/techfix_muted</item><item name="android:fontFamily">@font/plex_sans</item></style>
+    <style name="TextAppearance.TechFix.Label" parent="TextAppearance.Material3.LabelLarge"><item name="android:fontFamily">@font/plex_sans</item></style>
+    <style name="TextAppearance.TechFix.Mono" parent="TextAppearance.Material3.BodyMedium"><item name="android:fontFamily">@font/plex_mono</item><item name="android:textColor">@color/navy_700</item><item name="android:textSize">12sp</item></style>
+
+    <!-- Status stamp: uppercase, letterspaced, tinted -->
+    <style name="Widget.TechFix.Stamp" parent="Widget.TechFix.StatusChip">
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
+    </style>
+
+    <!-- Modern soft shadow card (E1): 3dp elevation, 16dp radius, hairline stroke -->
+    <style name="Widget.TechFix.ShadowCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">16dp</item>
+        <item name="cardElevation">3dp</item>
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="strokeColor">@color/line</item>
+        <item name="strokeWidth">1dp</item>
+    </style>
+
+    <!-- Aliases used by some layouts -->
+    <style name="Widget.TechFix.Filled" parent="Widget.TechFix.Button.Filled" />
+    <style name="Widget.TechFix.Secondary" parent="Widget.TechFix.Button.Secondary" />
+    <style name="TextAppearance.TechFix.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:fontFamily">@font/plex_sans</item>
+        <item name="android:textColor">@color/muted_text</item>
+    </style>
+
+    <style name="Widget.TechFix.Input" parent="Widget.AppCompat.EditText">
+        <item name="android:background">@drawable/bg_field</item>
+        <item name="android:minHeight">54dp</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:textColor">@color/techfix_ink</item>
+        <item name="android:textColorHint">@color/techfix_muted</item>
+    </style>
+
+    <style name="Widget.TechFix.Spinner" parent="Widget.AppCompat.Spinner.Underlined">
+        <item name="android:background">@drawable/bg_field</item>
+        <item name="android:minHeight">54dp</item>
+        <item name="android:paddingHorizontal">12dp</item>
+        <item name="android:popupBackground">@color/white</item>
+    </style>
+
+    <!-- ===== Scaffold styles: single source of truth for every screen ===== -->
+
+    <!-- Colored top band used by every screen header -->
+    <style name="Widget.TechFix.ScreenHeader" parent="">
+
+        <item name="android:background">@drawable/bg_service_band</item>
+        <item name="android:padding">20dp</item>
+    </style>
+
+    <!-- Section heading inside body content -->
+    <style name="Widget.TechFix.SectionTitle" parent="TextAppearance.TechFix.Title">
+        <item name="android:textSize">19sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <!-- Small pill showing appointment/payment state -->
+    <style name="Widget.TechFix.StatusChip" parent="">
+        <item name="android:background">@drawable/bg_field</item>
+        <item name="android:paddingLeft">10dp</item>
+        <item name="android:paddingRight">10dp</item>
+        <item name="android:paddingTop">3dp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:textColor">@color/techfix_blue_dark</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <!-- Vertical padding wrapper for scrollable body content -->
+    <style name="Widget.TechFix.ScreenBody" parent="">
+        <item name="android:padding">14dp</item>
+    </style>
+
+    <!-- Outlined secondary button used across screens -->
+    <style name="Widget.TechFix.Button.Secondary" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="cornerRadius">14dp</item>
+        <item name="android:minHeight">48dp</item>
+        <item name="android:textAllCaps">false</item>
+    </style>
+
+
+    <style name="Theme.TechFixSmartApp" parent="Base.Theme.TechFixSmartApp" />
+</resources>
