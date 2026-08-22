@@ -7,7 +7,9 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -43,6 +45,7 @@ public class QueueFragment extends Fragment {
     private StaffAppointmentAdapter queueAdapter;
     private String branchFilter = "All Branches";
     private String statusFilter = "All";
+    private String sortOrder = "Newest First";
 
     private final FirebaseSyncManager.SyncListener syncListener = (isSyncing, success) -> {
         if (!isSyncing && success && isAdded() && binding != null) {
@@ -75,9 +78,24 @@ public class QueueFragment extends Fragment {
 
         FirebaseSyncManager.getInstance().addListener(syncListener);
 
+        // Status update spinner
         ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, AppointmentStatus.labels());
         statusAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.statusSpinner.setAdapter(statusAdapter);
+
+        // Sort order spinner
+        String[] sortOptions = {"Newest First", "Oldest First", "Price: High → Low", "Price: Low → High", "Status", "Device / Brand"};
+        ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, sortOptions);
+        sortAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.sortQueueSpinner.setAdapter(sortAdapter);
+        binding.sortQueueSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                sortOrder = sortOptions[position];
+                refresh();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         queueAdapter = new StaffAppointmentAdapter(this::showDocketActionMenu);
         binding.appointmentList.setLayoutManager(new LinearLayoutManager(requireContext()));
@@ -112,7 +130,7 @@ public class QueueFragment extends Fragment {
 
     private void refresh() {
         String searchQuery = binding.searchQueueInput.getText().toString();
-        List<Appointment> filtered = appointmentDAO.filter(branchFilter, statusFilter, searchQuery);
+        List<Appointment> filtered = appointmentDAO.filter(branchFilter, statusFilter, searchQuery, sortOrder);
 
         queueAdapter.submit(filtered);
         binding.appointmentList.setVisibility(filtered.isEmpty() ? View.GONE : View.VISIBLE);
@@ -137,17 +155,17 @@ public class QueueFragment extends Fragment {
         resetChipStyle(binding.chipFilterCompleted);
         resetChipStyle(binding.chipFilterUnpaid);
 
-        if (activeChip instanceof android.widget.Button) {
-            ((android.widget.Button) activeChip).setBackgroundColor(requireContext().getColor(R.color.navy_900));
-            ((android.widget.Button) activeChip).setTextColor(requireContext().getColor(R.color.white));
+        if (activeChip instanceof TextView) {
+            ((TextView) activeChip).setBackgroundResource(R.drawable.bg_filter_pill_selected);
+            ((TextView) activeChip).setTextColor(requireContext().getColor(R.color.white));
         }
 
         refresh();
     }
 
-    private void resetChipStyle(android.widget.Button btn) {
-        btn.setBackgroundColor(requireContext().getColor(R.color.surface));
-        btn.setTextColor(requireContext().getColor(R.color.navy_700));
+    private void resetChipStyle(TextView chip) {
+        chip.setBackgroundResource(R.drawable.bg_filter_pill);
+        chip.setTextColor(requireContext().getColor(R.color.navy_700));
     }
 
     private void showDocketActionMenu(Appointment a) {

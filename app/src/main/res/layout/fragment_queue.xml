@@ -13,7 +13,7 @@
                 android:orientation="vertical"
                 android:padding="@dimen/screen_padding">
 
-                <!-- Summary Overview & Search Card -->
+                <!-- Summary Overview, Search & Sort Card -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -25,23 +25,45 @@
                         android:orientation="vertical"
                         android:padding="@dimen/space_16">
 
-                        <TextView
-                            android:id="@+id/queueStatsTitle"
-                            android:layout_width="wrap_content"
+                        <!-- Header Row: Docket Stats & Sort Spinner -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Workshop Queue"
-                            android:textColor="@color/navy_900"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
 
-                        <TextView
-                            android:id="@+id/queueStatsSubtitle"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="0 Active Repairs Â· 0 Completed"
-                            android:textColor="@color/muted_text"
-                            android:textSize="12sp" />
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/queueStatsTitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Workshop Queue"
+                                    android:textColor="@color/navy_900"
+                                    android:textSize="19sp"
+                                    android:textStyle="bold" />
+
+                                <TextView
+                                    android:id="@+id/queueStatsSubtitle"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginTop="2dp"
+                                    android:text="0 Active Repairs · 0 Completed"
+                                    android:textColor="@color/muted_text"
+                                    android:textSize="12sp" />
+                            </LinearLayout>
+
+                            <Spinner
+                                android:id="@+id/sortQueueSpinner"
+                                style="@style/Widget.TechFix.Spinner"
+                                android:layout_width="wrap_content"
+                                android:layout_height="40dp"
+                                android:minWidth="145dp" />
+                        </LinearLayout>
 
                         <!-- Quick Search Input -->
                         <EditText
@@ -68,94 +90,95 @@
                         android:layout_height="wrap_content"
                         android:orientation="horizontal">
 
-                        <Button
+                        <TextView
                             android:id="@+id/chipFilterAll"
-                            style="@style/Widget.TechFix.Button.Filled"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
-                            android:minHeight="0dp"
-                            android:paddingHorizontal="14dp"
+                            android:background="@drawable/bg_filter_pill_selected"
+                            android:gravity="center"
+                            android:paddingHorizontal="16dp"
                             android:text="All Dockets"
+                            android:textColor="@color/white"
                             android:textSize="12sp"
-                            app:cornerRadius="18dp" />
+                            android:textStyle="bold" />
 
-                        <Button
+                        <TextView
                             android:id="@+id/chipFilterActive"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
                             android:layout_marginStart="6dp"
-                            android:minHeight="0dp"
-                            android:paddingHorizontal="14dp"
+                            android:background="@drawable/bg_filter_pill"
+                            android:gravity="center"
+                            android:paddingHorizontal="16dp"
                             android:text="Active"
                             android:textColor="@color/navy_700"
                             android:textSize="12sp"
-                            app:cornerRadius="18dp" />
+                            android:textStyle="bold" />
 
-                        <Button
+                        <TextView
                             android:id="@+id/chipFilterReceived"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
                             android:layout_marginStart="6dp"
-                            android:minHeight="0dp"
-                            android:paddingHorizontal="14dp"
+                            android:background="@drawable/bg_filter_pill"
+                            android:gravity="center"
+                            android:paddingHorizontal="16dp"
                             android:text="Received"
                             android:textColor="@color/navy_700"
                             android:textSize="12sp"
-                            app:cornerRadius="18dp" />
+                            android:textStyle="bold" />
 
-                        <Button
+                        <TextView
                             android:id="@+id/chipFilterRepairing"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
                             android:layout_marginStart="6dp"
-                            android:minHeight="0dp"
-                            android:paddingHorizontal="14dp"
+                            android:background="@drawable/bg_filter_pill"
+                            android:gravity="center"
+                            android:paddingHorizontal="16dp"
                             android:text="In Repair"
                             android:textColor="@color/navy_700"
                             android:textSize="12sp"
-                            app:cornerRadius="18dp" />
+                            android:textStyle="bold" />
 
-                        <Button
+                        <TextView
                             android:id="@+id/chipFilterReady"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
                             android:layout_marginStart="6dp"
-                            android:minHeight="0dp"
-                            android:paddingHorizontal="14dp"
+                            android:background="@drawable/bg_filter_pill"
+                            android:gravity="center"
+                            android:paddingHorizontal="16dp"
                             android:text="Ready for Pickup"
                             android:textColor="@color/navy_700"
                             android:textSize="12sp"
-                            app:cornerRadius="18dp" />
+                            android:textStyle="bold" />
 
-                        <Button
+                        <TextView
                             android:id="@+id/chipFilterCompleted"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
                             android:layout_marginStart="6dp"
-                            android:minHeight="0dp"
-                            android:paddingHorizontal="14dp"
+                            android:background="@drawable/bg_filter_pill"
+                            android:gravity="center"
+                            android:paddingHorizontal="16dp"
                             android:text="Completed"
                             android:textColor="@color/navy_700"
                             android:textSize="12sp"
-                            app:cornerRadius="18dp" />
+                            android:textStyle="bold" />
 
-                        <Button
+                        <TextView
                             android:id="@+id/chipFilterUnpaid"
-                            style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="wrap_content"
                             android:layout_height="36dp"
                             android:layout_marginStart="6dp"
-                            android:minHeight="0dp"
-                            android:paddingHorizontal="14dp"
-                            android:text="Payment Due"
-                            android:textColor="@color/error"
+                            android:background="@drawable/bg_filter_pill"
+                            android:gravity="center"
+                            android:paddingHorizontal="16dp"
+                            android:text="Unpaid"
+                            android:textColor="@color/navy_700"
                             android:textSize="12sp"
-                            app:cornerRadius="18dp" />
+                            android:textStyle="bold" />
                     </LinearLayout>
                 </HorizontalScrollView>
 
