@@ -286,17 +286,30 @@ public class HomeActivity extends AppCompatActivity {
             serviceOptions.add("Operating system repair · Rs 6500");
         }
         ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
+        serviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.bookingServiceSpinner.setAdapter(serviceAdapter);
 
         // 2. Setup Device Category Dropdown
         String[] deviceCategories = {"Mobile phone", "Laptop / computer", "Tablet", "Other smart device"};
         ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, deviceCategories);
+        deviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.bookingDeviceSpinner.setAdapter(deviceAdapter);
 
-        // 3. Setup Branch Dropdown
+        // 3. Setup Branch Dropdown & Dynamic Service Loading
         String[] branches = {"Colombo branch", "Galle branch"};
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
+        branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.bookingBranchSpinner.setAdapter(branchAdapter);
+
+        updateBookingServicesForBranch(branches[0]);
+
+        binding.bookingBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updateBookingServicesForBranch(branches[position]);
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         // 4. Setup Attach Photo Button
         binding.bookingPhotoButton.setOnClickListener(v -> showPhotoOptionsDialog());
@@ -313,6 +326,16 @@ public class HomeActivity extends AppCompatActivity {
 
         // 6. Setup Submit Booking Button
         binding.submitBookingButton.setOnClickListener(v -> submitAppointmentBooking());
+    }
+
+    private void updateBookingServicesForBranch(String branch) {
+        List<String> serviceOptions = serviceDAO.allByBranch(branch);
+        if (serviceOptions.isEmpty()) {
+            serviceOptions = serviceDAO.all();
+        }
+        ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
+        serviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.bookingServiceSpinner.setAdapter(serviceAdapter);
     }
 
     /**
@@ -580,6 +603,7 @@ public class HomeActivity extends AppCompatActivity {
     private void setupPartsPanel() {
         String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
+        branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.homePartsBranchSpinner.setAdapter(branchAdapter);
 
         binding.homePartsBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

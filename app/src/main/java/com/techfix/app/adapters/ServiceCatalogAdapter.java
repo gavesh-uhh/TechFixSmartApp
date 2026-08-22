@@ -48,6 +48,7 @@ public class ServiceCatalogAdapter extends RecyclerView.Adapter<ServiceCatalogAd
 
         holder.serviceName.setText(service.name);
         holder.serviceCategoryBadge.setText(service.category);
+        holder.serviceBranchBadge.setText(service.branch != null && !service.branch.isEmpty() ? service.branch : "All Branches");
         holder.servicePrice.setText("Rs " + String.format("%,.0f", service.price));
 
         if (service.requiredPart != null && !service.requiredPart.trim().isEmpty()) {
@@ -72,13 +73,14 @@ public class ServiceCatalogAdapter extends RecyclerView.Adapter<ServiceCatalogAd
     }
 
     static class Holder extends RecyclerView.ViewHolder {
-        final TextView serviceName, serviceCategoryBadge, serviceRequiredPart, servicePrice;
+        final TextView serviceName, serviceCategoryBadge, serviceBranchBadge, serviceRequiredPart, servicePrice;
         final Button btnEditPrice, btnDeleteService;
 
         Holder(@NonNull View itemView) {
             super(itemView);
             serviceName = itemView.findViewById(R.id.serviceName);
             serviceCategoryBadge = itemView.findViewById(R.id.serviceCategoryBadge);
+            serviceBranchBadge = itemView.findViewById(R.id.serviceBranchBadge);
             serviceRequiredPart = itemView.findViewById(R.id.serviceRequiredPart);
             servicePrice = itemView.findViewById(R.id.servicePrice);
             btnEditPrice = itemView.findViewById(R.id.btnEditPrice);

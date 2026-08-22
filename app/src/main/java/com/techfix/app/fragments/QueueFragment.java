@@ -75,7 +75,9 @@ public class QueueFragment extends Fragment {
 
         FirebaseSyncManager.getInstance().addListener(syncListener);
 
-        binding.statusSpinner.setAdapter(new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, AppointmentStatus.labels()));
+        ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, AppointmentStatus.labels());
+        statusAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.statusSpinner.setAdapter(statusAdapter);
 
         queueAdapter = new StaffAppointmentAdapter(this::showDocketActionMenu);
         binding.appointmentList.setLayoutManager(new LinearLayoutManager(requireContext()));

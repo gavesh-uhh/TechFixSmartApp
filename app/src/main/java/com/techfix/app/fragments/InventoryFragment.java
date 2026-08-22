@@ -63,6 +63,7 @@ public class InventoryFragment extends Fragment {
 
         String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branches);
+        branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.inventoryBranchSpinner.setAdapter(branchAdapter);
 
         binding.inventoryBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -117,6 +118,7 @@ public class InventoryFragment extends Fragment {
 
         String[] branchOptions = {"Colombo branch", "Galle branch"};
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
+        branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         spinnerBranch.setAdapter(branchAdapter);
 
         // Pre-select branch based on current active branch filter if applicable

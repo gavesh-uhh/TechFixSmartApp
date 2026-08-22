@@ -6,6 +6,8 @@ import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -82,7 +84,27 @@ public class CatalogFragment extends Fragment {
         refresh();
     }
 
+    private String selectedCatalogBranch = "All Branches";
+
     private void setupServices() {
+        String[] branchFilters = {"All Branches", "Colombo branch", "Galle branch"};
+        ArrayAdapter<String> filterAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchFilters);
+        filterAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.catalogBranchSpinner.setAdapter(filterAdapter);
+        binding.catalogBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                selectedCatalogBranch = branchFilters[position];
+                refresh();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        String[] branchOptions = {"Colombo branch", "Galle branch", "All Branches"};
+        ArrayAdapter<String> newServiceBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
+        newServiceBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.newServiceBranchSpinner.setAdapter(newServiceBranchAdapter);
+
         ServiceCatalogAdapter serviceCatalogAdapter = new ServiceCatalogAdapter(new ServiceCatalogAdapter.OnServiceActionListener() {
             @Override
             public void onEditPrice(Service service) {
@@ -93,7 +115,7 @@ public class CatalogFragment extends Fragment {
             public void onDelete(Service service) {
                 new AlertDialog.Builder(requireContext())
                         .setTitle("Remove Service?")
-                        .setMessage("Remove \"" + service.name + "\" from service catalog?")
+                        .setMessage("Remove \"" + service.name + "\" (" + service.branch + ") from service catalog?")
                         .setPositiveButton("Remove", (dialog, which) -> {
                             serviceDAO.delete(service.id);
                             FirebaseSyncManager.getInstance().sync(requireContext(), null);
@@ -113,6 +135,7 @@ public class CatalogFragment extends Fragment {
             String category = binding.newServiceCategory.getText().toString().trim();
             String part = binding.newServiceRequiredPart.getText().toString().trim();
             String priceStr = binding.newServicePrice.getText().toString().trim();
+            String branch = (String) binding.newServiceBranchSpinner.getSelectedItem();
 
             if (name.isEmpty()) {
                 binding.newServiceName.setError("Enter service name");
@@ -125,7 +148,7 @@ public class CatalogFragment extends Fragment {
 
             try {
                 double price = Double.parseDouble(priceStr);
-                serviceDAO.add(name, category.isEmpty() ? "Mobile phone" : category, price, part);
+                serviceDAO.add(name, category.isEmpty() ? "Mobile phone" : category, price, part, branch);
                 FirebaseSyncManager.getInstance().sync(requireContext(), null);
                 binding.newServiceName.setText("");
                 binding.newServiceCategory.setText("");
@@ -133,7 +156,7 @@ public class CatalogFragment extends Fragment {
                 binding.newServicePrice.setText("");
 
                 refresh();
-                Snackbar.make(v, "Service \"" + name + "\" published to catalog", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(v, "Service \"" + name + "\" published to " + branch, Snackbar.LENGTH_LONG).show();
             } catch (Exception e) {
                 binding.newServicePrice.setError("Invalid price");
             }
@@ -215,11 +238,15 @@ public class CatalogFragment extends Fragment {
     }
 
     private void refresh() {
-        List<Service> services = serviceDAO.list();
-        ((ServiceCatalogAdapter) binding.servicesList.getAdapter()).submit(services);
+        List<Service> services = serviceDAO.listByBranch(selectedCatalogBranch);
+        if (binding.servicesList.getAdapter() != null) {
+            ((ServiceCatalogAdapter) binding.servicesList.getAdapter()).submit(services);
+        }
 
         List<Technician> techs = technicianDAO.all();
-        ((TechnicianAdapter) binding.techniciansList.getAdapter()).submit(techs);
+        if (binding.techniciansList.getAdapter() != null) {
+            ((TechnicianAdapter) binding.techniciansList.getAdapter()).submit(techs);
+        }
     }
 
     private void showEditServicePriceDialog(Service service) {

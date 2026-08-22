@@ -77,6 +77,7 @@ public class OverviewFragment extends Fragment {
 
         String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branches);
+        branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.overviewBranchSpinner.setAdapter(branchAdapter);
         for (int i = 0; i < branches.length; i++) {
             if (branches[i].equals(selectedBranch)) binding.overviewBranchSpinner.setSelection(i);
@@ -154,13 +155,19 @@ public class OverviewFragment extends Fragment {
         layout.addView(inputProblem);
 
         final Spinner spinnerBranch = new Spinner(requireContext());
+        spinnerBranch.setBackgroundResource(R.drawable.bg_spinner);
         String[] branchOptions = {"Colombo branch", "Galle branch"};
-        spinnerBranch.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, branchOptions));
+        ArrayAdapter<String> dialogBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
+        dialogBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        spinnerBranch.setAdapter(dialogBranchAdapter);
         layout.addView(spinnerBranch);
 
         final Spinner spinnerService = new Spinner(requireContext());
+        spinnerService.setBackgroundResource(R.drawable.bg_spinner);
         List<String> serviceNames = serviceDAO.all();
-        spinnerService.setAdapter(new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, serviceNames));
+        ArrayAdapter<String> dialogServiceAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, serviceNames);
+        dialogServiceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        spinnerService.setAdapter(dialogServiceAdapter);
         layout.addView(spinnerService);
 
         new AlertDialog.Builder(requireContext())
