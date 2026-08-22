@@ -57,9 +57,25 @@ public class ServiceDAO {
     }
 
     public boolean add(String name, String category, double price) {
-        if (name.trim().isEmpty() || price <= 0) return false;
-        ContentValues v = new ContentValues(); v.put("name", name.trim()); v.put("category", category); v.put("price", price); v.put("requiredPart", "");
+        return add(name, category, price, "");
+    }
+
+    public boolean add(String name, String category, double price, String requiredPart) {
+        if (name == null || name.trim().isEmpty() || price <= 0) return false;
+        ContentValues v = new ContentValues();
+        v.put("name", name.trim());
+        v.put("category", (category != null && !category.trim().isEmpty()) ? category.trim() : "Mobile phone");
+        v.put("price", price);
+        v.put("requiredPart", requiredPart != null ? requiredPart.trim() : "");
         return helper.getWritableDatabase().insertWithOnConflict("services", null, v, android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE) > 0;
+    }
+
+    public boolean delete(long id) {
+        return helper.getWritableDatabase().delete("services", "id=?", new String[]{String.valueOf(id)}) > 0;
+    }
+
+    public boolean deleteByName(String name) {
+        return helper.getWritableDatabase().delete("services", "name=?", new String[]{name}) > 0;
     }
 
     public String catalog() {

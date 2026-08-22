@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import com.techfix.app.models.User;
 import com.techfix.app.models.UserRole;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Data Access Object for Users table in SQLite.
@@ -60,8 +62,31 @@ public class UserDAO {
         return helper.getWritableDatabase().insertWithOnConflict("users", null, v, android.database.sqlite.SQLiteDatabase.CONFLICT_REPLACE) > 0;
     }
 
-    public boolean create(String name, String email, String password) {
-        return create(name, email, "", password);
+    public List<User> allCustomers() {
+        List<User> list = new ArrayList<>();
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT id,name,email,role,phone FROM users WHERE role!='STAFF' ORDER BY id DESC", null);
+        while (c.moveToNext()) list.add(read(c));
+        c.close();
+        return list;
+    }
+
+    public List<User> searchCustomers(String query) {
+        if (query == null || query.trim().isEmpty()) return allCustomers();
+        String q = "%" + query.trim().toLowerCase() + "%";
+        List<User> list = new ArrayList<>();
+        Cursor c = helper.getReadableDatabase().rawQuery(
+                "SELECT id,name,email,role,phone FROM users WHERE role!='STAFF' AND (LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR phone LIKE ?) ORDER BY id DESC",
+                new String[]{q, q, q});
+        while (c.moveToNext()) list.add(read(c));
+        c.close();
+        return list;
+    }
+
+    public int getRepairCountForUser(long userId) {
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT COUNT(*) FROM appointments WHERE user_id=?", new String[]{String.valueOf(userId)});
+        int count = c.moveToFirst() ? c.getInt(0) : 0;
+        c.close();
+        return count;
     }
 
     private static User read(Cursor c) {

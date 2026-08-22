@@ -41,6 +41,77 @@ public class AppointmentDAO {
     public List<Appointment> activeFor(long userId) { return query("WHERE user_id=" + userId + " AND status!='" + AppointmentStatus.COMPLETED.label + "' ORDER BY id DESC"); }
     public List<Appointment> historyFor(long userId) { return query("WHERE user_id=" + userId + " AND status='" + AppointmentStatus.COMPLETED.label + "' ORDER BY id DESC"); }
 
+    public int countAll(String branch) {
+        String where = (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) ? " WHERE branch='" + branch + "'" : "";
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT COUNT(*) FROM appointments" + where, null);
+        int count = c.moveToFirst() ? c.getInt(0) : 0;
+        c.close();
+        return count;
+    }
+
+    public int countActive(String branch) {
+        String branchClause = (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) ? " AND branch='" + branch + "'" : "";
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT COUNT(*) FROM appointments WHERE status!='" + AppointmentStatus.COMPLETED.label + "'" + branchClause, null);
+        int count = c.moveToFirst() ? c.getInt(0) : 0;
+        c.close();
+        return count;
+    }
+
+    public int countCompleted(String branch) {
+        String branchClause = (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) ? " AND branch='" + branch + "'" : "";
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT COUNT(*) FROM appointments WHERE status='" + AppointmentStatus.COMPLETED.label + "'" + branchClause, null);
+        int count = c.moveToFirst() ? c.getInt(0) : 0;
+        c.close();
+        return count;
+    }
+
+    public double sumPaidRevenue(String branch) {
+        String branchClause = (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) ? " AND branch='" + branch + "'" : "";
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT SUM(price) FROM appointments WHERE payment='" + PaymentStatus.PAID.label + "'" + branchClause, null);
+        double sum = (c.moveToFirst() && !c.isNull(0)) ? c.getDouble(0) : 0.0;
+        c.close();
+        return sum;
+    }
+
+    public double sumPendingRevenue(String branch) {
+        String branchClause = (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) ? " AND branch='" + branch + "'" : "";
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT SUM(price) FROM appointments WHERE payment!='" + PaymentStatus.PAID.label + "'" + branchClause, null);
+        double sum = (c.moveToFirst() && !c.isNull(0)) ? c.getDouble(0) : 0.0;
+        c.close();
+        return sum;
+    }
+
+    public List<Appointment> filter(String branch, String statusFilter, String searchQuery) {
+        StringBuilder where = new StringBuilder("WHERE 1=1");
+
+        if (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) {
+            where.append(" AND branch='").append(branch.replace("'", "''")).append("'");
+        }
+
+        if (statusFilter != null && !statusFilter.isEmpty() && !"All".equalsIgnoreCase(statusFilter)) {
+            if ("Active".equalsIgnoreCase(statusFilter)) {
+                where.append(" AND status!='").append(AppointmentStatus.COMPLETED.label).append("'");
+            } else if ("Unpaid".equalsIgnoreCase(statusFilter) || "Payment Due".equalsIgnoreCase(statusFilter)) {
+                where.append(" AND payment!='").append(PaymentStatus.PAID.label).append("'");
+            } else {
+                where.append(" AND status='").append(statusFilter.replace("'", "''")).append("'");
+            }
+        }
+
+        if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+            String q = "%" + searchQuery.trim().toLowerCase().replace("'", "''") + "%";
+            where.append(" AND (LOWER(device) LIKE '").append(q)
+                 .append("' OR LOWER(problem) LIKE '").append(q)
+                 .append("' OR LOWER(service) LIKE '").append(q)
+                 .append("' OR LOWER(technician) LIKE '").append(q)
+                 .append("' OR LOWER(branch) LIKE '").append(q)
+                 .append("' OR CAST(id AS TEXT) LIKE '").append(q).append("')");
+        }
+
+        where.append(" ORDER BY id DESC");
+        return query(where.toString());
+    }
+
     public Appointment get(long id) {
         Cursor c = helper.getReadableDatabase().rawQuery("SELECT " + COLS + " FROM appointments WHERE id=?", new String[]{String.valueOf(id)});
         Appointment a = c.moveToFirst() ? read(c) : null;

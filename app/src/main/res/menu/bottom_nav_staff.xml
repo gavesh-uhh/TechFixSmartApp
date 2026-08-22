@@ -1,19 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
+        android:id="@+id/nav_staff_overview"
+        android:icon="@drawable/ic_nav_dashboard"
+        android:title="Overview" />
+    <item
         android:id="@+id/nav_staff_queue"
         android:icon="@drawable/ic_nav_store"
         android:title="Queue" />
     <item
-        android:id="@+id/nav_staff_services"
-        android:icon="@drawable/ic_nav_book"
-        android:title="Services" />
+        android:id="@+id/nav_staff_inventory"
+        android:icon="@drawable/ic_nav_inventory"
+        android:title="Inventory" />
     <item
-        android:id="@+id/nav_staff_technicians"
-        android:icon="@drawable/ic_nav_location"
-        android:title="Technicians" />
+        android:id="@+id/nav_staff_catalog"
+        android:icon="@drawable/ic_nav_tools"
+        android:title="Catalog" />
     <item
         android:id="@+id/nav_staff_profile"
         android:icon="@drawable/ic_nav_account"
-        android:title="Profile" />
+        android:title="Admin" />
 </menu>

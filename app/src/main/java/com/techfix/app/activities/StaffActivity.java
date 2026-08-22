@@ -5,8 +5,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -16,17 +21,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.techfix.app.R;
+import com.techfix.app.adapters.ServiceCatalogAdapter;
+import com.techfix.app.adapters.SparePartAdapter;
 import com.techfix.app.adapters.StaffAppointmentAdapter;
+import com.techfix.app.adapters.TechnicianAdapter;
+import com.techfix.app.adapters.UserDirectoryAdapter;
 import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.DatabaseHelper;
 import com.techfix.app.database.SampleRepairDAO;
 import com.techfix.app.database.ServiceDAO;
 import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
+import com.techfix.app.database.UserDAO;
 import com.techfix.app.databinding.ActivityStaffBinding;
 import com.techfix.app.models.Appointment;
 import com.techfix.app.models.AppointmentStatus;
+import com.techfix.app.models.PaymentStatus;
+import com.techfix.app.models.Service;
+import com.techfix.app.models.SparePart;
 import com.techfix.app.models.Technician;
+import com.techfix.app.models.User;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
@@ -34,14 +48,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * StaffActivity - Complete Administrator & Workshop Dashboard.
- * Features:
- * - Real-time searchable repair queue with interactive docket management
- * - Workflow status transitions, technician reassignment & payment handling
- * - Service pricing management & new repair service publishing
- * - Technician duty controls & new technician registration
- * - Spare parts inventory restock & sample repair showcase publisher
- * - Guaranteed one-tap logout with task stack reset
+ * StaffActivity - Executive Workshop & Admin Dashboard.
+ * Hubs:
+ * 1. Overview & Financial KPIs (Revenue, receivables, low stock alerts, quick actions)
+ * 2. Repair Queue & Docket Master (Multi-status chips, real-time search, workflow updates)
+ * 3. Inventory & Spare Parts (Stock badges, 1-tap stock adjustments, part creation)
+ * 4. Catalog & Staff Roster (Service pricing, technician duty switches, showcase camera)
+ * 5. Admin & Customer Directory (Customer directory, DB diagnostics & maintenance)
  */
 public class StaffActivity extends AppCompatActivity {
 
@@ -55,12 +68,19 @@ public class StaffActivity extends AppCompatActivity {
     private TechnicianDAO technicianDAO;
     private SparePartDAO sparePartDAO;
     private SampleRepairDAO sampleRepairDAO;
+    private UserDAO userDAO;
 
-    // Adapters & Data
+    // Adapters
     private StaffAppointmentAdapter queueAdapter;
-    private ArrayAdapter<String> serviceDropdownAdapter;
-    private ArrayAdapter<String> techDropdownAdapter;
-    private List<Appointment> fullQueue = new ArrayList<>();
+    private SparePartAdapter sparePartAdapter;
+    private ServiceCatalogAdapter serviceCatalogAdapter;
+    private TechnicianAdapter technicianAdapter;
+    private UserDirectoryAdapter userDirectoryAdapter;
+
+    // State
+    private String currentSelectedBranch = "All Branches";
+    private String currentQueueStatusFilter = "All";
+    private int currentTabPosition = 0;
 
     private Uri pendingSampleUri;
     private final ActivityResultLauncher<Uri> cameraLauncher =
@@ -79,7 +99,7 @@ public class StaffActivity extends AppCompatActivity {
             return;
         }
 
-        // 2. Inflate Layout
+        // 2. View Binding & Insets
         binding = ActivityStaffBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         WindowInsetsHelper.apply(binding.staffHeader, binding.staffContent);
@@ -91,16 +111,18 @@ public class StaffActivity extends AppCompatActivity {
         technicianDAO = new TechnicianDAO(dbHelper);
         sparePartDAO = new SparePartDAO(dbHelper);
         sampleRepairDAO = new SampleRepairDAO(dbHelper);
+        userDAO = new UserDAO(dbHelper);
 
-        // 4. Setup Components
+        // 4. Setup UI Hubs & Navigation
         setupHeader();
         setupBottomNavigation();
+        setupOverviewTab();
         setupQueueTab();
-        setupServicesTab();
-        setupWorkshopTab();
+        setupInventoryTab();
+        setupCatalogTab();
+        setupAdminTab();
 
-        // 5. Initial Load
-        refreshQueue();
+        // 5. Initial Data Load
         showPanel(0);
     }
 
@@ -109,6 +131,8 @@ public class StaffActivity extends AppCompatActivity {
         super.onResume();
         if (!session.isLoggedIn()) {
             goHome();
+        } else {
+            refreshCurrentTab();
         }
     }
 
@@ -123,7 +147,7 @@ public class StaffActivity extends AppCompatActivity {
 
     private void performLogout() {
         session.logout();
-        Toast.makeText(this, "Logged out of staff workspace", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Logged out of admin workspace", Toast.LENGTH_SHORT).show();
         goHome();
     }
 
@@ -135,25 +159,28 @@ public class StaffActivity extends AppCompatActivity {
     }
 
     /**
-     * Setup 4-tab bottom navigation (Queue, Services, Technicians, Profile).
+     * Setup 5-tab bottom navigation (Overview, Queue, Inventory, Catalog, Admin).
      */
     private void setupBottomNavigation() {
-        binding.staffBottomNavigation.setSelectedItemId(R.id.nav_staff_queue);
+        binding.staffBottomNavigation.setSelectedItemId(R.id.nav_staff_overview);
 
         binding.staffBottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
 
-            if (itemId == R.id.nav_staff_queue) {
+            if (itemId == R.id.nav_staff_overview) {
                 showPanel(0);
                 return true;
-            } else if (itemId == R.id.nav_staff_services) {
+            } else if (itemId == R.id.nav_staff_queue) {
                 showPanel(1);
                 return true;
-            } else if (itemId == R.id.nav_staff_technicians) {
+            } else if (itemId == R.id.nav_staff_inventory) {
                 showPanel(2);
                 return true;
-            } else if (itemId == R.id.nav_staff_profile) {
+            } else if (itemId == R.id.nav_staff_catalog) {
                 showPanel(3);
+                return true;
+            } else if (itemId == R.id.nav_staff_profile) {
+                showPanel(4);
                 return true;
             }
 
@@ -162,23 +189,99 @@ public class StaffActivity extends AppCompatActivity {
     }
 
     private void showPanel(int position) {
-        binding.tabQueue.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
-        binding.tabServices.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
-        binding.tabWorkshop.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
-        binding.tabProfile.setVisibility(position == 3 ? View.VISIBLE : View.GONE);
+        currentTabPosition = position;
+        binding.tabOverview.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
+        binding.tabQueue.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
+        binding.tabInventory.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
+        binding.tabCatalog.setVisibility(position == 3 ? View.VISIBLE : View.GONE);
+        binding.tabProfile.setVisibility(position == 4 ? View.VISIBLE : View.GONE);
 
-        if (position == 0) {
+        refreshCurrentTab();
+    }
+
+    private void refreshCurrentTab() {
+        if (currentTabPosition == 0) {
+            refreshOverview();
+        } else if (currentTabPosition == 1) {
             refreshQueue();
-        } else if (position == 1) {
-            refreshServicesDropdown();
-        } else if (position == 2) {
-            refreshTechniciansDropdown();
+        } else if (currentTabPosition == 2) {
+            refreshInventory();
+        } else if (currentTabPosition == 3) {
+            refreshCatalog();
+        } else if (currentTabPosition == 4) {
+            refreshAdminTab();
         }
     }
 
-    /**
-     * Tab 1: Queue setup and repair management.
-     */
+    // =========================================================================
+    // TAB 1: OVERVIEW & FINANCIAL KPIS
+    // =========================================================================
+
+    private void setupOverviewTab() {
+        String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
+        ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
+        binding.overviewBranchSpinner.setAdapter(branchAdapter);
+
+        binding.overviewBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                currentSelectedBranch = branches[position];
+                binding.headerBranchBadge.setText(currentSelectedBranch.toUpperCase());
+                refreshOverview();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // Quick Actions
+        binding.btnQuickWalkIn.setOnClickListener(v -> showWalkInDocketDialog());
+        binding.btnQuickRestock.setOnClickListener(v -> {
+            binding.staffBottomNavigation.setSelectedItemId(R.id.nav_staff_inventory);
+        });
+        binding.btnQuickAddService.setOnClickListener(v -> {
+            binding.staffBottomNavigation.setSelectedItemId(R.id.nav_staff_catalog);
+        });
+        binding.btnQuickAddTech.setOnClickListener(v -> {
+            binding.staffBottomNavigation.setSelectedItemId(R.id.nav_staff_catalog);
+        });
+    }
+
+    private void refreshOverview() {
+        int totalDockets = appointmentDAO.countAll(currentSelectedBranch);
+        int activeDockets = appointmentDAO.countActive(currentSelectedBranch);
+        int completedDockets = appointmentDAO.countCompleted(currentSelectedBranch);
+        double paidRevenue = appointmentDAO.sumPaidRevenue(currentSelectedBranch);
+        double pendingRevenue = appointmentDAO.sumPendingRevenue(currentSelectedBranch);
+        int lowStockCount = sparePartDAO.getLowStockCount(2);
+
+        binding.kpiTotalDockets.setText(String.valueOf(totalDockets));
+        binding.kpiTotalDocketsSub.setText(completedDockets + " completed · " + activeDockets + " in progress");
+
+        binding.kpiActiveDockets.setText(String.valueOf(activeDockets));
+        binding.kpiActiveDocketsSub.setText("Awaiting collection & repair");
+
+        binding.kpiRevenueCollected.setText("Rs " + String.format("%,.0f", paidRevenue));
+        binding.kpiRevenuePending.setText("Rs " + String.format("%,.0f", pendingRevenue));
+
+        if (lowStockCount > 0) {
+            binding.kpiLowStockAlert.setText("⚠️ " + lowStockCount + " Parts Low in Stock!");
+            binding.kpiLowStockAlert.setTextColor(getColor(R.color.warning));
+        } else {
+            binding.kpiLowStockAlert.setText("📦 Inventory: All parts in stock");
+            binding.kpiLowStockAlert.setTextColor(getColor(R.color.navy_900));
+        }
+
+        List<Technician> techList = technicianDAO.allByBranch(currentSelectedBranch);
+        int availableTechs = 0;
+        for (Technician t : techList) {
+            if (t.available) availableTechs++;
+        }
+        binding.kpiTechDutyStatus.setText("👨‍🔧 " + availableTechs + "/" + techList.size() + " Techs On Duty");
+    }
+
+    // =========================================================================
+    // TAB 2: REPAIR QUEUE & DOCKET MANAGEMENT
+    // =========================================================================
+
     private void setupQueueTab() {
         binding.statusSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.item_dropdown, AppointmentStatus.labels()));
 
@@ -186,71 +289,80 @@ public class StaffActivity extends AppCompatActivity {
         binding.appointmentList.setLayoutManager(new LinearLayoutManager(this));
         binding.appointmentList.setAdapter(queueAdapter);
 
-        // Real-time search filter
+        // Real-time search listener
         binding.searchQueueInput.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
-                filterQueue(s.toString());
+                refreshQueue();
             }
             @Override public void afterTextChanged(Editable s) {}
         });
+
+        // Filter chips setup
+        setupFilterChips();
 
         // Quick status update by ID
         binding.updateStatusButton.setOnClickListener(this::updateStatusById);
     }
 
-    private void refreshQueue() {
-        fullQueue = appointmentDAO.all();
-        filterQueue(binding.searchQueueInput.getText().toString());
-
-        int activeCount = 0;
-        int completedCount = 0;
-        for (Appointment a : fullQueue) {
-            if (AppointmentStatus.COMPLETED.label.equalsIgnoreCase(a.status)) {
-                completedCount++;
-            } else {
-                activeCount++;
-            }
-        }
-
-        binding.queueStatsTitle.setText(fullQueue.size() + (fullQueue.size() == 1 ? " Repair Docket" : " Repair Dockets"));
-        binding.queueStatsSubtitle.setText(activeCount + " Active Repairs · " + completedCount + " Completed");
+    private void setupFilterChips() {
+        binding.chipFilterAll.setOnClickListener(v -> setQueueFilter("All", binding.chipFilterAll));
+        binding.chipFilterActive.setOnClickListener(v -> setQueueFilter("Active", binding.chipFilterActive));
+        binding.chipFilterReceived.setOnClickListener(v -> setQueueFilter(AppointmentStatus.REQUEST_RECEIVED.label, binding.chipFilterReceived));
+        binding.chipFilterRepairing.setOnClickListener(v -> setQueueFilter(AppointmentStatus.REPAIRING.label, binding.chipFilterRepairing));
+        binding.chipFilterReady.setOnClickListener(v -> setQueueFilter(AppointmentStatus.READY_FOR_COLLECTION.label, binding.chipFilterReady));
+        binding.chipFilterCompleted.setOnClickListener(v -> setQueueFilter(AppointmentStatus.COMPLETED.label, binding.chipFilterCompleted));
+        binding.chipFilterUnpaid.setOnClickListener(v -> setQueueFilter("Unpaid", binding.chipFilterUnpaid));
     }
 
-    private void filterQueue(String query) {
-        String q = (query == null) ? "" : query.trim().toLowerCase();
-        if (q.isEmpty()) {
-            queueAdapter.submit(fullQueue);
-            binding.appointmentList.setVisibility(fullQueue.isEmpty() ? View.GONE : View.VISIBLE);
-            binding.emptyQueueContainer.setVisibility(fullQueue.isEmpty() ? View.VISIBLE : View.GONE);
-            return;
+    private void setQueueFilter(String status, View activeChip) {
+        currentQueueStatusFilter = status;
+
+        // Reset all chip backgrounds
+        resetChipStyle(binding.chipFilterAll);
+        resetChipStyle(binding.chipFilterActive);
+        resetChipStyle(binding.chipFilterReceived);
+        resetChipStyle(binding.chipFilterRepairing);
+        resetChipStyle(binding.chipFilterReady);
+        resetChipStyle(binding.chipFilterCompleted);
+        resetChipStyle(binding.chipFilterUnpaid);
+
+        // Highlight selected chip
+        if (activeChip instanceof android.widget.Button) {
+            ((android.widget.Button) activeChip).setBackgroundColor(getColor(R.color.navy_700));
+            ((android.widget.Button) activeChip).setTextColor(getColor(R.color.white));
         }
 
-        List<Appointment> filtered = new ArrayList<>();
-        for (Appointment a : fullQueue) {
-            String searchHaystack = ("#" + a.id + " " + a.device + " " + a.service + " " + a.problem + " " + a.technician + " " + a.branch + " " + a.status).toLowerCase();
-            if (searchHaystack.contains(q)) {
-                filtered.add(a);
-            }
-        }
+        refreshQueue();
+    }
+
+    private void resetChipStyle(android.widget.Button btn) {
+        btn.setBackgroundColor(getColor(R.color.surface));
+        btn.setTextColor(getColor(R.color.navy_700));
+    }
+
+    private void refreshQueue() {
+        String searchQuery = binding.searchQueueInput.getText().toString();
+        List<Appointment> filtered = appointmentDAO.filter(currentSelectedBranch, currentQueueStatusFilter, searchQuery);
 
         queueAdapter.submit(filtered);
         binding.appointmentList.setVisibility(filtered.isEmpty() ? View.GONE : View.VISIBLE);
         binding.emptyQueueContainer.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
+
+        int activeCount = appointmentDAO.countActive(currentSelectedBranch);
+        int completedCount = appointmentDAO.countCompleted(currentSelectedBranch);
+        int totalCount = appointmentDAO.countAll(currentSelectedBranch);
+
+        binding.queueStatsTitle.setText(totalCount + (totalCount == 1 ? " Repair Docket" : " Repair Dockets"));
+        binding.queueStatsSubtitle.setText(activeCount + " Active Repairs · " + completedCount + " Completed");
     }
 
-    /**
-     * Action Menu for a tapped docket:
-     * 1. Change Workflow Stage
-     * 2. Re-assign Technician
-     * 3. Record Payment
-     * 4. Delete Docket
-     */
     private void showDocketActionMenu(Appointment a) {
         String[] actions = {
                 "Change Workflow Stage (" + a.status + ")",
                 "Re-assign Technician (" + a.technician + ")",
                 "Record Payment (Rs " + (long) a.price + ")",
+                "View Full Docket & Timeline",
                 "Delete Docket"
         };
 
@@ -264,6 +376,10 @@ public class StaffActivity extends AppCompatActivity {
                     } else if (which == 2) {
                         showPaymentMethodPicker(a);
                     } else if (which == 3) {
+                        Intent intent = new Intent(this, AppointmentDetailActivity.class);
+                        intent.putExtra("appointmentId", a.id);
+                        startActivity(intent);
+                    } else if (which == 4) {
                         showDeleteConfirmation(a);
                     }
                 })
@@ -279,6 +395,7 @@ public class StaffActivity extends AppCompatActivity {
                     String newStatus = labels[which];
                     appointmentDAO.updateStatus(a.id, newStatus);
                     refreshQueue();
+                    refreshOverview();
                     Snackbar.make(binding.getRoot(), "Docket #" + a.id + " updated to " + newStatus, Snackbar.LENGTH_LONG).show();
                 })
                 .setNegativeButton("Cancel", null)
@@ -311,6 +428,7 @@ public class StaffActivity extends AppCompatActivity {
                 .setItems(methods, (dialog, which) -> {
                     boolean ok = appointmentDAO.pay(a.id, a.price, methods[which]);
                     refreshQueue();
+                    refreshOverview();
                     if (ok) {
                         Snackbar.make(binding.getRoot(), "Payment recorded (" + methods[which] + ")", Snackbar.LENGTH_LONG).show();
                     } else {
@@ -328,6 +446,7 @@ public class StaffActivity extends AppCompatActivity {
                 .setPositiveButton("Delete", (dialog, which) -> {
                     appointmentDAO.delete(a.id);
                     refreshQueue();
+                    refreshOverview();
                     Snackbar.make(binding.getRoot(), "Docket #" + a.id + " deleted", Snackbar.LENGTH_LONG).show();
                 })
                 .setNegativeButton("Cancel", null)
@@ -347,6 +466,7 @@ public class StaffActivity extends AppCompatActivity {
             appointmentDAO.updateStatus(id, status);
             binding.appointmentIdInput.setText("");
             refreshQueue();
+            refreshOverview();
             Snackbar.make(v, "Docket #" + id + " updated to " + status, Snackbar.LENGTH_LONG).show();
         } catch (Exception e) {
             binding.appointmentIdInput.setError("Invalid docket ID");
@@ -354,37 +474,177 @@ public class StaffActivity extends AppCompatActivity {
     }
 
     /**
-     * Tab 2: Services & Pricing Management.
+     * Dialog to create a walk-in repair order right at the counter.
      */
-    private void setupServicesTab() {
-        refreshServicesDropdown();
+    private void showWalkInDocketDialog() {
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.activity_appointment_detail, null, false);
+        // Let's create an elegant programmatic form dialog
+        android.widget.LinearLayout layout = new android.widget.LinearLayout(this);
+        layout.setOrientation(android.widget.LinearLayout.VERTICAL);
+        int padding = (int) (18 * getResources().getDisplayMetrics().density);
+        layout.setPadding(padding, padding, padding, padding);
 
-        binding.updatePriceButton.setOnClickListener(v -> {
-            String selectedService = (String) binding.serviceSpinner.getSelectedItem();
-            String priceStr = binding.priceInput.getText().toString().trim();
+        final EditText inputCustomer = new EditText(this);
+        inputCustomer.setHint("Customer Name (e.g. Ruwan Silva)");
+        layout.addView(inputCustomer);
 
-            if (selectedService == null) return;
-            if (priceStr.isEmpty()) {
-                binding.priceInput.setError("Please enter a valid price");
-                return;
+        final EditText inputDevice = new EditText(this);
+        inputDevice.setHint("Device (e.g. iPhone 14 Pro, ThinkPad X1)");
+        layout.addView(inputDevice);
+
+        final EditText inputProblem = new EditText(this);
+        inputProblem.setHint("Problem Description (e.g. Cracked screen, battery drain)");
+        layout.addView(inputProblem);
+
+        final Spinner spinnerBranch = new Spinner(this);
+        String[] branchOptions = {"Colombo branch", "Galle branch"};
+        spinnerBranch.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, branchOptions));
+        layout.addView(spinnerBranch);
+
+        final Spinner spinnerService = new Spinner(this);
+        List<String> serviceNames = serviceDAO.all();
+        spinnerService.setAdapter(new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, serviceNames));
+        layout.addView(spinnerService);
+
+        new AlertDialog.Builder(this)
+                .setTitle("➕ New Walk-in Repair Docket")
+                .setView(layout)
+                .setPositiveButton("Create Docket", (dialog, which) -> {
+                    String customer = inputCustomer.getText().toString().trim();
+                    String device = inputDevice.getText().toString().trim();
+                    String problem = inputProblem.getText().toString().trim();
+                    String branch = (String) spinnerBranch.getSelectedItem();
+                    String selectedService = (String) spinnerService.getSelectedItem();
+
+                    if (device.isEmpty() || problem.isEmpty() || selectedService == null) {
+                        Toast.makeText(this, "Please fill in device, issue, and service", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String sName = serviceDAO.serviceName(selectedService);
+                    double sPrice = serviceDAO.price(selectedService);
+                    String tech = technicianDAO.availableFor(branch, device);
+
+                    long newId = appointmentDAO.add(0, device, problem + (customer.isEmpty() ? "" : " (Walk-in: " + customer + ")"), branch, sName, sPrice, tech, "Walk-in Counter");
+                    refreshQueue();
+                    refreshOverview();
+                    Snackbar.make(binding.getRoot(), "Walk-in Docket #" + newId + " created successfully!", Snackbar.LENGTH_LONG).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    // =========================================================================
+    // TAB 3: INVENTORY & SPARE PARTS
+    // =========================================================================
+
+    private void setupInventoryTab() {
+        String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
+        ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
+        binding.inventoryBranchSpinner.setAdapter(branchAdapter);
+
+        binding.inventoryBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                refreshInventory();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        sparePartAdapter = new SparePartAdapter(new SparePartAdapter.OnPartActionListener() {
+            @Override
+            public void onAdjustQuantity(SparePart part, int delta) {
+                sparePartDAO.adjustStock(part.id, delta);
+                refreshInventory();
+                refreshOverview();
             }
 
-            try {
-                double newPrice = Double.parseDouble(priceStr);
-                String serviceName = serviceDAO.serviceName(selectedService);
-                serviceDAO.updatePrice(serviceName, newPrice);
-
-                binding.priceInput.setText("");
-                refreshServicesDropdown();
-                Snackbar.make(v, "Price updated for " + serviceName + " (Rs " + (long) newPrice + ")", Snackbar.LENGTH_LONG).show();
-            } catch (Exception e) {
-                binding.priceInput.setError("Invalid price number");
+            @Override
+            public void onDelete(SparePart part) {
+                new AlertDialog.Builder(StaffActivity.this)
+                        .setTitle("Delete " + part.name + "?")
+                        .setMessage("Remove this spare part item from " + part.branch + " inventory?")
+                        .setPositiveButton("Delete", (dialog, which) -> {
+                            sparePartDAO.delete(part.id);
+                            refreshInventory();
+                            refreshOverview();
+                            Snackbar.make(binding.getRoot(), "Part deleted", Snackbar.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
             }
         });
 
+        binding.partsList.setLayoutManager(new LinearLayoutManager(this));
+        binding.partsList.setAdapter(sparePartAdapter);
+
+        // Add part button
+        binding.btnAddPartButton.setOnClickListener(v -> {
+            String name = binding.newPartNameInput.getText().toString().trim();
+            String branch = binding.newPartBranchInput.getText().toString().trim();
+            String qtyStr = binding.newPartQtyInput.getText().toString().trim();
+
+            if (name.isEmpty()) {
+                binding.newPartNameInput.setError("Enter part name");
+                return;
+            }
+            int qty = 1;
+            try { if (!qtyStr.isEmpty()) qty = Integer.parseInt(qtyStr); } catch (Exception ignored) {}
+
+            sparePartDAO.add(name, branch.isEmpty() ? "Colombo branch" : branch, qty);
+            binding.newPartNameInput.setText("");
+            binding.newPartBranchInput.setText("");
+            binding.newPartQtyInput.setText("");
+
+            refreshInventory();
+            refreshOverview();
+            Snackbar.make(v, "Saved " + name + " to inventory", Snackbar.LENGTH_LONG).show();
+        });
+    }
+
+    private void refreshInventory() {
+        String branch = (String) binding.inventoryBranchSpinner.getSelectedItem();
+        List<SparePart> parts = sparePartDAO.allByBranch(branch);
+
+        sparePartAdapter.submit(parts);
+        binding.partsList.setVisibility(parts.isEmpty() ? View.GONE : View.VISIBLE);
+        binding.emptyPartsContainer.setVisibility(parts.isEmpty() ? View.VISIBLE : View.GONE);
+    }
+
+    // =========================================================================
+    // TAB 4: SERVICES & STAFF CATALOG
+    // =========================================================================
+
+    private void setupCatalogTab() {
+        // Services Adapter
+        serviceCatalogAdapter = new ServiceCatalogAdapter(new ServiceCatalogAdapter.OnServiceActionListener() {
+            @Override
+            public void onEditPrice(Service service) {
+                showEditServicePriceDialog(service);
+            }
+
+            @Override
+            public void onDelete(Service service) {
+                new AlertDialog.Builder(StaffActivity.this)
+                        .setTitle("Remove Service?")
+                        .setMessage("Remove \"" + service.name + "\" from service catalog?")
+                        .setPositiveButton("Remove", (dialog, which) -> {
+                            serviceDAO.delete(service.id);
+                            refreshCatalog();
+                            Snackbar.make(binding.getRoot(), "Service removed", Snackbar.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        });
+        binding.servicesList.setLayoutManager(new LinearLayoutManager(this));
+        binding.servicesList.setAdapter(serviceCatalogAdapter);
+
+        // Add Service Button
         binding.addServiceButton.setOnClickListener(v -> {
             String name = binding.newServiceName.getText().toString().trim();
             String category = binding.newServiceCategory.getText().toString().trim();
+            String part = binding.newServiceRequiredPart.getText().toString().trim();
             String priceStr = binding.newServicePrice.getText().toString().trim();
 
             if (name.isEmpty()) {
@@ -392,53 +652,55 @@ public class StaffActivity extends AppCompatActivity {
                 return;
             }
             if (priceStr.isEmpty()) {
-                binding.newServicePrice.setError("Enter service price");
+                binding.newServicePrice.setError("Enter price");
                 return;
             }
 
             try {
                 double price = Double.parseDouble(priceStr);
-                boolean ok = serviceDAO.add(name, category.isEmpty() ? "Mobile phone" : category, price);
-                if (ok) {
-                    binding.newServiceName.setText("");
-                    binding.newServiceCategory.setText("");
-                    binding.newServicePrice.setText("");
-                    refreshServicesDropdown();
-                    Snackbar.make(v, "Service \"" + name + "\" published to catalog", Snackbar.LENGTH_LONG).show();
-                } else {
-                    Snackbar.make(v, "Could not add service", Snackbar.LENGTH_LONG).show();
-                }
+                serviceDAO.add(name, category.isEmpty() ? "Mobile phone" : category, price, part);
+                binding.newServiceName.setText("");
+                binding.newServiceCategory.setText("");
+                binding.newServiceRequiredPart.setText("");
+                binding.newServicePrice.setText("");
+
+                refreshCatalog();
+                Snackbar.make(v, "Service \"" + name + "\" published to catalog", Snackbar.LENGTH_LONG).show();
             } catch (Exception e) {
                 binding.newServicePrice.setError("Invalid price");
             }
         });
-    }
 
-    private void refreshServicesDropdown() {
-        List<String> services = serviceDAO.all();
-        serviceDropdownAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, services);
-        binding.serviceSpinner.setAdapter(serviceDropdownAdapter);
-    }
-
-    /**
-     * Tab 3: Technicians & Workshop Management.
-     */
-    private void setupWorkshopTab() {
-        refreshTechniciansDropdown();
-
-        // Toggle duty button
-        binding.toggleTechButton.setOnClickListener(v -> {
-            int pos = binding.techSpinner.getSelectedItemPosition();
-            List<Technician> technicians = technicianDAO.all();
-            if (pos >= 0 && pos < technicians.size()) {
-                Technician t = technicians.get(pos);
-                technicianDAO.setAvailability(t.name, !t.available);
-                refreshTechniciansDropdown();
-                Snackbar.make(v, t.name + " is now " + (!t.available ? "AVAILABLE 🟢" : "BUSY 🔴"), Snackbar.LENGTH_LONG).show();
+        // Technicians Adapter
+        technicianAdapter = new TechnicianAdapter(new TechnicianAdapter.OnTechnicianActionListener() {
+            @Override
+            public void onToggleDuty(Technician technician) {
+                technicianDAO.setAvailability(technician.name, !technician.available);
+                refreshCatalog();
+                refreshOverview();
+                Snackbar.make(binding.getRoot(), technician.name + " duty status updated", Snackbar.LENGTH_SHORT).show();
             }
-        });
 
-        // Add new technician button
+            @Override
+            public void onDelete(Technician technician) {
+                new AlertDialog.Builder(StaffActivity.this)
+                        .setTitle("Remove Technician?")
+                        .setMessage("Remove " + technician.name + " from technician roster?")
+                        .setPositiveButton("Remove", (dialog, which) -> {
+                            technicianDAO.delete(technician.id);
+                            refreshCatalog();
+                            refreshOverview();
+                            Snackbar.make(binding.getRoot(), "Technician removed", Snackbar.LENGTH_SHORT).show();
+                        })
+                        .setNegativeButton("Cancel", null)
+                        .show();
+            }
+        }, techName -> technicianDAO.getActiveJobCount(techName));
+
+        binding.techniciansList.setLayoutManager(new LinearLayoutManager(this));
+        binding.techniciansList.setAdapter(technicianAdapter);
+
+        // Add Tech Button
         binding.addTechButton.setOnClickListener(v -> {
             String name = binding.newTechName.getText().toString().trim();
             String branch = binding.newTechBranch.getText().toString().trim();
@@ -449,43 +711,21 @@ public class StaffActivity extends AppCompatActivity {
                 return;
             }
 
-            boolean ok = technicianDAO.add(name, branch.isEmpty() ? "Colombo branch" : branch, skill.isEmpty() ? "Mobile phone" : skill);
-            if (ok) {
-                binding.newTechName.setText("");
-                binding.newTechBranch.setText("");
-                binding.newTechSkill.setText("");
-                refreshTechniciansDropdown();
-                Snackbar.make(v, "Technician " + name + " registered successfully", Snackbar.LENGTH_LONG).show();
-            } else {
-                Snackbar.make(v, "Failed to register technician", Snackbar.LENGTH_LONG).show();
-            }
+            technicianDAO.add(name, branch.isEmpty() ? "Colombo branch" : branch, skill.isEmpty() ? "Mobile phone" : skill);
+            binding.newTechName.setText("");
+            binding.newTechBranch.setText("");
+            binding.newTechSkill.setText("");
+
+            refreshCatalog();
+            refreshOverview();
+            Snackbar.make(v, "Technician " + name + " registered successfully", Snackbar.LENGTH_LONG).show();
         });
 
-        // Restock parts button
-        binding.restockButton.setOnClickListener(v -> {
-            String part = binding.partInput.getText().toString().trim();
-            String branch = binding.branchInput.getText().toString().trim();
-
-            if (part.isEmpty()) {
-                binding.partInput.setError("Enter part name");
-                return;
-            }
-            if (branch.isEmpty()) {
-                binding.branchInput.setError("Enter branch name");
-                return;
-            }
-
-            sparePartDAO.restock(part, branch, 2);
-            binding.partInput.setText("");
-            binding.branchInput.setText("");
-            Snackbar.make(v, "Restocked " + part + " at " + branch, Snackbar.LENGTH_LONG).show();
-        });
-
-        // Publish sample showcase button
+        // Publish Showcase Button
         binding.addSampleButton.setOnClickListener(v -> {
             String title = binding.sampleTitleInput.getText().toString().trim();
             if (title.isEmpty()) {
-                binding.sampleTitleInput.setError("Add a sample title");
+                binding.sampleTitleInput.setError("Add showcase title");
                 return;
             }
 
@@ -496,33 +736,119 @@ public class StaffActivity extends AppCompatActivity {
                 pendingSampleUri = androidx.core.content.FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photo);
                 cameraLauncher.launch(pendingSampleUri);
             } catch (Exception e) {
-                sampleRepairDAO.add(title, "Staff pick", "");
+                sampleRepairDAO.add(title, "Staff showcase", "");
                 binding.sampleTitleInput.setText("");
                 Snackbar.make(v, "Showcase published to Explore", Snackbar.LENGTH_LONG).show();
             }
         });
     }
 
-    private void refreshTechniciansDropdown() {
-        List<Technician> list = technicianDAO.all();
-        List<String> labels = new ArrayList<>();
-        for (Technician t : list) {
-            String statusIndicator = t.available ? "🟢 Available" : "🔴 Busy";
-            labels.add(t.name + " (" + t.branch + ") · " + statusIndicator);
-        }
-        techDropdownAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, labels);
-        binding.techSpinner.setAdapter(techDropdownAdapter);
+    private void refreshCatalog() {
+        List<Service> services = serviceDAO.list();
+        serviceCatalogAdapter.submit(services);
+
+        List<Technician> techs = technicianDAO.all();
+        technicianAdapter.submit(techs);
+    }
+
+    private void showEditServicePriceDialog(Service service) {
+        EditText input = new EditText(this);
+        input.setHint("New Price in LKR");
+        input.setText(String.valueOf((long) service.price));
+        input.setInputType(android.text.InputType.TYPE_CLASS_NUMBER | android.text.InputType.TYPE_NUMBER_FLAG_DECIMAL);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Update Price · " + service.name)
+                .setView(input)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String pStr = input.getText().toString().trim();
+                    try {
+                        double price = Double.parseDouble(pStr);
+                        serviceDAO.updatePrice(service.name, price);
+                        refreshCatalog();
+                        Snackbar.make(binding.getRoot(), "Price updated for " + service.name, Snackbar.LENGTH_LONG).show();
+                    } catch (Exception e) {
+                        Toast.makeText(this, "Invalid price", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void publishSample() {
         try {
             String title = binding.sampleTitleInput.getText().toString().trim();
             if (title.isEmpty()) title = "Repair Showcase";
-            sampleRepairDAO.add(title, "Staff pick", String.valueOf(pendingSampleUri));
+            sampleRepairDAO.add(title, "Staff showcase", String.valueOf(pendingSampleUri));
             binding.sampleTitleInput.setText("");
             Snackbar.make(binding.getRoot(), "Sample photo published to Explore", Snackbar.LENGTH_LONG).show();
         } catch (Exception e) {
-            Snackbar.make(binding.getRoot(), "Could not save sample", Snackbar.LENGTH_LONG).show();
+            Snackbar.make(binding.getRoot(), "Could not save showcase", Snackbar.LENGTH_LONG).show();
         }
+    }
+
+    // =========================================================================
+    // TAB 5: ADMIN & CUSTOMER DIRECTORY
+    // =========================================================================
+
+    private void setupAdminTab() {
+        userDirectoryAdapter = new UserDirectoryAdapter(
+                userId -> userDAO.getRepairCountForUser(userId),
+                user -> {
+                    Toast.makeText(this, "Customer: " + user.name + " (" + user.email + ")", Toast.LENGTH_SHORT).show();
+                }
+        );
+
+        binding.customersList.setLayoutManager(new LinearLayoutManager(this));
+        binding.customersList.setAdapter(userDirectoryAdapter);
+
+        binding.searchCustomersInput.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                refreshCustomers(s.toString());
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        // Reseed demo data button
+        binding.btnReseedDemoData.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Reset Demo Database?")
+                    .setMessage("This will reset repair appointments and inventory to clean demo default values.")
+                    .setPositiveButton("Reset & Reseed", (dialog, which) -> {
+                        dbHelper.reseedData();
+                        refreshOverview();
+                        refreshQueue();
+                        refreshInventory();
+                        refreshCatalog();
+                        refreshAdminTab();
+                        Snackbar.make(binding.getRoot(), "Demo data reseeded successfully", Snackbar.LENGTH_LONG).show();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
+    }
+
+    private void refreshAdminTab() {
+        refreshCustomers(binding.searchCustomersInput.getText().toString());
+
+        int appointmentsCount = appointmentDAO.all().size();
+        int customersCount = userDAO.allCustomers().size();
+        int partsCount = sparePartDAO.all().size();
+        int servicesCount = serviceDAO.list().size();
+        int techsCount = technicianDAO.all().size();
+
+        binding.dbDiagnosticsText.setText("• SQLite Database: v5 (techfix.db)\n"
+                + "• Records: " + appointmentsCount + " repairs, " + customersCount + " customers, "
+                + partsCount + " parts, " + servicesCount + " services, " + techsCount + " technicians\n"
+                + "• Cloud Sync: Firebase Auth & Firestore enabled\n"
+                + "• Branches: Colombo Branch, Galle Branch");
+    }
+
+    private void refreshCustomers(String query) {
+        List<User> customers = userDAO.searchCustomers(query);
+        userDirectoryAdapter.submit(customers);
+        binding.customersList.setVisibility(customers.isEmpty() ? View.GONE : View.VISIBLE);
+        binding.emptyCustomersContainer.setVisibility(customers.isEmpty() ? View.VISIBLE : View.GONE);
     }
 }

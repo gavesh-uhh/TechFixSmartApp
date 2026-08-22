@@ -73,6 +73,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         } catch (Exception e) { return value; }
     }
 
+    public void reseedData() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM status_history");
+        db.execSQL("DELETE FROM payments");
+        db.execSQL("DELETE FROM appointments");
+        db.execSQL("DELETE FROM parts");
+        db.execSQL("DELETE FROM services");
+        db.execSQL("DELETE FROM technicians");
+        db.execSQL("DELETE FROM branches");
+        db.execSQL("DELETE FROM samples");
+        seed(db);
+    }
+
     public static String now() {
         return new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.US).format(new java.util.Date());
     }

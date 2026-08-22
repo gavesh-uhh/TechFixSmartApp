@@ -12,8 +12,18 @@ public class TechnicianDAO {
     public TechnicianDAO(DatabaseHelper helper) { this.helper = helper; }
 
     public List<Technician> all() {
+        return allByBranch("All Branches");
+    }
+
+    public List<Technician> allByBranch(String branch) {
         List<Technician> out = new ArrayList<>();
-        Cursor c = helper.getReadableDatabase().rawQuery("SELECT id,name,branch,skill,available FROM technicians ORDER BY name", null);
+        String sql = (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch))
+                ? "SELECT id,name,branch,skill,available FROM technicians WHERE branch=? ORDER BY name"
+                : "SELECT id,name,branch,skill,available FROM technicians ORDER BY branch, name";
+        String[] args = (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch))
+                ? new String[]{branch} : null;
+
+        Cursor c = helper.getReadableDatabase().rawQuery(sql, args);
         while (c.moveToNext()) out.add(new Technician(c.getLong(0), c.getString(1), c.getString(2), c.getString(3), c.getInt(4) == 1));
         c.close();
         return out;
@@ -42,5 +52,23 @@ public class TechnicianDAO {
         v.put("skill", skill != null ? skill.trim() : "Mobile phone");
         v.put("available", 1);
         return helper.getWritableDatabase().insert("technicians", null, v) > 0;
+    }
+
+    public boolean delete(long id) {
+        return helper.getWritableDatabase().delete("technicians", "id=?", new String[]{String.valueOf(id)}) > 0;
+    }
+
+    public boolean deleteByName(String name) {
+        return helper.getWritableDatabase().delete("technicians", "name=?", new String[]{name}) > 0;
+    }
+
+    public int getActiveJobCount(String techName) {
+        if (techName == null || techName.isEmpty()) return 0;
+        Cursor c = helper.getReadableDatabase().rawQuery(
+                "SELECT COUNT(*) FROM appointments WHERE technician=? AND status!='Completed'",
+                new String[]{techName});
+        int count = c.moveToFirst() ? c.getInt(0) : 0;
+        c.close();
+        return count;
     }
 }
