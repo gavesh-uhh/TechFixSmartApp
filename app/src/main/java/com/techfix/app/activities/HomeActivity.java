@@ -10,56 +10,36 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.techfix.app.R;
 import com.techfix.app.database.DatabaseHelper;
+import com.techfix.app.database.ServiceDAO;
 import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.databinding.ActivityHomeBinding;
+import com.techfix.app.models.Service;
 import com.techfix.app.models.SparePart;
 import com.techfix.app.util.WindowInsetsHelper;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * HomeActivity - Landing Page for TechFix Store.
- * TechFix is a newly established computer and mobile phone repair shop & device store.
- * Displays devices and items available for sale:
- * - Smartphones & Mobile Phones
- * - Laptops & Desktop Computers
- * - Batteries, Chargers & Accessories
- * - Spare Parts & Displays
+ * HomeActivity - Landing Page for TechFix Repair Shop.
+ * TechFix is a newly established computer and mobile phone repair shop.
+ * Features:
+ * - Round category quick-filters (All, Phones, Computers, Screens, Batteries, Parts)
+ * - Available repair services catalog with pricing in LKR
+ * - In-stock replacement spare parts & components
+ * - Branch locations with Google Maps navigation
+ * - Bottom navigation bar
  */
 public class HomeActivity extends AppCompatActivity {
 
     // View binding instance for activity_home.xml
     private ActivityHomeBinding binding;
 
-    // Database access object
+    // Database access objects
+    private ServiceDAO serviceDAO;
     private SparePartDAO sparePartDAO;
 
     // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES", "PARTS"
     private String currentCategory = "ALL";
-
-    /**
-     * Simple model representing a device or item for sale in the TechFix store.
-     */
-    public static class SaleItem {
-        public final String name;
-        public final String category; // "Phones", "Computers", "Screens", "Batteries", "Parts"
-        public final double price;
-        public final String specs;
-        public final String branch;
-        public final int imageRes;
-        public final int stock;
-
-        public SaleItem(String name, String category, double price, String specs, String branch, int imageRes, int stock) {
-            this.name = name;
-            this.category = category;
-            this.price = price;
-            this.specs = specs;
-            this.branch = branch;
-            this.imageRes = imageRes;
-            this.stock = stock;
-        }
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,8 +50,9 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
         WindowInsetsHelper.apply(binding.homeContent, binding.homeContent);
 
-        // 2. Initialize Database DAO
+        // 2. Initialize Database DAOs
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(this);
+        serviceDAO = new ServiceDAO(dbHelper);
         sparePartDAO = new SparePartDAO(dbHelper);
 
         // 3. Setup UI components
@@ -79,7 +60,7 @@ public class HomeActivity extends AppCompatActivity {
         setupBottomNavigation();
         setupRoundCategories();
 
-        // 4. Initial load of devices and items for sale (ALL)
+        // 4. Initial load of all available repair services and spare parts
         selectCategory("ALL");
     }
 
@@ -119,7 +100,7 @@ public class HomeActivity extends AppCompatActivity {
             highlightCategory(binding.circleCatParts, binding.iconCatParts, binding.labelCatParts);
         }
 
-        // Reload devices and spare parts according to the selected filter
+        // Reload repair services and spare parts according to the selected filter
         loadItemsForCategory(categoryKey);
     }
 
@@ -173,53 +154,33 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Returns the list of devices (smartphones, laptops, computers, chargers) for sale.
-     */
-    private List<SaleItem> getDevicesForSale() {
-        List<SaleItem> list = new ArrayList<>();
-
-        // Smartphones for sale
-        list.add(new SaleItem("Apple iPhone 13 (128GB)", "Phones", 165000, "Grade A Refurbished · Factory Unlocked", "Colombo branch", R.drawable.ic_store_phone_screen, 4));
-        list.add(new SaleItem("Samsung Galaxy S22 5G (128GB)", "Phones", 142000, "Brand New Sealed · Official Warranty", "Galle branch", R.drawable.ic_store_phone_screen, 3));
-        list.add(new SaleItem("Google Pixel 7 (128GB)", "Phones", 118000, "Factory Unlocked · Obsidian Black", "Colombo branch", R.drawable.ic_store_phone_screen, 5));
-        list.add(new SaleItem("Xiaomi Redmi Note 12", "Phones", 49000, "Brand New · 8GB RAM / 128GB Storage", "Colombo branch", R.drawable.ic_store_phone_screen, 6));
-
-        // Laptops & Computers for sale
-        list.add(new SaleItem("Dell Latitude 5420 Laptop", "Computers", 135000, "Core i5 11th Gen · 16GB RAM · 512GB SSD", "Colombo branch", R.drawable.ic_store_laptop_diagnostics, 3));
-        list.add(new SaleItem("Apple MacBook Air M1", "Computers", 215000, "8-Core CPU · 8GB RAM · 256GB SSD", "Colombo branch", R.drawable.ic_store_laptop_diagnostics, 2));
-        list.add(new SaleItem("HP ProBook 450 G8 Laptop", "Computers", 128000, "Core i5 · 8GB RAM · 512GB NVMe SSD", "Galle branch", R.drawable.ic_store_laptop_diagnostics, 4));
-        list.add(new SaleItem("Lenovo ThinkPad T14", "Computers", 148000, "Core i7 · 16GB RAM · 512GB SSD", "Galle branch", R.drawable.ic_store_laptop_diagnostics, 3));
-
-        // Screens & Hardware Accessories
-        list.add(new SaleItem("Original Phone Display Assembly", "Screens", 8500, "High Refresh Rate OLED Screen", "Colombo branch", R.drawable.ic_store_phone_screen, 8));
-        list.add(new SaleItem("65W USB-C Fast Charger", "Batteries", 4500, "Universal Laptop & Smartphone Fast Adapter", "Colombo branch", R.drawable.ic_store_battery, 12));
-        list.add(new SaleItem("Replacement Laptop Battery Pack", "Batteries", 7500, "Genuine OEM 4-Cell High Capacity", "Colombo branch", R.drawable.ic_store_laptop_battery, 4));
-        list.add(new SaleItem("Original Smartphone Battery", "Batteries", 4500, "Extended Life Lithium-Ion Battery", "Galle branch", R.drawable.ic_store_battery, 5));
-        list.add(new SaleItem("512GB NVMe High-Speed SSD", "Parts", 9500, "M.2 PCIe 3.0 · 3500MB/s Read Speed", "Galle branch", R.drawable.ic_store_hardware_part, 7));
-
-        return list;
-    }
-
-    /**
-     * Loads and filters devices and items for sale for the given category.
+     * Loads and filters repair services and spare parts for the given category.
      */
     private void loadItemsForCategory(String filter) {
-        loadAvailableDevices(filter);
+        loadAvailableServices(filter);
         loadAvailableSpareParts(filter);
     }
 
     /**
-     * Load devices for sale (phones, laptops, computers, etc.) with category filtering.
+     * Load computer and mobile phone repair services from the SQLite database with category filtering.
      */
-    private void loadAvailableDevices(String filter) {
+    private void loadAvailableServices(String filter) {
         binding.servicesContainer.removeAllViews();
 
-        List<SaleItem> devices = getDevicesForSale();
+        if ("PARTS".equals(filter)) {
+            // Hide repair services section when viewing spare parts only
+            binding.servicesHeaderTitle.setVisibility(View.GONE);
+            binding.servicesHeaderSubtitle.setVisibility(View.GONE);
+            binding.servicesContainer.setVisibility(View.GONE);
+            return;
+        }
+
+        List<Service> services = serviceDAO.list();
         int count = 0;
 
-        for (SaleItem item : devices) {
-            // Check if device matches filter
-            if (!matchesFilter(item.name, item.category, filter)) {
+        for (Service service : services) {
+            // Check if repair service matches filter
+            if (!matchesFilter(service.name, service.category, filter)) {
                 continue;
             }
 
@@ -233,14 +194,21 @@ public class HomeActivity extends AppCompatActivity {
             TextView partText = itemView.findViewById(R.id.servicePartText);
             TextView badgeText = itemView.findViewById(R.id.serviceBadge);
 
-            imageView.setImageResource(item.imageRes);
-            nameText.setText(item.name);
-            priceText.setText("Rs " + String.format("%,d", (long) item.price));
-            categoryText.setText(item.category + " • " + item.branch);
-            partText.setText(item.specs);
-            badgeText.setText("In Stock (" + item.stock + ")");
+            imageView.setImageResource(getServiceImageResource(service.name, service.category));
+            nameText.setText(service.name);
+            priceText.setText("Rs " + String.format("%,d", (long) service.price));
+            categoryText.setText(service.category);
+            badgeText.setText("Available");
 
-            // Click item -> open login / reservation flow
+            if (service.requiredPart != null && !service.requiredPart.isEmpty()) {
+                partText.setText("Includes part: " + service.requiredPart);
+                partText.setVisibility(View.VISIBLE);
+            } else {
+                partText.setText("Full diagnostic & repair");
+                partText.setVisibility(View.VISIBLE);
+            }
+
+            // Click service -> open login / booking appointment flow
             itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                 startActivity(intent);
@@ -255,18 +223,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Load spare parts from database with filtering.
+     * Load in-stock replacement spare parts from the SQLite database with category filtering.
      */
     private void loadAvailableSpareParts(String filter) {
         binding.partsContainer.removeAllViews();
-
-        if ("PHONES".equals(filter) || "COMPUTERS".equals(filter)) {
-            // Hide separate spare parts container for specific phone/computer device filters
-            binding.partsHeaderTitle.setVisibility(View.GONE);
-            binding.partsHeaderSubtitle.setVisibility(View.GONE);
-            binding.partsContainer.setVisibility(View.GONE);
-            return;
-        }
 
         List<SparePart> parts = sparePartDAO.all();
         int count = 0;
@@ -320,15 +280,15 @@ public class HomeActivity extends AppCompatActivity {
 
         switch (filter) {
             case "PHONES":
-                return combined.contains("phone") || combined.contains("iphone") || combined.contains("pixel") || combined.contains("samsung") || combined.contains("redmi");
+                return combined.contains("phone") || combined.contains("display");
             case "COMPUTERS":
-                return combined.contains("laptop") || combined.contains("computer") || combined.contains("dell") || combined.contains("macbook") || combined.contains("probook") || combined.contains("thinkpad");
+                return combined.contains("laptop") || combined.contains("computer") || combined.contains("system") || combined.contains("diagnostics");
             case "SCREENS":
                 return combined.contains("screen") || combined.contains("display");
             case "BATTERIES":
-                return combined.contains("battery") || combined.contains("charger");
+                return combined.contains("battery");
             case "PARTS":
-                return combined.contains("display") || combined.contains("battery") || combined.contains("charger") || combined.contains("ssd") || combined.contains("part");
+                return true;
             default:
                 return true;
         }
@@ -373,6 +333,24 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
+     * Helper method to choose an image for a repair service.
+     */
+    private int getServiceImageResource(String serviceName, String category) {
+        String query = (serviceName + " " + category).toLowerCase();
+        if (query.contains("screen") || query.contains("display")) {
+            return R.drawable.ic_store_phone_screen;
+        } else if (query.contains("battery")) {
+            return R.drawable.ic_store_battery;
+        } else if (query.contains("diagnostics")) {
+            return R.drawable.ic_store_laptop_diagnostics;
+        } else if (query.contains("system") || query.contains("os") || query.contains("software")) {
+            return R.drawable.ic_store_os_repair;
+        } else {
+            return R.drawable.ic_store_hardware_part;
+        }
+    }
+
+    /**
      * Helper method to choose an image for a spare part item.
      */
     private int getPartImageResource(String partName) {
@@ -381,7 +359,7 @@ public class HomeActivity extends AppCompatActivity {
             return R.drawable.ic_store_phone_screen;
         } else if (query.contains("laptop") && query.contains("battery")) {
             return R.drawable.ic_store_laptop_battery;
-        } else if (query.contains("battery") || query.contains("charger")) {
+        } else if (query.contains("battery")) {
             return R.drawable.ic_store_battery;
         } else {
             return R.drawable.ic_store_hardware_part;

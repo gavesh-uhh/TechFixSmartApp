@@ -308,12 +308,12 @@
                 android:paddingHorizontal="@dimen/space_16"
                 android:paddingTop="@dimen/space_16">
 
-                <!-- Available Devices & Products for Sale Section Header -->
+                <!-- Available Repair Services Section Header -->
                 <TextView
                     android:id="@+id/servicesHeaderTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Devices &amp; Products for Sale"
+                    android:text="Available Repair Services"
                     style="@style/Widget.TechFix.SectionTitle" />
 
                 <TextView
@@ -322,10 +322,10 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:layout_marginBottom="@dimen/space_8"
-                    android:text="Phones, laptops, computers, and parts available to buy:"
+                    android:text="Select a repair service to book an appointment:"
                     android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
-                <!-- Dynamic Devices Container (populated in HomeActivity) -->
+                <!-- Dynamic Services Container (populated in HomeActivity) -->
                 <LinearLayout
                     android:id="@+id/servicesContainer"
                     android:layout_width="match_parent"
@@ -338,7 +338,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/space_16"
-                    android:text="Spare Parts &amp; Hardware"
+                    android:text="In-Stock Spare Parts"
                     style="@style/Widget.TechFix.SectionTitle" />
 
                 <TextView
@@ -347,7 +347,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:layout_marginBottom="@dimen/space_8"
-                    android:text="Available hardware parts and accessories in stock:"
+                    android:text="Genuine replacement parts available at our repair counters:"
                     android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                 <!-- Dynamic Parts Container (populated in HomeActivity) -->
