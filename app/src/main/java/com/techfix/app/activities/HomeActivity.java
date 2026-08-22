@@ -67,10 +67,9 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Inflate layout and apply insets
+        // 1. Inflate layout
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        WindowInsetsHelper.apply(binding.homeContent, binding.homeContent);
 
         // 2. Initialize Database DAOs and Session
         dbHelper = DatabaseHelper.getInstance(this);
@@ -92,6 +91,8 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         session = new SessionManager(this);
+        showStorePanel();
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
     }
 
     /**

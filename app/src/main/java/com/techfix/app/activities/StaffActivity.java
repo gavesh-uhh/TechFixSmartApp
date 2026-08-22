@@ -124,8 +124,12 @@ public class StaffActivity extends AppCompatActivity {
     private void performLogout() {
         session.logout();
         Toast.makeText(this, "Logged out of staff workspace", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(StaffActivity.this, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        goHome();
+    }
+
+    private void goHome() {
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
         finish();
     }
@@ -397,12 +401,5 @@ public class StaffActivity extends AppCompatActivity {
         } catch (Exception e) {
             Snackbar.make(binding.getRoot(), "Could not save sample", Snackbar.LENGTH_LONG).show();
         }
-    }
-
-    private void goHome() {
-        Intent intent = new Intent(this, HomeActivity.class);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        startActivity(intent);
-        finish();
     }
 }
