@@ -166,10 +166,7 @@ public class CustomerActivity extends AppCompatActivity {
             return false;
         });
 
-        // Quick book buttons
-        binding.quickBookButton.setOnClickListener(v -> {
-            binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_book);
-        });
+
 
         binding.emptyBookButton.setOnClickListener(v -> {
             binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_book);
@@ -217,8 +214,7 @@ public class CustomerActivity extends AppCompatActivity {
         binding.repairList.setVisibility(hasRepairs ? View.VISIBLE : View.GONE);
         binding.emptyStateContainer.setVisibility(hasRepairs ? View.GONE : View.VISIBLE);
 
-        binding.activeCount.setText(repairs.size() + (repairs.size() == 1 ? " Total Repair" : " Total Repairs"));
-        binding.lastUpdated.setText("Updated just now");
+
 
         // Check if there are any pending payments
         boolean hasPendingPayment = false;
