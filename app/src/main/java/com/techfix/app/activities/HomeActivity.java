@@ -3,10 +3,14 @@ package com.techfix.app.activities;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
@@ -16,13 +20,16 @@ import com.techfix.app.R;
 import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.DatabaseHelper;
 import com.techfix.app.database.ServiceDAO;
+import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.databinding.ActivityHomeBinding;
 import com.techfix.app.models.Service;
+import com.techfix.app.models.SparePart;
 import com.techfix.app.models.UserRole;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,7 +38,8 @@ import java.util.List;
  * Features:
  * - Round category quick-filters (All, Phones, Computers, Screens, Batteries)
  * - Available repair services catalog with pricing in LKR
- * - Bottom navigation: Store, Book Appointment, Branches, Account
+ * - Dedicated Spare Parts Inventory navigation
+ * - Bottom navigation: Store, Parts, Book Appointment, Branches, Account
  * - Mandatory login/account check before placing repair appointments
  */
 public class HomeActivity extends AppCompatActivity {
@@ -42,11 +50,13 @@ public class HomeActivity extends AppCompatActivity {
     // Database access objects
     private DatabaseHelper dbHelper;
     private ServiceDAO serviceDAO;
+    private SparePartDAO sparePartDAO;
     private AppointmentDAO appointmentDAO;
     private SessionManager session;
 
     // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES"
     private String currentCategory = "ALL";
+    private String currentPartsBranch = "All Branches";
 
     // Attached device photo URI
     private Uri selectedPhotoUri = null;
@@ -74,6 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         // 2. Initialize Database DAOs and Session
         dbHelper = DatabaseHelper.getInstance(this);
         serviceDAO = new ServiceDAO(dbHelper);
+        sparePartDAO = new SparePartDAO(dbHelper);
         appointmentDAO = new AppointmentDAO(dbHelper);
         session = new SessionManager(this);
 
@@ -81,6 +92,7 @@ public class HomeActivity extends AppCompatActivity {
         setupBranchButtons();
         setupBottomNavigation();
         setupRoundCategories();
+        setupPartsPanel();
         setupBookingForm();
 
         // 4. Initial load of all available repair services
@@ -96,7 +108,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Setup bottom navigation bar (Store, Book, Branches, Account).
+     * Setup bottom navigation bar (Store, Parts, Book, Branches, Account).
      */
     private void setupBottomNavigation() {
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
@@ -108,6 +120,11 @@ public class HomeActivity extends AppCompatActivity {
                 // Show Store Catalog Panel
                 showStorePanel();
                 binding.storePanel.smoothScrollTo(0, 0);
+                return true;
+
+            } else if (itemId == R.id.nav_home_parts) {
+                // Show Dedicated Spare Parts Panel
+                showPartsPanel();
                 return true;
 
             } else if (itemId == R.id.nav_home_book) {
@@ -142,20 +159,34 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows the Store Catalog panel and hides the Booking panel.
+     * Shows the Store Catalog panel and hides others.
      */
     private void showStorePanel() {
         binding.storePanel.setVisibility(View.VISIBLE);
+        binding.partsPanel.setVisibility(View.GONE);
         binding.bookAppointmentPanel.setVisibility(View.GONE);
         binding.topBarTitle.setText("TechFix Store");
         binding.topBarSubtitle.setText("Computer & Mobile Phone Repairs");
     }
 
     /**
-     * Shows the Book Appointment panel and hides the Store Catalog panel.
+     * Shows the Dedicated Spare Parts panel and hides others.
+     */
+    private void showPartsPanel() {
+        binding.storePanel.setVisibility(View.GONE);
+        binding.partsPanel.setVisibility(View.VISIBLE);
+        binding.bookAppointmentPanel.setVisibility(View.GONE);
+        binding.topBarTitle.setText("Workshop Spare Parts");
+        binding.topBarSubtitle.setText("Live Inventory & Component Availability");
+        loadAvailableParts();
+    }
+
+    /**
+     * Shows the Book Appointment panel and hides others.
      */
     private void showBookAppointmentPanel() {
         binding.storePanel.setVisibility(View.GONE);
+        binding.partsPanel.setVisibility(View.GONE);
         binding.bookAppointmentPanel.setVisibility(View.VISIBLE);
         binding.topBarTitle.setText("Book Appointment");
         binding.topBarSubtitle.setText("Repair request & device details");
@@ -458,6 +489,99 @@ public class HomeActivity extends AppCompatActivity {
         } else {
             return R.drawable.ic_store_phone_screen;
         }
+    }
+
+    /**
+     * Setup the Spare Parts panel: branch filter dropdown & real-time search input.
+     */
+    private void setupPartsPanel() {
+        String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
+        ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
+        binding.homePartsBranchSpinner.setAdapter(branchAdapter);
+
+        binding.homePartsBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                currentPartsBranch = branches[position];
+                loadAvailableParts();
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        binding.searchHomePartsInput.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                loadAvailableParts();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+    }
+
+    /**
+     * Loads spare parts from SQLite database and inflates them into homePartsContainer.
+     */
+    private void loadAvailableParts() {
+        binding.homePartsContainer.removeAllViews();
+        List<SparePart> parts = sparePartDAO.allByBranch(currentPartsBranch);
+        String searchQuery = binding.searchHomePartsInput.getText() != null
+                ? binding.searchHomePartsInput.getText().toString().trim().toLowerCase()
+                : "";
+
+        int count = 0;
+        for (SparePart part : parts) {
+            if (!searchQuery.isEmpty() && !part.name.toLowerCase().contains(searchQuery)) {
+                continue;
+            }
+
+            count++;
+            View itemView = getLayoutInflater().inflate(R.layout.item_home_part, binding.homePartsContainer, false);
+
+            ImageView imageView = itemView.findViewById(R.id.partImageView);
+            TextView branchText = itemView.findViewById(R.id.partBranchText);
+            TextView nameText = itemView.findViewById(R.id.partNameText);
+            TextView qtyText = itemView.findViewById(R.id.partQuantityText);
+            TextView badgeText = itemView.findViewById(R.id.partStatusBadge);
+
+            branchText.setText("📍 " + part.branch);
+            nameText.setText(part.name);
+            qtyText.setText(part.quantity + " units available in store");
+
+            // Choose icon
+            if (part.name.toLowerCase().contains("screen") || part.name.toLowerCase().contains("display")) {
+                imageView.setImageResource(R.drawable.ic_store_phone_screen);
+            } else if (part.name.toLowerCase().contains("battery")) {
+                if (part.name.toLowerCase().contains("laptop")) {
+                    imageView.setImageResource(R.drawable.ic_store_laptop_battery);
+                } else {
+                    imageView.setImageResource(R.drawable.ic_store_battery);
+                }
+            } else {
+                imageView.setImageResource(R.drawable.ic_store_hardware_part);
+            }
+
+            // Stock badge status
+            if (part.quantity == 0) {
+                badgeText.setText("Out of Stock");
+                badgeText.setTextColor(getColor(R.color.error));
+            } else if (part.quantity < 3) {
+                badgeText.setText("Low Stock (" + part.quantity + ")");
+                badgeText.setTextColor(getColor(R.color.warning));
+            } else {
+                badgeText.setText("In Stock (" + part.quantity + ")");
+                badgeText.setTextColor(getColor(R.color.success));
+            }
+
+            // When customer taps part -> switch to Booking tab
+            itemView.setOnClickListener(v -> {
+                binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
+                Toast.makeText(this, "Selected " + part.name + " for repair booking", Toast.LENGTH_SHORT).show();
+            });
+
+            binding.homePartsContainer.addView(itemView);
+        }
+
+        binding.emptyHomePartsContainer.setVisibility(count == 0 ? View.VISIBLE : View.GONE);
+        binding.homePartsContainer.setVisibility(count == 0 ? View.GONE : View.VISIBLE);
     }
 
     /**
