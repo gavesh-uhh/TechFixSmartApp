@@ -508,19 +508,6 @@
                         android:orientation="vertical"
                         android:padding="@dimen/card_padding">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Book Repair Appointment"
-                            android:textAppearance="@style/TextAppearance.TechFix.Headline" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4"
-                            android:layout_marginBottom="@dimen/space_16"
-                            android:text="Fill in your device information and our technicians will inspect it."
-                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                         <!-- 1. Service Type -->
                         <TextView
