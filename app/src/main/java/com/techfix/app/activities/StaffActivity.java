@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -55,6 +56,18 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
         // 3. Header & Navigation
         binding.staffHomeStoreButton.setOnClickListener(v ->
                 startActivity(new Intent(StaffActivity.this, HomeActivity.class)));
+        binding.staffLogoutButton.setOnClickListener(v -> {
+            new AlertDialog.Builder(this)
+                    .setTitle("Log Out")
+                    .setMessage("Are you sure you want to log out of the admin workspace?")
+                    .setPositiveButton("Log Out", (dialog, which) -> {
+                        session.logout();
+                        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+                        goHome();
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+        });
         setupBottomNavigation();
 
         if (savedInstanceState == null) {
@@ -120,7 +133,7 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
 
     @Override
     public void setHeaderBadge(String text) {
-        binding.headerBranchBadge.setText(text);
+        // Badge removed from top header bar
     }
 
     @Override

@@ -1,14 +1,19 @@
 package com.techfix.app.activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.techfix.app.R;
@@ -28,6 +33,7 @@ import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.Feedback;
 import com.techfix.app.util.WindowInsetsHelper;
 
+import java.io.File;
 import java.util.List;
 
 /**
@@ -58,18 +64,78 @@ public class CustomerActivity extends AppCompatActivity {
 
     // Photo capture / selection
     private Uri selectedPhotoUri = null;
+    private Uri tempCameraUri = null;
 
-    // Photo picker launcher
+    // 1. Photo picker launcher (Gallery)
     private final ActivityResultLauncher<String> photoPickerLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
                 if (uri != null) {
-                    selectedPhotoUri = uri;
-                    binding.customerPhotoPreview.setImageURI(uri);
-                    binding.customerPhotoPreviewContainer.setVisibility(View.VISIBLE);
-                    binding.customerPhotoStatus.setText("Photo attached");
-                    binding.customerPhotoStatus.setTextColor(getResources().getColor(R.color.success, null));
+                    onPhotoReady(uri);
                 }
             });
+
+    // 2. Camera Take Picture Launcher
+    private final ActivityResultLauncher<Uri> takePictureLauncher =
+            registerForActivityResult(new ActivityResultContracts.TakePicture(), (Boolean success) -> {
+                if (Boolean.TRUE.equals(success) && tempCameraUri != null) {
+                    onPhotoReady(tempCameraUri);
+                }
+            });
+
+    // 3. Camera Permission Launcher
+    private final ActivityResultLauncher<String> cameraPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), (Boolean isGranted) -> {
+                if (Boolean.TRUE.equals(isGranted)) {
+                    launchCamera();
+                } else {
+                    Toast.makeText(this, "Camera permission is required to take a photo", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+    private void onPhotoReady(Uri uri) {
+        selectedPhotoUri = uri;
+        binding.customerPhotoPreview.setImageURI(uri);
+        binding.customerPhotoPreviewContainer.setVisibility(View.VISIBLE);
+        binding.customerPhotoStatus.setText("Photo attached");
+        binding.customerPhotoStatus.setTextColor(ContextCompat.getColor(this, R.color.success));
+    }
+
+    private void showPhotoOptionsDialog() {
+        CharSequence[] options = {"Take Photo with Camera", "Choose from Gallery"};
+        new AlertDialog.Builder(this)
+                .setTitle("Attach Device Photo")
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        checkCameraPermissionAndLaunch();
+                    } else {
+                        photoPickerLauncher.launch("image/*");
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void checkCameraPermissionAndLaunch() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            launchCamera();
+        } else {
+            cameraPermissionLauncher.launch(Manifest.permission.CAMERA);
+        }
+    }
+
+    private void launchCamera() {
+        try {
+            File cacheDir = new File(getCacheDir(), "images");
+            if (!cacheDir.exists()) {
+                cacheDir.mkdirs();
+            }
+            File photoFile = new File(cacheDir, "device_photo_" + System.currentTimeMillis() + ".jpg");
+            tempCameraUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
+            takePictureLauncher.launch(tempCameraUri);
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to open camera: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -265,15 +331,16 @@ public class CustomerActivity extends AppCompatActivity {
         binding.branchSpinner.setAdapter(branchAdapter);
 
         // 4. Attach Photo Button
-        binding.cameraButton.setOnClickListener(v -> photoPickerLauncher.launch("image/*"));
+        binding.cameraButton.setOnClickListener(v -> showPhotoOptionsDialog());
 
         // 5. Remove Photo Button
         binding.customerRemovePhotoButton.setOnClickListener(v -> {
             selectedPhotoUri = null;
+            tempCameraUri = null;
             binding.customerPhotoPreview.setImageURI(null);
             binding.customerPhotoPreviewContainer.setVisibility(View.GONE);
             binding.customerPhotoStatus.setText("No photo attached");
-            binding.customerPhotoStatus.setTextColor(getResources().getColor(R.color.muted_text, null));
+            binding.customerPhotoStatus.setTextColor(ContextCompat.getColor(this, R.color.muted_text));
         });
 
         // 6. Submit Booking Button

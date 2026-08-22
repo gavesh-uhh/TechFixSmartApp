@@ -13,120 +13,56 @@
                 android:orientation="vertical"
                 android:padding="@dimen/screen_padding">
 
-                <!-- Inventory Branch Filter -->
+                <!-- Inventory Header: Branch Filter & Add Part Button -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_nav_location"
-                        app:tint="@color/muted_text" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginStart="4dp"
-                        android:text="Branch:"
-                        android:textColor="@color/muted_text"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <Spinner
-                        android:id="@+id/inventoryBranchSpinner"
-                        style="@style/Widget.TechFix.Spinner"
-                        android:layout_width="0dp"
-                        android:layout_height="44dp"
-                        android:layout_marginStart="@dimen/space_8"
-                        android:layout_weight="1" />
-                </LinearLayout>
-
-                <!-- Add New Spare Part Card -->
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.TechFix.ShadowCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_12">
-
                     <LinearLayout
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/card_padding">
+                        android:layout_weight="1"
+                        android:gravity="center_vertical"
+                        android:orientation="horizontal">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_nav_location"
+                            app:tint="@color/muted_text" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Add / Restock Workshop Part"
-                            style="@style/Widget.TechFix.SectionTitle" />
-
-                        <EditText
-                            android:id="@+id/newPartNameInput"
-                            style="@style/Widget.TechFix.Input"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
-                            android:hint="Part Name"
-                            android:inputType="text"
-                            android:maxLines="1" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="e.g. iPhone Screen, Type-C Port"
+                            android:layout_marginStart="4dp"
+                            android:text="Branch:"
                             android:textColor="@color/muted_text"
-                            android:textSize="11sp" />
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
 
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_8"
-                            android:orientation="horizontal">
-
-                            <EditText
-                                android:id="@+id/newPartBranchInput"
-                                style="@style/Widget.TechFix.Input"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="6dp"
-                                android:layout_weight="1"
-                                android:hint="Branch"
-                                android:inputType="text"
-                                android:maxLines="1" />
-
-                            <EditText
-                                android:id="@+id/newPartQtyInput"
-                                style="@style/Widget.TechFix.Input"
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_marginStart="6dp"
-                                android:layout_weight="1"
-                                android:hint="Quantity"
-                                android:inputType="number" />
-                        </LinearLayout>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Branch: Colombo / Galle"
-                            android:textColor="@color/muted_text"
-                            android:textSize="11sp" />
-
-                        <Button
-                            android:id="@+id/btnAddPartButton"
-                            style="@style/Widget.TechFix.Button.Filled"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
-                            android:text="Save Part to Inventory" />
+                        <Spinner
+                            android:id="@+id/inventoryBranchSpinner"
+                            style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="0dp"
+                            android:layout_height="44dp"
+                            android:layout_marginStart="@dimen/space_8"
+                            android:layout_weight="1" />
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+
+                    <Button
+                        android:id="@+id/btnAddPartButton"
+                        style="@style/Widget.TechFix.Button.Filled"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginStart="@dimen/space_12"
+                        android:minWidth="0dp"
+                        android:paddingHorizontal="14dp"
+                        android:text="+ Add Part"
+                        android:textSize="13sp" />
+                </LinearLayout>
 
                 <!-- Inventory Items Section -->
                 <TextView
