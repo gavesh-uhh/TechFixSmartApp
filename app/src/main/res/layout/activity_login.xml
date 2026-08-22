@@ -59,7 +59,7 @@
                 android:orientation="vertical"
                 android:padding="@dimen/card_padding">
 
-                <!-- Full Name (Only visible for sign up) -->
+                <!-- 1. Full Name (Only visible for sign up) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/nameLayout"
                     style="@style/Widget.TechFix.TextInput"
@@ -71,10 +71,28 @@
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/nameInput"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Email Input -->
+                <!-- 2. Phone Number (Only visible for sign up) -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/phoneLayout"
+                    style="@style/Widget.TechFix.TextInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:hint="Phone number"
+                    android:visibility="gone">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/phoneInput"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="phone" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- 3. Email Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.TechFix.TextInput"
                     android:layout_width="match_parent"
@@ -89,7 +107,7 @@
                         android:inputType="textEmailAddress" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Password Input -->
+                <!-- 4. Password Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.TechFix.TextInput"
                     android:layout_width="match_parent"

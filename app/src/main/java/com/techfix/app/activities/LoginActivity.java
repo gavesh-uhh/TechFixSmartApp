@@ -18,8 +18,9 @@ import com.techfix.app.util.WindowInsetsHelper;
 
 /**
  * LoginActivity - Unified Authentication for Customers and Staff.
- * Users sign in with their email and password.
- * The system automatically detects their role (Customer vs Staff) and redirects them
+ * - Sign In: Email + Password
+ * - Sign Up: Full Name + Phone Number + Email + Password
+ * The system automatically detects the account role (Customer vs Staff) and redirects
  * to the appropriate dashboard workspace.
  */
 public class LoginActivity extends AppCompatActivity {
@@ -87,6 +88,7 @@ public class LoginActivity extends AppCompatActivity {
         boolean isSignUp = (mode == Mode.SIGN_UP);
 
         binding.nameLayout.setVisibility(isSignUp ? View.VISIBLE : View.GONE);
+        binding.phoneLayout.setVisibility(isSignUp ? View.VISIBLE : View.GONE);
         binding.passwordStrength.setVisibility(isSignUp ? View.VISIBLE : View.GONE);
         binding.strengthLabel.setVisibility(isSignUp ? View.VISIBLE : View.GONE);
 
@@ -113,21 +115,33 @@ public class LoginActivity extends AppCompatActivity {
         SessionManager session = new SessionManager(this);
 
         if (mode == Mode.SIGN_UP) {
-            // Customer Sign Up
+            // Customer Sign Up: Full name, Phone number, Email, Password
             String fullName = binding.nameInput.getText().toString().trim();
+            String phone = binding.phoneInput.getText().toString().trim();
+
             if (fullName.isEmpty()) {
                 Snackbar.make(view, "Please enter your full name", Snackbar.LENGTH_LONG).show();
                 return;
             }
 
-            boolean created = userDAO.create(fullName, email, password);
+            if (phone.isEmpty()) {
+                Snackbar.make(view, "Please enter your phone number", Snackbar.LENGTH_LONG).show();
+                return;
+            }
+
+            if (password.length() < 4) {
+                Snackbar.make(view, "Password must be at least 4 characters", Snackbar.LENGTH_LONG).show();
+                return;
+            }
+
+            boolean created = userDAO.create(fullName, email, phone, password);
             if (created) {
                 User newUser = userDAO.findByEmail(email);
                 UserRole role = (newUser != null && newUser.role != null) ? newUser.role : UserRole.CUSTOMER;
                 session.start(newUser.id, role);
                 openDashboard(role);
             } else {
-                Snackbar.make(view, "Could not create account or email already exists", Snackbar.LENGTH_LONG).show();
+                Snackbar.make(view, "Could not create account or email already registered", Snackbar.LENGTH_LONG).show();
             }
 
         } else {

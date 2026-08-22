@@ -11,14 +11,14 @@ public class UserDAO {
     public UserDAO(DatabaseHelper helper) { this.helper = helper; }
 
     public User get(long id) {
-        Cursor c = helper.getReadableDatabase().rawQuery("SELECT id,name,email,role FROM users WHERE id=?", new String[]{String.valueOf(id)});
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT id,name,email,role,phone FROM users WHERE id=?", new String[]{String.valueOf(id)});
         User u = c.moveToFirst() ? read(c) : null;
         c.close();
         return u;
     }
 
     public User findByEmail(String email) {
-        Cursor c = helper.getReadableDatabase().rawQuery("SELECT id,name,email,role FROM users WHERE email=?", new String[]{email});
+        Cursor c = helper.getReadableDatabase().rawQuery("SELECT id,name,email,role,phone FROM users WHERE email=?", new String[]{email});
         User u = c.moveToFirst() ? read(c) : null;
         c.close();
         return u;
@@ -32,17 +32,25 @@ public class UserDAO {
         return ok;
     }
 
-    public boolean create(String name, String email, String password) {
+    public boolean create(String name, String email, String phone, String password) {
         if (name.trim().isEmpty() || email.trim().isEmpty() || password.length() < 4) return false;
         ContentValues v = new ContentValues();
-        v.put("name", name.trim()); v.put("email", email.trim());
-        v.put("password", DatabaseHelper.hash(password)); v.put("role", UserRole.CUSTOMER.name());
+        v.put("name", name.trim());
+        v.put("email", email.trim());
+        v.put("phone", phone != null ? phone.trim() : "");
+        v.put("password", DatabaseHelper.hash(password));
+        v.put("role", UserRole.CUSTOMER.name());
         return helper.getWritableDatabase().insertWithOnConflict("users", null, v, android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE) > 0;
+    }
+
+    public boolean create(String name, String email, String password) {
+        return create(name, email, "", password);
     }
 
     private static User read(Cursor c) {
         UserRole role;
         try { role = UserRole.valueOf(c.getString(3)); } catch (Exception e) { role = UserRole.CUSTOMER; }
-        return new User(c.getLong(0), c.getString(1), c.getString(2), role);
+        String phone = (c.getColumnCount() > 4 && !c.isNull(4)) ? c.getString(4) : "";
+        return new User(c.getLong(0), c.getString(1), c.getString(2), phone, role);
     }
 }
