@@ -8,10 +8,12 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.firestore.WriteBatch;
 import com.techfix.app.database.DatabaseHelper;
 import com.techfix.app.models.Appointment;
 import com.techfix.app.models.Service;
@@ -22,8 +24,10 @@ import com.techfix.app.util.NetworkUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -170,6 +174,8 @@ public class FirebaseSyncManager {
      */
     private void pushLocalDataToFirestore(DatabaseHelper dbHelper, FirebaseFirestore firestore) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
+        WriteBatch batch = firestore.batch();
+        int ops = 0;
 
         // Push Users
         Cursor cu = db.rawQuery("SELECT id, name, email, phone, role FROM users", null);
@@ -181,7 +187,8 @@ public class FirebaseSyncManager {
             map.put("email", cu.getString(2));
             map.put("phone", cu.getString(3));
             map.put("role", cu.getString(4));
-            firestore.collection("users").document("user_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("users").document("user_" + id), map, SetOptions.merge());
+            ops++;
         }
         cu.close();
 
@@ -203,7 +210,8 @@ public class FirebaseSyncManager {
             map.put("timeSlot", ca.getString(10));
             map.put("createdAt", ca.getString(11));
             map.put("photoUri", ca.getString(12));
-            firestore.collection("appointments").document("apt_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("appointments").document("apt_" + id), map, SetOptions.merge());
+            ops++;
         }
         ca.close();
 
@@ -216,14 +224,17 @@ public class FirebaseSyncManager {
             map.put("name", cp.getString(1));
             map.put("quantity", cp.getInt(2));
             map.put("branch", cp.getString(3));
-            firestore.collection("parts").document("part_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("parts").document("part_" + id), map, SetOptions.merge());
+            ops++;
         }
         cp.close();
 
         // Push Services
+        Set<Long> localServiceIds = new HashSet<>();
         Cursor cs = db.rawQuery("SELECT id, name, category, price, requiredPart, branch FROM services", null);
         while (cs.moveToNext()) {
             long id = cs.getLong(0);
+            localServiceIds.add(id);
             Map<String, Object> map = new HashMap<>();
             map.put("id", id);
             map.put("name", cs.getString(1));
@@ -231,9 +242,24 @@ public class FirebaseSyncManager {
             map.put("price", cs.getDouble(3));
             map.put("requiredPart", cs.getString(4));
             map.put("branch", cs.getString(5));
-            firestore.collection("services").document("srv_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("services").document("srv_" + id), map, SetOptions.merge());
+            ops++;
         }
         cs.close();
+
+        // Clean up services deleted locally
+        try {
+            QuerySnapshot remoteServices = Tasks.await(firestore.collection("services").get());
+            for (DocumentSnapshot doc : remoteServices.getDocuments()) {
+                Long id = doc.getLong("id");
+                if (id != null && !localServiceIds.contains(id)) {
+                    batch.delete(doc.getReference());
+                    ops++;
+                }
+            }
+        } catch (Exception e) {
+            Log.w(TAG, "Clean up deleted remote services skipped: " + e.getMessage());
+        }
 
         // Push Technicians
         Cursor ct = db.rawQuery("SELECT id, name, branch, skill, available FROM technicians", null);
@@ -245,7 +271,8 @@ public class FirebaseSyncManager {
             map.put("branch", ct.getString(2));
             map.put("skill", ct.getString(3));
             map.put("available", ct.getInt(4) == 1);
-            firestore.collection("technicians").document("tech_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("technicians").document("tech_" + id), map, SetOptions.merge());
+            ops++;
         }
         ct.close();
 
@@ -259,7 +286,8 @@ public class FirebaseSyncManager {
             map.put("status", ch.getString(2));
             map.put("updatedAt", ch.getString(3));
             map.put("note", ch.getString(4));
-            firestore.collection("status_history").document("hist_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("status_history").document("hist_" + id), map, SetOptions.merge());
+            ops++;
         }
         ch.close();
 
@@ -273,7 +301,8 @@ public class FirebaseSyncManager {
             map.put("amount", cpay.getDouble(2));
             map.put("method", cpay.getString(3));
             map.put("paidAt", cpay.getString(4));
-            firestore.collection("payments").document("pay_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("payments").document("pay_" + id), map, SetOptions.merge());
+            ops++;
         }
         cpay.close();
 
@@ -287,7 +316,8 @@ public class FirebaseSyncManager {
             map.put("city", cb.getString(2));
             map.put("latitude", cb.getDouble(3));
             map.put("longitude", cb.getDouble(4));
-            firestore.collection("branches").document("branch_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("branches").document("branch_" + id), map, SetOptions.merge());
+            ops++;
         }
         cb.close();
 
@@ -300,9 +330,19 @@ public class FirebaseSyncManager {
             map.put("title", csm.getString(1));
             map.put("service", csm.getString(2));
             map.put("imageUri", csm.getString(3));
-            firestore.collection("samples").document("sample_" + id).set(map, SetOptions.merge());
+            batch.set(firestore.collection("samples").document("sample_" + id), map, SetOptions.merge());
+            ops++;
         }
         csm.close();
+
+        if (ops > 0) {
+            try {
+                Tasks.await(batch.commit());
+                Log.d(TAG, "Successfully committed " + ops + " batch operations.");
+            } catch (Exception e) {
+                Log.e(TAG, "Batch commit failed: " + e.getMessage());
+            }
+        }
     }
 
     /**
