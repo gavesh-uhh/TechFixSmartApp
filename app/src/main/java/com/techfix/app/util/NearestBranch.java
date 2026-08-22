@@ -31,6 +31,7 @@ public final class NearestBranch {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
+    //noinspection MissingPermission — permission is checked by hasPermission() before this call
     public static void resolve(Activity activity, com.techfix.app.database.DatabaseHelper dbHelper, Callback callback) {
         if (!hasPermission(activity)) {
             callback.onResult(null, 0);
