@@ -21,6 +21,7 @@ import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.databinding.ActivityHomeBinding;
 import com.techfix.app.models.Service;
 import com.techfix.app.models.SparePart;
+import com.techfix.app.models.UserRole;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
@@ -34,7 +35,7 @@ import java.util.List;
  * - Available repair services catalog with pricing in LKR
  * - In-stock replacement spare parts & components
  * - Bottom navigation: Store, Book Appointment, Branches, Account
- * - Complete Book Appointment form with service type, device info, photo, and description
+ * - Mandatory login/account check before placing repair appointments
  */
 public class HomeActivity extends AppCompatActivity {
 
@@ -122,9 +123,14 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
 
             } else if (itemId == R.id.nav_home_account) {
-                // Open Customer & Staff login / account screen
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
+                // Open Customer / Staff dashboard if logged in, or Login screen if not
+                if (session.isLoggedIn()) {
+                    Class<?> target = session.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
+                    startActivity(new Intent(HomeActivity.this, target));
+                } else {
+                    Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                }
                 return false;
             }
 
@@ -197,15 +203,30 @@ public class HomeActivity extends AppCompatActivity {
 
     /**
      * Validates and submits the appointment booking to the SQLite database.
+     * Requires the user to be logged in with an account before placing the appointment.
      */
     private void submitAppointmentBooking() {
+        // 1. Enforce user login/account requirement
+        if (!session.isLoggedIn()) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Account Required")
+                    .setMessage("To place a repair appointment, please sign in or create an account so you can track and manage your repairs.")
+                    .setPositiveButton("Sign In / Create Account", (dialog, which) -> {
+                        Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                        startActivity(intent);
+                    })
+                    .setNegativeButton("Cancel", null)
+                    .show();
+            return;
+        }
+
         String serviceSelection = (String) binding.bookingServiceSpinner.getSelectedItem();
         String deviceCategory = (String) binding.bookingDeviceSpinner.getSelectedItem();
         String deviceModel = binding.bookingModelInput.getText().toString().trim();
         String problemDescription = binding.bookingProblemInput.getText().toString().trim();
         String branch = (String) binding.bookingBranchSpinner.getSelectedItem();
 
-        // Validation
+        // 2. Validate input fields
         if (deviceModel.isEmpty()) {
             binding.bookingModelInput.setError("Please enter your device model / brand");
             binding.bookingModelInput.requestFocus();
@@ -218,28 +239,28 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        // Parse service name and price
+        // 3. Parse service name and price
         String serviceName = serviceDAO.serviceName(serviceSelection != null ? serviceSelection : "Repair Service");
         double price = serviceDAO.price(serviceSelection != null ? serviceSelection : "0");
 
-        // Combine device info: e.g. "Mobile phone (iPhone 13 Pro)"
+        // 4. Combine device info: e.g. "Mobile phone (iPhone 13 Pro)"
         String fullDeviceInfo = deviceCategory + " (" + deviceModel + ")";
 
-        // Get user ID (or default customer ID 1)
-        long userId = session.isLoggedIn() ? session.getUserId() : 1;
+        // 5. Get logged-in user ID
+        long userId = session.getUserId();
 
-        // Auto-assign available technician
+        // 6. Auto-assign available technician for the branch
         String technician = new TechnicianDAO(dbHelper).availableFor(branch, deviceCategory);
 
-        // Insert into SQLite database
+        // 7. Insert appointment into SQLite database
         long appointmentId = appointmentDAO.add(userId, fullDeviceInfo, problemDescription, branch, serviceName, price, technician, "");
 
-        // Save attached photo URI if provided
+        // 8. Save attached photo URI if provided
         if (selectedPhotoUri != null && appointmentId > 0) {
             appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
         }
 
-        // Show Success Dialog
+        // 9. Show Success Confirmation Dialog
         new AlertDialog.Builder(this)
                 .setTitle("Appointment Booked!")
                 .setMessage("Your repair appointment #" + appointmentId + " has been booked successfully at " + branch + ".\n\nTechnician assigned: " + technician + "\nService: " + serviceName + " (Rs " + (long) price + ")")
