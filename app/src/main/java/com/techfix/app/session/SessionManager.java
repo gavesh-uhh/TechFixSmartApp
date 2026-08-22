@@ -2,9 +2,12 @@ package com.techfix.app.session;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import com.google.firebase.auth.FirebaseAuth;
 import com.techfix.app.models.UserRole;
 
-/** Persists the logged-in user across app restarts. */
+/**
+ * Persists the logged-in user across app restarts and manages Firebase Auth session.
+ */
 public class SessionManager {
     private static final String PREFS = "techfix_session";
     private static final String KEY_USER_ID = "userId";
@@ -13,22 +16,39 @@ public class SessionManager {
     private final SharedPreferences prefs;
 
     public SessionManager(Context context) {
-        prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
     public void start(long userId, UserRole role) {
-        prefs.edit().putLong(KEY_USER_ID, userId).putString(KEY_ROLE, role.name()).apply();
+        prefs.edit()
+                .putLong(KEY_USER_ID, userId)
+                .putString(KEY_ROLE, role.name())
+                .commit();
     }
 
-    public boolean isLoggedIn() { return prefs.contains(KEY_USER_ID); }
+    public boolean isLoggedIn() {
+        return prefs.contains(KEY_USER_ID) && prefs.getLong(KEY_USER_ID, -1) > 0;
+    }
 
-    public long getUserId() { return prefs.getLong(KEY_USER_ID, -1); }
+    public long getUserId() {
+        return prefs.getLong(KEY_USER_ID, -1);
+    }
 
     public UserRole getRole() {
-        try { return UserRole.valueOf(prefs.getString(KEY_ROLE, UserRole.CUSTOMER.name())); }
-        catch (Exception e) { return UserRole.CUSTOMER; }
+        try {
+            return UserRole.valueOf(prefs.getString(KEY_ROLE, UserRole.CUSTOMER.name()));
+        } catch (Exception e) {
+            return UserRole.CUSTOMER;
+        }
     }
 
-    public void logout() { prefs.edit().clear().apply(); }
+    public void logout() {
+        try {
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            if (auth != null) {
+                auth.signOut();
+            }
+        } catch (Exception ignored) {}
+        prefs.edit().clear().commit();
+    }
 }
-

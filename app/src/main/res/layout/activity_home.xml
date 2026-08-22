@@ -1,122 +1,754 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/homeRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:background="@color/cloud">
 
-    <LinearLayout android:id="@+id/homeContent"
+    <!-- Clean Top App Header -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:clipToPadding="false">
+        android:paddingHorizontal="@dimen/space_16"
+        android:paddingTop="16dp"
+        android:paddingBottom="12dp"
+        android:background="@color/white">
 
-        <!-- Header band -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="64dp"
-            android:background="@drawable/bg_service_band"
-            android:orientation="vertical"
-            android:gravity="center_vertical"
-            android:paddingHorizontal="@dimen/space_16">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="TechFix"
-                android:textColor="@color/white"
-                style="@style/TextAppearance.TechFix.Label" />
-        </LinearLayout>
-
-        <!-- Body -->
-        <LinearLayout
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/topBarTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="@dimen/space_16">
+            android:text="TechFix Store"
+            android:textColor="@color/navy_900"
+            android:textSize="22sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_24"
-                android:text="Your repairs, sorted."
-                android:textAppearance="@style/TextAppearance.TechFix.Headline" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_8"
-                android:text="Book, track and pay for repairs at our Colombo and Galle branches."
-                android:textAppearance="@style/TextAppearance.TechFix.Body" />
-
-            <Button android:id="@+id/continueButton"
-                style="@style/Widget.TechFix.Button.Filled"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_16"
-                android:text="Get started" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_24"
-                android:text="Visit us"
-                style="@style/Widget.TechFix.SectionTitle" />
-
-            <LinearLayout android:id="@+id/colomboChip"
-                style="@style/Widget.TechFix.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_12"
-                android:minHeight="@dimen/touch_target"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="@dimen/space_16"
-                android:background="@color/white"
-                android:clickable="true"
-                android:focusable="true">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Colombo branch"
-                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="&#8250;"
-                    android:textColor="@color/muted_text"
-                    android:textAppearance="@style/TextAppearance.TechFix.Title" />
-            </LinearLayout>
-
-            <LinearLayout android:id="@+id/galleChip"
-                style="@style/Widget.TechFix.Card"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/space_12"
-                android:minHeight="@dimen/touch_target"
-                android:orientation="horizontal"
-                android:gravity="center_vertical"
-                android:padding="@dimen/space_16"
-                android:background="@color/white"
-                android:clickable="true"
-                android:focusable="true">
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Galle branch"
-                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="&#8250;"
-                    android:textColor="@color/muted_text"
-                    android:textAppearance="@style/TextAppearance.TechFix.Title" />
-            </LinearLayout>
-        </LinearLayout>
+        <TextView
+            android:id="@+id/topBarSubtitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Computer &amp; Mobile Phone Repairs"
+            android:textColor="@color/muted_text"
+            android:textSize="12sp" />
     </LinearLayout>
-</FrameLayout>
+
+    <!-- Divider Line -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/line" />
+
+    <!-- Content Area: Panels Container -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <!-- ================= PANEL 1: STORE CATALOG ================= -->
+        <ScrollView
+            android:id="@+id/storePanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:id="@+id/homeContent"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/space_24">
+
+                <!-- Round Categories Selector Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/space_16"
+                    android:layout_marginTop="@dimen/space_16"
+                    android:layout_marginBottom="@dimen/space_8"
+                    android:text="Categories"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <!-- Horizontal Scrollable Round Categories -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:scrollbars="none"
+                    android:clipToPadding="false"
+                    android:paddingHorizontal="@dimen/space_16">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:paddingVertical="4dp">
+
+                        <!-- Category 1: All -->
+                        <LinearLayout
+                            android:id="@+id/catAll"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:layout_marginEnd="16dp">
+
+                            <FrameLayout
+                                android:id="@+id/circleCatAll"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/bg_circle_category_selected"
+                                android:padding="15dp">
+
+                                <ImageView
+                                    android:id="@+id/iconCatAll"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/ic_cat_all" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:id="@+id/labelCatAll"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="All"
+                                android:textColor="@color/navy_900"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+
+                        <!-- Category 2: Phones -->
+                        <LinearLayout
+                            android:id="@+id/catPhones"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:layout_marginEnd="16dp">
+
+                            <FrameLayout
+                                android:id="@+id/circleCatPhones"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/bg_circle_category"
+                                android:padding="14dp">
+
+                                <ImageView
+                                    android:id="@+id/iconCatPhones"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/ic_store_phone_screen" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:id="@+id/labelCatPhones"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="Phones"
+                                android:textColor="@color/muted_text"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- Category 3: Computers & Laptops -->
+                        <LinearLayout
+                            android:id="@+id/catComputers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:layout_marginEnd="16dp">
+
+                            <FrameLayout
+                                android:id="@+id/circleCatComputers"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/bg_circle_category"
+                                android:padding="14dp">
+
+                                <ImageView
+                                    android:id="@+id/iconCatComputers"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/ic_store_laptop_diagnostics" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:id="@+id/labelCatComputers"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="Computers"
+                                android:textColor="@color/muted_text"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- Category 4: Screens -->
+                        <LinearLayout
+                            android:id="@+id/catScreens"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:layout_marginEnd="16dp">
+
+                            <FrameLayout
+                                android:id="@+id/circleCatScreens"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/bg_circle_category"
+                                android:padding="14dp">
+
+                                <ImageView
+                                    android:id="@+id/iconCatScreens"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/ic_store_phone_screen" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:id="@+id/labelCatScreens"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="Screens"
+                                android:textColor="@color/muted_text"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- Category 5: Batteries -->
+                        <LinearLayout
+                            android:id="@+id/catBatteries"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:gravity="center_horizontal"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:layout_marginEnd="8dp">
+
+                            <FrameLayout
+                                android:id="@+id/circleCatBatteries"
+                                android:layout_width="56dp"
+                                android:layout_height="56dp"
+                                android:background="@drawable/bg_circle_category"
+                                android:padding="14dp">
+
+                                <ImageView
+                                    android:id="@+id/iconCatBatteries"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:src="@drawable/ic_store_battery" />
+                            </FrameLayout>
+
+                            <TextView
+                                android:id="@+id/labelCatBatteries"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="6dp"
+                                android:text="Batteries"
+                                android:textColor="@color/muted_text"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Main Body Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:paddingHorizontal="@dimen/space_16"
+                    android:paddingTop="@dimen/space_16">
+
+                    <!-- Available Repair Services Section Header -->
+                    <TextView
+                        android:id="@+id/servicesHeaderTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Available Repair Services"
+                        style="@style/Widget.TechFix.SectionTitle" />
+
+                    <TextView
+                        android:id="@+id/servicesHeaderSubtitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginBottom="@dimen/space_8"
+                        android:text="Select a repair service to book an appointment:"
+                        android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+                    <!-- Dynamic Services Container (populated in HomeActivity) -->
+                    <LinearLayout
+                        android:id="@+id/servicesContainer"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical" />
+
+                    <!-- Our Branches Section -->
+                    <TextView
+                        android:id="@+id/branchesSectionTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_16"
+                        android:text="Our Store Branches"
+                        style="@style/Widget.TechFix.SectionTitle" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Tap a branch to view location on Google Maps:"
+                        android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+                    <!-- Colombo Branch Card -->
+                    <LinearLayout
+                        android:id="@+id/colomboChip"
+                        style="@style/Widget.TechFix.Card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:minHeight="@dimen/touch_target"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/space_16"
+                        android:background="@color/white"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Colombo Branch"
+                                android:textColor="@color/navy_900"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Phones &amp; Laptops • Open Daily"
+                                android:textColor="@color/muted_text"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="View Map &#8250;"
+                            android:textColor="@color/techfix_blue"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Galle Branch Card -->
+                    <LinearLayout
+                        android:id="@+id/galleChip"
+                        style="@style/Widget.TechFix.Card"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_12"
+                        android:minHeight="@dimen/touch_target"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:padding="@dimen/space_16"
+                        android:background="@color/white"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Galle Branch"
+                                android:textColor="@color/navy_900"
+                                android:textSize="15sp"
+                                android:textStyle="bold" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="2dp"
+                                android:text="Mobile Phone Specialist • Open Daily"
+                                android:textColor="@color/muted_text"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="View Map &#8250;"
+                            android:textColor="@color/techfix_blue"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <!-- Simple Footer -->
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_24"
+                        android:gravity="center"
+                        android:text="TechFix Repair Shop • Fast &amp; Reliable Smart Device Service"
+                        android:textColor="@color/muted_text"
+                        android:textSize="11sp" />
+
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ================= PANEL 2: SPARE PARTS INVENTORY ================= -->
+        <ScrollView
+            android:id="@+id/partsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
+
+                <!-- Header Info Card -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_16">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Workshop Spare Parts"
+                            android:textColor="@color/navy_900"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Genuine replacement parts in stock at our Colombo &amp; Galle service centers."
+                            android:textColor="@color/muted_text"
+                            android:textSize="13sp" />
+
+                        <!-- Branch Filter & Search -->
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:gravity="center_vertical"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="📍 Branch:"
+                                android:textColor="@color/navy_900"
+                                android:textSize="12sp"
+                                android:textStyle="bold" />
+
+                            <Spinner
+                                android:id="@+id/homePartsBranchSpinner"
+                                style="@style/Widget.TechFix.Spinner"
+                                android:layout_width="0dp"
+                                android:layout_height="40dp"
+                                android:layout_marginStart="8dp"
+                                android:layout_weight="1" />
+                        </LinearLayout>
+
+                        <EditText
+                            android:id="@+id/searchHomePartsInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:hint="🔍 Search parts (e.g. display, battery)..."
+                            android:inputType="text"
+                            android:maxLines="1" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Section Title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_16"
+                    android:layout_marginBottom="6dp"
+                    android:text="Available Parts In Stock"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <!-- Empty State -->
+                <LinearLayout
+                    android:id="@+id/emptyHomePartsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_24"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="📦"
+                        android:textSize="44sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_8"
+                        android:text="No spare parts match your search"
+                        android:textColor="@color/navy_900"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Dynamic Parts Container -->
+                <LinearLayout
+                    android:id="@+id/homePartsContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ================= PANEL 3: BOOK APPOINTMENT FORM ================= -->
+        <ScrollView
+            android:id="@+id/bookAppointmentPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
+
+                <!-- Card container for booking form -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <!-- 1. Service Type -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Service Type"
+                            android:textColor="@color/navy_900"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/bookingServiceSpinner"
+                            style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4" />
+
+                        <!-- 2. Device Category -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Device Type"
+                            android:textColor="@color/navy_900"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/bookingDeviceSpinner"
+                            style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4" />
+
+                        <!-- 3. Device Model / Name -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Device Model / Brand"
+                            android:textColor="@color/navy_900"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/bookingModelInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:hint="e.g. iPhone 13 Pro, Dell Inspiron 15"
+                            android:inputType="text"
+                            android:maxLines="1" />
+
+                        <!-- 4. Problem Description -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Problem Description"
+                            android:textColor="@color/navy_900"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <EditText
+                            android:id="@+id/bookingProblemInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:hint="Describe the damage, screen issue, battery life or symptoms..."
+                            android:inputType="textMultiLine"
+                            android:minLines="3"
+                            android:gravity="top" />
+
+                        <!-- 5. Photos of Device -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Photos of the Device"
+                            android:textColor="@color/navy_900"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <Button
+                                android:id="@+id/bookingPhotoButton"
+                                style="@style/Widget.TechFix.Secondary"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Attach / Take Photo" />
+
+                            <TextView
+                                android:id="@+id/photoStatusText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="12dp"
+                                android:text="No photo attached"
+                                android:textColor="@color/muted_text"
+                                android:textSize="12sp" />
+                        </LinearLayout>
+
+                        <!-- Photo Preview Container -->
+                        <FrameLayout
+                            android:id="@+id/photoPreviewContainer"
+                            android:layout_width="match_parent"
+                            android:layout_height="180dp"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:background="@drawable/bg_field"
+                            android:visibility="gone">
+
+                            <ImageView
+                                android:id="@+id/bookingPhotoPreview"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerCrop"
+                                android:contentDescription="Attached Device Photo" />
+
+                            <Button
+                                android:id="@+id/removePhotoButton"
+                                style="@style/Widget.Material3.Button.TextButton"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="top|end"
+                                android:text="✕ Remove"
+                                android:textColor="@color/error" />
+                        </FrameLayout>
+
+                        <!-- 6. Branch Location Selection -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Preferred Branch"
+                            android:textColor="@color/navy_900"
+                            android:textSize="13sp"
+                            android:textStyle="bold" />
+
+                        <Spinner
+                            android:id="@+id/bookingBranchSpinner"
+                            style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_4" />
+
+                        <!-- Submit Button -->
+                        <Button
+                            android:id="@+id/submitBookingButton"
+                            style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_24"
+                            android:text="Confirm &amp; Book Appointment" />
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </FrameLayout>
+
+    <!-- Bottom Navigation Bar -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:elevation="8dp"
+        app:itemIconTint="@color/techfix_blue"
+        app:itemTextColor="@color/navy_900"
+        app:menu="@menu/bottom_nav_home" />
+
+</LinearLayout>

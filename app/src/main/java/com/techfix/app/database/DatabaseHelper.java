@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 /** Single SQLite connection holder for all DAOs. */
 public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DB_NAME = "techfix.db";
-    private static final int DB_VERSION = 4;
+    private static final int DB_VERSION = 5;
 
     private static volatile DatabaseHelper instance;
 
@@ -25,7 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE technicians(id INTEGER PRIMARY KEY,name TEXT,branch TEXT,skill TEXT,available INTEGER)");
         db.execSQL("CREATE TABLE parts(id INTEGER PRIMARY KEY,name TEXT,quantity INTEGER,branch TEXT)");
         db.execSQL("CREATE TABLE samples(id INTEGER PRIMARY KEY,title TEXT,service TEXT,imageUri TEXT)");
-        db.execSQL("CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,email TEXT UNIQUE,password TEXT,role TEXT DEFAULT 'CUSTOMER')");
+        db.execSQL("CREATE TABLE users(id INTEGER PRIMARY KEY AUTOINCREMENT,name TEXT,email TEXT UNIQUE,phone TEXT DEFAULT '',password TEXT,role TEXT DEFAULT 'CUSTOMER')");
         db.execSQL("CREATE TABLE appointments(id INTEGER PRIMARY KEY AUTOINCREMENT,user_id INTEGER DEFAULT 0,device TEXT,problem TEXT,branch TEXT,status TEXT,service TEXT,price REAL,technician TEXT,payment TEXT,time_slot TEXT DEFAULT '',created_at TEXT DEFAULT '',photo_uri TEXT DEFAULT '')");
         db.execSQL("CREATE TABLE status_history(id INTEGER PRIMARY KEY AUTOINCREMENT,appointment_id INTEGER,status TEXT,updated_at TEXT,note TEXT DEFAULT '')");
         db.execSQL("CREATE TABLE payments(id INTEGER PRIMARY KEY AUTOINCREMENT,appointment_id INTEGER,amount REAL,method TEXT,paid_at TEXT)");
@@ -40,20 +40,27 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("INSERT INTO samples VALUES(1,'iPhone screen restoration','Screen replacement',''),(2,'Laptop performance recovery','Operating system repair','')");
         android.content.ContentValues staff = new android.content.ContentValues();
         staff.put("name", "TechFix Staff"); staff.put("email", "staff@techfix.lk");
+        staff.put("phone", "0112345678");
         staff.put("password", hash("techfix123")); staff.put("role", "STAFF");
         db.insertWithOnConflict("users", null, staff, SQLiteDatabase.CONFLICT_IGNORE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        if (oldVersion >= 4) return;
-        db.execSQL("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'CUSTOMER'");
-        db.execSQL("ALTER TABLE appointments ADD COLUMN user_id INTEGER DEFAULT 0");
-        db.execSQL("ALTER TABLE appointments ADD COLUMN time_slot TEXT DEFAULT ''");
-        db.execSQL("ALTER TABLE appointments ADD COLUMN created_at TEXT DEFAULT ''");
-        db.execSQL("ALTER TABLE appointments ADD COLUMN photo_uri TEXT DEFAULT ''");
-        db.execSQL("CREATE TABLE IF NOT EXISTS status_history(id INTEGER PRIMARY KEY AUTOINCREMENT,appointment_id INTEGER,status TEXT,updated_at TEXT,note TEXT DEFAULT '')");
-        db.execSQL("CREATE TABLE IF NOT EXISTS payments(id INTEGER PRIMARY KEY AUTOINCREMENT,appointment_id INTEGER,amount REAL,method TEXT,paid_at TEXT)");
+        if (oldVersion < 4) {
+            db.execSQL("ALTER TABLE users ADD COLUMN role TEXT DEFAULT 'CUSTOMER'");
+            db.execSQL("ALTER TABLE appointments ADD COLUMN user_id INTEGER DEFAULT 0");
+            db.execSQL("ALTER TABLE appointments ADD COLUMN time_slot TEXT DEFAULT ''");
+            db.execSQL("ALTER TABLE appointments ADD COLUMN created_at TEXT DEFAULT ''");
+            db.execSQL("ALTER TABLE appointments ADD COLUMN photo_uri TEXT DEFAULT ''");
+            db.execSQL("CREATE TABLE IF NOT EXISTS status_history(id INTEGER PRIMARY KEY AUTOINCREMENT,appointment_id INTEGER,status TEXT,updated_at TEXT,note TEXT DEFAULT '')");
+            db.execSQL("CREATE TABLE IF NOT EXISTS payments(id INTEGER PRIMARY KEY AUTOINCREMENT,appointment_id INTEGER,amount REAL,method TEXT,paid_at TEXT)");
+        }
+        if (oldVersion < 5) {
+            try {
+                db.execSQL("ALTER TABLE users ADD COLUMN phone TEXT DEFAULT ''");
+            } catch (Exception ignored) {}
+        }
     }
 
     public static String hash(String value) {
@@ -64,6 +71,19 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             for (byte b : bytes) out.append(String.format("%02x", b));
             return out.toString();
         } catch (Exception e) { return value; }
+    }
+
+    public void reseedData() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.execSQL("DELETE FROM status_history");
+        db.execSQL("DELETE FROM payments");
+        db.execSQL("DELETE FROM appointments");
+        db.execSQL("DELETE FROM parts");
+        db.execSQL("DELETE FROM services");
+        db.execSQL("DELETE FROM technicians");
+        db.execSQL("DELETE FROM branches");
+        db.execSQL("DELETE FROM samples");
+        seed(db);
     }
 
     public static String now() {
