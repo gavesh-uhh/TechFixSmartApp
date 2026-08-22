@@ -1,0 +1,253 @@
+<?xml version="1.0" encoding="utf-8"?>
+        <ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/tabQueue"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
+
+                <!-- Summary Overview & Search Card -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/space_16">
+
+                        <TextView
+                            android:id="@+id/queueStatsTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Workshop Queue"
+                            android:textColor="@color/navy_900"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/queueStatsSubtitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="0 Active Repairs Â· 0 Completed"
+                            android:textColor="@color/muted_text"
+                            android:textSize="12sp" />
+
+                        <!-- Quick Search Input -->
+                        <EditText
+                            android:id="@+id/searchQueueInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Search Docket #, Device, Tech, Problem..."
+                            android:inputType="text"
+                            android:maxLines="1" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Filter Chips Row (Horizontal Scroll) -->
+                <HorizontalScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12"
+                    android:scrollbars="none">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <Button
+                            android:id="@+id/chipFilterAll"
+                            style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="14dp"
+                            android:text="All Dockets"
+                            android:textSize="12sp"
+                            app:cornerRadius="18dp" />
+
+                        <Button
+                            android:id="@+id/chipFilterActive"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="6dp"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="14dp"
+                            android:text="Active"
+                            android:textColor="@color/navy_700"
+                            android:textSize="12sp"
+                            app:cornerRadius="18dp" />
+
+                        <Button
+                            android:id="@+id/chipFilterReceived"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="6dp"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="14dp"
+                            android:text="Received"
+                            android:textColor="@color/navy_700"
+                            android:textSize="12sp"
+                            app:cornerRadius="18dp" />
+
+                        <Button
+                            android:id="@+id/chipFilterRepairing"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="6dp"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="14dp"
+                            android:text="In Repair"
+                            android:textColor="@color/navy_700"
+                            android:textSize="12sp"
+                            app:cornerRadius="18dp" />
+
+                        <Button
+                            android:id="@+id/chipFilterReady"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="6dp"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="14dp"
+                            android:text="Ready for Pickup"
+                            android:textColor="@color/navy_700"
+                            android:textSize="12sp"
+                            app:cornerRadius="18dp" />
+
+                        <Button
+                            android:id="@+id/chipFilterCompleted"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="6dp"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="14dp"
+                            android:text="Completed"
+                            android:textColor="@color/navy_700"
+                            android:textSize="12sp"
+                            app:cornerRadius="18dp" />
+
+                        <Button
+                            android:id="@+id/chipFilterUnpaid"
+                            style="@style/Widget.Material3.Button.OutlinedButton"
+                            android:layout_width="wrap_content"
+                            android:layout_height="36dp"
+                            android:layout_marginStart="6dp"
+                            android:minHeight="0dp"
+                            android:paddingHorizontal="14dp"
+                            android:text="Payment Due"
+                            android:textColor="@color/error"
+                            android:textSize="12sp"
+                            app:cornerRadius="18dp" />
+                    </LinearLayout>
+                </HorizontalScrollView>
+
+                <!-- Section Title -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_16"
+                    android:layout_marginBottom="@dimen/space_4"
+                    android:text="Repair Dockets"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <!-- Empty State -->
+                <LinearLayout
+                    android:id="@+id/emptyQueueContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:padding="@dimen/space_24" android:visibility="gone">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_nav_book"
+                        app:tint="@color/muted_text" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/space_8"
+                        android:text="No repairs found matching filter"
+                        android:textColor="@color/navy_900"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- Appointment RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/appointmentList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_4"
+                    android:clipToPadding="false"
+                    android:paddingBottom="@dimen/space_8"
+                    android:nestedScrollingEnabled="false" />
+
+                <!-- Quick Status Update Card -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_16">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Quick Status Update by Docket ID"
+                            style="@style/Widget.TechFix.SectionTitle" />
+
+                        <EditText
+                            android:id="@+id/appointmentIdInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Enter Docket ID (e.g. 1)"
+                            android:inputType="number" />
+
+                        <Spinner
+                            android:id="@+id/statusSpinner"
+                            style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12" />
+
+                        <Button
+                            android:id="@+id/updateStatusButton"
+                            style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Apply Status Update" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </ScrollView>

@@ -9,12 +9,13 @@
 
     <!-- Clean Top App Header -->
     <LinearLayout
+        android:id="@+id/homeHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:paddingHorizontal="@dimen/space_16"
-        android:paddingTop="16dp"
-        android:paddingBottom="12dp"
+        android:paddingTop="@dimen/space_16"
+        android:paddingBottom="@dimen/space_12"
         android:background="@color/white">
 
         <TextView
@@ -23,7 +24,7 @@
             android:layout_height="wrap_content"
             android:text="TechFix Store"
             android:textColor="@color/navy_900"
-            android:textSize="22sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <TextView
@@ -85,7 +86,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:orientation="horizontal"
-                        android:paddingVertical="4dp">
+                        android:paddingVertical="@dimen/space_4">
 
                         <!-- Category 1: All -->
                         <LinearLayout
@@ -96,7 +97,7 @@
                             android:gravity="center_horizontal"
                             android:clickable="true"
                             android:focusable="true"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="@dimen/space_16">
 
                             <FrameLayout
                                 android:id="@+id/circleCatAll"
@@ -132,7 +133,7 @@
                             android:gravity="center_horizontal"
                             android:clickable="true"
                             android:focusable="true"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="@dimen/space_16">
 
                             <FrameLayout
                                 android:id="@+id/circleCatPhones"
@@ -167,7 +168,7 @@
                             android:gravity="center_horizontal"
                             android:clickable="true"
                             android:focusable="true"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="@dimen/space_16">
 
                             <FrameLayout
                                 android:id="@+id/circleCatComputers"
@@ -202,7 +203,7 @@
                             android:gravity="center_horizontal"
                             android:clickable="true"
                             android:focusable="true"
-                            android:layout_marginEnd="16dp">
+                            android:layout_marginEnd="@dimen/space_16">
 
                             <FrameLayout
                                 android:id="@+id/circleCatScreens"
@@ -237,7 +238,7 @@
                             android:gravity="center_horizontal"
                             android:clickable="true"
                             android:focusable="true"
-                            android:layout_marginEnd="8dp">
+                            android:layout_marginEnd="@dimen/space_8">
 
                             <FrameLayout
                                 android:id="@+id/circleCatBatteries"
@@ -340,14 +341,14 @@
                                 android:layout_height="wrap_content"
                                 android:text="Colombo Branch"
                                 android:textColor="@color/navy_900"
-                                android:textSize="15sp"
+                                android:textSize="16sp"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="Phones &amp; Laptops • Open Daily"
+                                android:text="Phones &amp; Laptops â€¢ Open Daily"
                                 android:textColor="@color/muted_text"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -357,7 +358,7 @@
                             android:layout_height="wrap_content"
                             android:text="View Map &#8250;"
                             android:textColor="@color/techfix_blue"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -387,14 +388,14 @@
                                 android:layout_height="wrap_content"
                                 android:text="Galle Branch"
                                 android:textColor="@color/navy_900"
-                                android:textSize="15sp"
+                                android:textSize="16sp"
                                 android:textStyle="bold" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="2dp"
-                                android:text="Mobile Phone Specialist • Open Daily"
+                                android:text="Mobile Phone Specialist â€¢ Open Daily"
                                 android:textColor="@color/muted_text"
                                 android:textSize="12sp" />
                         </LinearLayout>
@@ -404,7 +405,7 @@
                             android:layout_height="wrap_content"
                             android:text="View Map &#8250;"
                             android:textColor="@color/techfix_blue"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -414,7 +415,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="@dimen/space_24"
                         android:gravity="center"
-                        android:text="TechFix Repair Shop • Fast &amp; Reliable Smart Device Service"
+                        android:text="TechFix Repair Shop â€¢ Fast &amp; Reliable Smart Device Service"
                         android:textColor="@color/muted_text"
                         android:textSize="11sp" />
 
@@ -453,7 +454,7 @@
                             android:layout_height="wrap_content"
                             android:text="Workshop Spare Parts"
                             android:textColor="@color/navy_900"
-                            android:textSize="18sp"
+                            android:textSize="20sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -462,7 +463,7 @@
                             android:layout_marginTop="2dp"
                             android:text="Genuine replacement parts in stock at our Colombo &amp; Galle service centers."
                             android:textColor="@color/muted_text"
-                            android:textSize="13sp" />
+                            android:textSize="12sp" />
 
                         <!-- Branch Filter & Search -->
                         <LinearLayout
@@ -472,11 +473,19 @@
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="18dp"
+                                android:contentDescription="@null"
+                                android:src="@drawable/ic_nav_location"
+                                app:tint="@color/muted_text" />
+
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="📍 Branch:"
-                                android:textColor="@color/navy_900"
+                                android:layout_marginStart="4dp"
+                                android:text="Branch:"
+                                android:textColor="@color/muted_text"
                                 android:textSize="12sp"
                                 android:textStyle="bold" />
 
@@ -485,7 +494,7 @@
                                 style="@style/Widget.TechFix.Spinner"
                                 android:layout_width="0dp"
                                 android:layout_height="40dp"
-                                android:layout_marginStart="8dp"
+                                android:layout_marginStart="@dimen/space_8"
                                 android:layout_weight="1" />
                         </LinearLayout>
 
@@ -495,7 +504,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_8"
-                            android:hint="🔍 Search parts (e.g. display, battery)..."
+                            android:hint="Search parts (e.g. display, battery)..."
                             android:inputType="text"
                             android:maxLines="1" />
                     </LinearLayout>
@@ -520,11 +529,12 @@
                     android:padding="@dimen/space_24"
                     android:visibility="gone">
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📦"
-                        android:textSize="44sp" />
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_nav_inventory"
+                        app:tint="@color/muted_text" />
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -532,7 +542,7 @@
                         android:layout_marginTop="@dimen/space_8"
                         android:text="No spare parts match your search"
                         android:textColor="@color/navy_900"
-                        android:textSize="15sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
@@ -578,7 +588,7 @@
                             android:layout_height="wrap_content"
                             android:text="Service Type"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -595,7 +605,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Device Type"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -612,7 +622,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Device Model / Brand"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -632,7 +642,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Problem Description"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -653,7 +663,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Photos of the Device"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <LinearLayout
@@ -674,7 +684,7 @@
                                 android:id="@+id/photoStatusText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="@dimen/space_12"
                                 android:text="No photo attached"
                                 android:textColor="@color/muted_text"
                                 android:textSize="12sp" />
@@ -702,7 +712,7 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top|end"
-                                android:text="✕ Remove"
+                                android:text="âœ• Remove"
                                 android:textColor="@color/error" />
                         </FrameLayout>
 
@@ -713,7 +723,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Preferred Branch"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <Spinner

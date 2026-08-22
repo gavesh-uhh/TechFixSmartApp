@@ -47,17 +47,17 @@ public class SparePartAdapter extends RecyclerView.Adapter<SparePartAdapter.Hold
         SparePart part = items.get(position);
 
         holder.partName.setText(part.name);
-        holder.partBranch.setText("📍 " + part.branch);
+        holder.partBranch.setText(part.branch);
 
         // Dynamic stock status badge
         if (part.quantity == 0) {
-            holder.partStockBadge.setText("🔴 OUT OF STOCK");
+            holder.partStockBadge.setText("OUT OF STOCK");
             holder.partStockBadge.setTextColor(holder.itemView.getContext().getColor(R.color.error));
         } else if (part.quantity < 3) {
-            holder.partStockBadge.setText("⚠️ LOW (" + part.quantity + " LEFT)");
+            holder.partStockBadge.setText("LOW (" + part.quantity + " LEFT)");
             holder.partStockBadge.setTextColor(holder.itemView.getContext().getColor(R.color.warning));
         } else {
-            holder.partStockBadge.setText("🟢 " + part.quantity + " IN STOCK");
+            holder.partStockBadge.setText(part.quantity + " IN STOCK");
             holder.partStockBadge.setTextColor(holder.itemView.getContext().getColor(R.color.success));
         }
 

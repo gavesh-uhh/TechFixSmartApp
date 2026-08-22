@@ -85,6 +85,8 @@ public class CustomerActivity extends AppCompatActivity {
         // 2. Inflate layout
         binding = ActivityCustomerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        // Top insets handled here; the BottomNavigationView (customerBottomNavigation) applies its
+        // own navigationBars inset via Material, so we don't pad it again (avoids double inset).
         WindowInsetsHelper.apply(binding.customerHeader, binding.dashboardContent);
 
         // 3. Initialize Database DAOs
@@ -138,7 +140,7 @@ public class CustomerActivity extends AppCompatActivity {
         });
 
         // Top bar Log Out button
-        binding.logoutButton.setOnClickListener(v -> performLogout());
+        // Log out lives only in the Profile panel card ("Log Out of Account").
 
         // Profile tab Log Out button
         binding.profileLogoutButton.setOnClickListener(v -> performLogout());

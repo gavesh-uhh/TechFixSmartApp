@@ -80,6 +80,10 @@ public class HomeActivity extends AppCompatActivity {
         // 1. Inflate layout
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        // Edge-to-edge: pad the header below status bar/cutout. The BottomNavigationView is left
+        // alone because Material's BottomNavigationView applies its own navigationBars inset,
+        // so padding it here too would double the bottom inset — apply only the header top inset.
+        WindowInsetsHelper.applyHeader(binding.homeHeader);
 
         // 2. Initialize Database DAOs and Session
         dbHelper = DatabaseHelper.getInstance(this);
@@ -542,7 +546,7 @@ public class HomeActivity extends AppCompatActivity {
             TextView qtyText = itemView.findViewById(R.id.partQuantityText);
             TextView badgeText = itemView.findViewById(R.id.partStatusBadge);
 
-            branchText.setText("📍 " + part.branch);
+            branchText.setText(part.branch);
             nameText.setText(part.name);
             qtyText.setText(part.quantity + " units available in store");
 

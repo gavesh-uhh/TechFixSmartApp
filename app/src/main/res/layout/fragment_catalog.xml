@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+        <ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/tabCatalog"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="@dimen/screen_padding">
+
+                <!-- SECTION 1: SERVICES CATALOG -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Repair Services &amp; Pricing"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <!-- Services RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/servicesList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:clipToPadding="false"
+                    android:paddingBottom="@dimen/space_8"
+                    android:nestedScrollingEnabled="false" />
+
+                <!-- Add New Service Card -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Publish New Repair Service"
+                            style="@style/Widget.TechFix.SectionTitle" />
+
+                        <EditText
+                            android:id="@+id/newServiceName"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Service Name (e.g. Camera Lens Fix)" />
+
+                        <EditText
+                            android:id="@+id/newServiceCategory"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:hint="Category (Mobile phone / Laptop / computer)" />
+
+                        <EditText
+                            android:id="@+id/newServiceRequiredPart"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:hint="Required Part (optional e.g. Phone display)" />
+
+                        <EditText
+                            android:id="@+id/newServicePrice"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:hint="Standard Price in LKR (e.g. 7500)"
+                            android:inputType="numberDecimal" />
+
+                        <Button
+                            android:id="@+id/addServiceButton"
+                            style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Publish Service to Store" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- SECTION 2: TECHNICIANS ROSTER -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_24"
+                    android:text="Technicians &amp; Duty Roster"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <!-- Technicians RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/techniciansList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8"
+                    android:clipToPadding="false"
+                    android:paddingBottom="@dimen/space_8"
+                    android:nestedScrollingEnabled="false" />
+
+                <!-- Register New Technician Card -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_8">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Register New Technician"
+                            style="@style/Widget.TechFix.SectionTitle" />
+
+                        <EditText
+                            android:id="@+id/newTechName"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Technician Full Name (e.g. Ravindu Perera)" />
+
+                        <EditText
+                            android:id="@+id/newTechBranch"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:hint="Branch (Colombo branch / Galle branch)" />
+
+                        <EditText
+                            android:id="@+id/newTechSkill"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:hint="Skill (Mobile phone / Laptop / computer)" />
+
+                        <Button
+                            android:id="@+id/addTechButton"
+                            style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Register Technician" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- SECTION 3: SHOWCASE PHOTO PUBLISHER -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_24"
+                    android:layout_marginBottom="@dimen/space_16">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="📸 Sample Repair Showcase"
+                            style="@style/Widget.TechFix.SectionTitle" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Publish before &amp; after repair photos to customer explore gallery."
+                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+                        <EditText
+                            android:id="@+id/sampleTitleInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:hint="Showcase Title (e.g. MacBook Liquid Damage Recovered)" />
+
+                        <Button
+                            android:id="@+id/addSampleButton"
+                            style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Attach Photo &amp; Publish Showcase" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+            </LinearLayout>
+        </ScrollView>
