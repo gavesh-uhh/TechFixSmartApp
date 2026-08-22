@@ -30,6 +30,7 @@ import com.techfix.app.models.Appointment;
 import com.techfix.app.models.PaymentStatus;
 import com.techfix.app.models.User;
 import com.techfix.app.session.SessionManager;
+import com.techfix.app.sync.FirebaseSyncManager;
 import com.techfix.app.util.Feedback;
 import com.techfix.app.util.WindowInsetsHelper;
 
@@ -162,18 +163,26 @@ public class CustomerActivity extends AppCompatActivity {
         branchDAO = new BranchDAO(dbHelper);
         userDAO = new UserDAO(dbHelper);
 
-        // 4. Setup User Header & Profile
+        // 4. Initialize Firebase Cloud Sync
+        FirebaseSyncManager.getInstance().init(this);
+        FirebaseSyncManager.getInstance().addListener((isSyncing, success) -> {
+            if (!isSyncing && success) {
+                runOnUiThread(this::refreshRepairs);
+            }
+        });
+
+        // 5. Setup User Header & Profile
         setupUserProfile();
 
-        // 5. Setup Bottom Navigation
+        // 6. Setup Bottom Navigation
         setupBottomNavigation();
 
-        // 6. Setup Form & Repair List
+        // 7. Setup Form & Repair List
         setupBookingForm();
         setupRepairsList();
         setupBranchesList();
 
-        // 7. Initial load of repairs
+        // 8. Initial load of repairs
         refreshRepairs();
         showPanel(0);
     }
@@ -382,6 +391,9 @@ public class CustomerActivity extends AppCompatActivity {
         if (selectedPhotoUri != null && appointmentId > 0) {
             appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
         }
+
+        // Trigger instant cloud sync to Firebase if online
+        FirebaseSyncManager.getInstance().sync(this, null);
 
         // Show confirmation dialog
         new AlertDialog.Builder(this)

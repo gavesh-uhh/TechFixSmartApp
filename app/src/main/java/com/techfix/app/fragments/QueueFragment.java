@@ -26,12 +26,14 @@ import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.databinding.FragmentQueueBinding;
 import com.techfix.app.models.Appointment;
 import com.techfix.app.models.AppointmentStatus;
+import com.techfix.app.sync.FirebaseSyncManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * TAB 2: Repair Queue & Docket Master (status chips, real-time search, workflow updates).
+ * TAB 2: Repair Queue & Docket Control (search, status filters, workflow stage transitions).
  */
 public class QueueFragment extends Fragment {
 
@@ -41,6 +43,12 @@ public class QueueFragment extends Fragment {
     private StaffAppointmentAdapter queueAdapter;
     private String branchFilter = "All Branches";
     private String statusFilter = "All";
+
+    private final FirebaseSyncManager.SyncListener syncListener = (isSyncing, success) -> {
+        if (!isSyncing && success && isAdded() && binding != null) {
+            requireActivity().runOnUiThread(this::refresh);
+        }
+    };
 
     private StaffTabHost host() {
         return (StaffTabHost) requireActivity();
@@ -64,6 +72,8 @@ public class QueueFragment extends Fragment {
 
         // Bottom inset so content clears the gesture nav bar / keyboard
         WindowInsetsHelper.applyBottomInset(binding.tabQueue);
+
+        FirebaseSyncManager.getInstance().addListener(syncListener);
 
         binding.statusSpinner.setAdapter(new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, AppointmentStatus.labels()));
 
@@ -89,13 +99,13 @@ public class QueueFragment extends Fragment {
     }
 
     private void setupFilterChips() {
-        binding.chipFilterAll.setOnClickListener(v -> setFilter("All", binding.chipFilterAll));
-        binding.chipFilterActive.setOnClickListener(v -> setFilter("Active", binding.chipFilterActive));
-        binding.chipFilterReceived.setOnClickListener(v -> setFilter(AppointmentStatus.REQUEST_RECEIVED.label, binding.chipFilterReceived));
-        binding.chipFilterRepairing.setOnClickListener(v -> setFilter(AppointmentStatus.REPAIRING.label, binding.chipFilterRepairing));
-        binding.chipFilterReady.setOnClickListener(v -> setFilter(AppointmentStatus.READY_FOR_COLLECTION.label, binding.chipFilterReady));
-        binding.chipFilterCompleted.setOnClickListener(v -> setFilter(AppointmentStatus.COMPLETED.label, binding.chipFilterCompleted));
-        binding.chipFilterUnpaid.setOnClickListener(v -> setFilter("Unpaid", binding.chipFilterUnpaid));
+        binding.chipFilterAll.setOnClickListener(v -> selectFilterChip("All", v));
+        binding.chipFilterActive.setOnClickListener(v -> selectFilterChip("Active", v));
+        binding.chipFilterReceived.setOnClickListener(v -> selectFilterChip(AppointmentStatus.REQUEST_RECEIVED.label, v));
+        binding.chipFilterRepairing.setOnClickListener(v -> selectFilterChip(AppointmentStatus.REPAIRING.label, v));
+        binding.chipFilterReady.setOnClickListener(v -> selectFilterChip(AppointmentStatus.READY_FOR_COLLECTION.label, v));
+        binding.chipFilterCompleted.setOnClickListener(v -> selectFilterChip(AppointmentStatus.COMPLETED.label, v));
+        binding.chipFilterUnpaid.setOnClickListener(v -> selectFilterChip("Unpaid", v));
     }
 
     private void refresh() {
@@ -114,7 +124,7 @@ public class QueueFragment extends Fragment {
         binding.queueStatsSubtitle.setText(activeCount + " Active Repairs · " + completedCount + " Completed");
     }
 
-    private void setFilter(String status, View activeChip) {
+    private void selectFilterChip(String status, View activeChip) {
         statusFilter = status;
 
         resetChipStyle(binding.chipFilterAll);
@@ -126,7 +136,7 @@ public class QueueFragment extends Fragment {
         resetChipStyle(binding.chipFilterUnpaid);
 
         if (activeChip instanceof android.widget.Button) {
-            ((android.widget.Button) activeChip).setBackgroundColor(requireContext().getColor(R.color.navy_700));
+            ((android.widget.Button) activeChip).setBackgroundColor(requireContext().getColor(R.color.navy_900));
             ((android.widget.Button) activeChip).setTextColor(requireContext().getColor(R.color.white));
         }
 
@@ -175,6 +185,7 @@ public class QueueFragment extends Fragment {
                 .setItems(labels, (dialog, which) -> {
                     String newStatus = labels[which];
                     appointmentDAO.updateStatus(a.id, newStatus);
+                    FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();
                     Snackbar.make(binding.getRoot(), "Docket #" + a.id + " updated to " + newStatus, Snackbar.LENGTH_LONG).show();
                 })
@@ -194,6 +205,7 @@ public class QueueFragment extends Fragment {
                 .setItems(techNames, (dialog, which) -> {
                     String chosenTech = techList.get(which).name;
                     appointmentDAO.updateTechnician(a.id, chosenTech);
+                    FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();
                     Snackbar.make(binding.getRoot(), "Assigned to " + chosenTech, Snackbar.LENGTH_LONG).show();
                 })
@@ -207,6 +219,7 @@ public class QueueFragment extends Fragment {
                 .setTitle("Record Payment · Rs " + (long) a.price)
                 .setItems(methods, (dialog, which) -> {
                     boolean ok = appointmentDAO.pay(a.id, a.price, methods[which]);
+                    FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();
                     if (ok) {
                         Snackbar.make(binding.getRoot(), "Payment recorded (" + methods[which] + ")", Snackbar.LENGTH_LONG).show();
@@ -224,6 +237,7 @@ public class QueueFragment extends Fragment {
                 .setMessage("Are you sure you want to remove this repair docket permanently?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     appointmentDAO.delete(a.id);
+                    FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();
                     Snackbar.make(binding.getRoot(), "Docket #" + a.id + " deleted", Snackbar.LENGTH_LONG).show();
                 })
@@ -242,6 +256,7 @@ public class QueueFragment extends Fragment {
             long id = Long.parseLong(idStr);
             String status = (String) binding.statusSpinner.getSelectedItem();
             appointmentDAO.updateStatus(id, status);
+            FirebaseSyncManager.getInstance().sync(requireContext(), null);
             binding.appointmentIdInput.setText("");
             refresh();
             Snackbar.make(v, "Docket #" + id + " updated to " + status, Snackbar.LENGTH_LONG).show();
@@ -253,6 +268,7 @@ public class QueueFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        FirebaseSyncManager.getInstance().removeListener(syncListener);
         binding = null;
     }
 }

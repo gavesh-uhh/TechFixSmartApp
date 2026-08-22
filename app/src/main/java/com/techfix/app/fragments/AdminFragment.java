@@ -81,18 +81,30 @@ public class AdminFragment extends Fragment {
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        // Log Out of Account (only remaining logout entry point)
+        // Log Out of Account
         binding.staffProfileLogoutButton.setOnClickListener(v -> performLogout());
 
-        // Reseed demo data button
+        // Manual Cloud Sync button
+        binding.btnSyncFirebaseNow.setOnClickListener(v -> {
+            binding.btnSyncFirebaseNow.setEnabled(false);
+            binding.btnSyncFirebaseNow.setText("⏳ Syncing with Cloud...");
+            com.techfix.app.sync.FirebaseSyncManager.getInstance().sync(requireContext(), (success, message) -> {
+                binding.btnSyncFirebaseNow.setEnabled(true);
+                binding.btnSyncFirebaseNow.setText("☁️ Sync with Firebase Cloud Now");
+                refresh();
+                Snackbar.make(binding.getRoot(), success ? "✅ Sync Complete: SQLite & Firebase matched!" : "⚠️ " + message, Snackbar.LENGTH_LONG).show();
+            });
+        });
+
+        // Clean & Reset database button
         binding.btnReseedDemoData.setOnClickListener(v -> {
             new AlertDialog.Builder(requireContext())
-                    .setTitle("Reset Demo Database?")
-                    .setMessage("This will reset repair appointments and inventory to clean demo default values.")
-                    .setPositiveButton("Reset & Reseed", (dialog, which) -> {
+                    .setTitle("Clean & Reset Database?")
+                    .setMessage("This will clean local appointments and reset inventory to clean defaults.")
+                    .setPositiveButton("Reset", (dialog, which) -> {
                         dbHelper.reseedData();
                         refresh();
-                        Snackbar.make(binding.getRoot(), "Demo data reseeded successfully", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(binding.getRoot(), "Database reset cleanly", Snackbar.LENGTH_LONG).show();
                     })
                     .setNegativeButton("Cancel", null)
                     .show();

@@ -153,12 +153,20 @@
                             android:textSize="12sp" />
 
                         <Button
+                            android:id="@+id/btnSyncFirebaseNow"
+                            style="@style/Widget.TechFix.Button.Filled"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="☁️ Sync with Firebase Cloud Now" />
+
+                        <Button
                             android:id="@+id/btnReseedDemoData"
                             style="@style/Widget.Material3.Button.OutlinedButton"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
-                            android:text="Reset &amp; Reseed Demo Database"
+                            android:layout_marginTop="@dimen/space_8"
+                            android:text="Clean &amp; Reset Local Database"
                             android:textColor="@color/warning"
                             app:cornerRadius="16dp" />
                     </LinearLayout>
