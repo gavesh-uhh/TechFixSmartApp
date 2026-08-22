@@ -64,6 +64,15 @@ public class HomeActivity extends AppCompatActivity {
     private String currentCategory = "ALL";
     private String currentPartsBranch = "All Branches";
 
+    private final FirebaseSyncManager.SyncListener syncListener = (isSyncing, success) -> {
+        if (!isSyncing && success) {
+            runOnUiThread(() -> {
+                loadAvailableServices(currentCategory);
+                loadAvailableParts();
+            });
+        }
+    };
+
     // Attached device photo URI & temp camera URI
     private Uri selectedPhotoUri = null;
     private Uri tempCameraUri = null;
@@ -160,14 +169,7 @@ public class HomeActivity extends AppCompatActivity {
 
         // 3. Initialize Firebase Cloud Sync (Offline-First auto-sync when online)
         FirebaseSyncManager.getInstance().init(this);
-        FirebaseSyncManager.getInstance().addListener((isSyncing, success) -> {
-            if (!isSyncing && success) {
-                runOnUiThread(() -> {
-                    loadAvailableServices(currentCategory);
-                    loadAvailableParts();
-                });
-            }
-        });
+        FirebaseSyncManager.getInstance().addListener(syncListener);
 
         // 4. Setup UI components
         setupBranchButtons();
@@ -698,5 +700,11 @@ public class HomeActivity extends AppCompatActivity {
         Uri mapUri = Uri.parse("geo:" + coordinates + "?q=" + Uri.encode(label));
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, mapUri);
         startActivity(mapIntent);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        FirebaseSyncManager.getInstance().removeListener(syncListener);
     }
 }
