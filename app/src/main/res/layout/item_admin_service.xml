@@ -113,7 +113,10 @@
                 app:icon="@drawable/ic_edit"
                 app:iconGravity="textStart"
                 app:iconSize="14dp"
-                app:iconTint="@color/primary" />
+                app:iconTint="@color/navy_700"
+                android:textColor="@color/navy_700"
+                android:textSize="12sp"
+                app:cornerRadius="8dp" />
 
             <View
                 android:layout_width="0dp"
