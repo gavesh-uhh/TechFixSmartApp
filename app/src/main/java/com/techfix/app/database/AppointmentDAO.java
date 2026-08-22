@@ -82,6 +82,10 @@ public class AppointmentDAO {
     }
 
     public List<Appointment> filter(String branch, String statusFilter, String searchQuery) {
+        return filter(branch, statusFilter, searchQuery, "Newest First");
+    }
+
+    public List<Appointment> filter(String branch, String statusFilter, String searchQuery, String sortOrder) {
         StringBuilder where = new StringBuilder("WHERE 1=1");
 
         if (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) {
@@ -108,7 +112,20 @@ public class AppointmentDAO {
                  .append("' OR CAST(id AS TEXT) LIKE '").append(q).append("')");
         }
 
-        where.append(" ORDER BY id DESC");
+        if (sortOrder != null && sortOrder.contains("Oldest")) {
+            where.append(" ORDER BY id ASC");
+        } else if (sortOrder != null && sortOrder.contains("High")) {
+            where.append(" ORDER BY price DESC, id DESC");
+        } else if (sortOrder != null && sortOrder.contains("Low")) {
+            where.append(" ORDER BY price ASC, id DESC");
+        } else if (sortOrder != null && sortOrder.contains("Status")) {
+            where.append(" ORDER BY status ASC, id DESC");
+        } else if (sortOrder != null && sortOrder.contains("Device")) {
+            where.append(" ORDER BY device ASC, id DESC");
+        } else {
+            where.append(" ORDER BY id DESC");
+        }
+
         return query(where.toString());
     }
 
