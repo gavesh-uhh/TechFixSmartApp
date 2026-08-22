@@ -12,7 +12,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.tabs.TabLayout;
 import com.techfix.app.R;
 import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.DatabaseHelper;
@@ -28,14 +27,14 @@ import com.techfix.app.util.WindowInsetsHelper;
 import java.util.List;
 
 /**
- * HomeActivity - Landing Page for TechFix Repair Shop.
+ * HomeActivity - Landing Page & Booking for TechFix Repair Shop.
  * TechFix is a newly established computer and mobile phone repair shop.
  * Features:
- * - Top Tabs: "Store" and "Book Appointment"
  * - Round category quick-filters (All, Phones, Computers, Screens, Batteries, Parts)
  * - Available repair services catalog with pricing in LKR
  * - In-stock replacement spare parts & components
- * - Complete Book Appointment form with service type, device info, photo picker, and description
+ * - Bottom navigation: Store, Book Appointment, Branches, Account
+ * - Complete Book Appointment form with service type, device info, photo, and description
  */
 public class HomeActivity extends AppCompatActivity {
 
@@ -84,8 +83,8 @@ public class HomeActivity extends AppCompatActivity {
         session = new SessionManager(this);
 
         // 3. Setup UI components
-        setupTopTabs();
         setupBranchButtons();
+        setupBottomNavigation();
         setupRoundCategories();
         setupBookingForm();
 
@@ -94,33 +93,42 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Setup top tabs: Store and Book Appointment.
+     * Setup bottom navigation bar (Store, Book, Branches, Account).
      */
-    private void setupTopTabs() {
-        binding.topTabs.addTab(binding.topTabs.newTab().setText("Store"));
-        binding.topTabs.addTab(binding.topTabs.newTab().setText("Book Appointment"));
+    private void setupBottomNavigation() {
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
 
-        binding.topTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                if (tab.getPosition() == 0) {
-                    showStorePanel();
-                } else if (tab.getPosition() == 1) {
-                    showBookAppointmentPanel();
-                }
+        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_home_store) {
+                // Show Store Catalog Panel
+                showStorePanel();
+                binding.storePanel.smoothScrollTo(0, 0);
+                return true;
+
+            } else if (itemId == R.id.nav_home_book) {
+                // Show Book Appointment Form Panel
+                showBookAppointmentPanel();
+                return true;
+
+            } else if (itemId == R.id.nav_home_branches) {
+                // Show Store Catalog and scroll down to the branches section
+                showStorePanel();
+                binding.storePanel.post(() -> {
+                    int targetY = binding.branchesSectionTitle.getTop();
+                    binding.storePanel.smoothScrollTo(0, targetY);
+                });
+                return true;
+
+            } else if (itemId == R.id.nav_home_account) {
+                // Open Customer & Staff login / account screen
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+                return false;
             }
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
-        });
-
-        // Setup top Account / Sign In button
-        binding.accountButton.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-            startActivity(intent);
+            return false;
         });
     }
 
@@ -130,7 +138,7 @@ public class HomeActivity extends AppCompatActivity {
     private void showStorePanel() {
         binding.storePanel.setVisibility(View.VISIBLE);
         binding.bookAppointmentPanel.setVisibility(View.GONE);
-        binding.topBarTitle.setText("TechFix");
+        binding.topBarTitle.setText("TechFix Store");
         binding.topBarSubtitle.setText("Computer & Mobile Phone Repairs");
     }
 
@@ -243,9 +251,8 @@ public class HomeActivity extends AppCompatActivity {
                     binding.photoPreviewContainer.setVisibility(View.GONE);
                     binding.photoStatusText.setText("No photo attached");
 
-                    // Switch back to Store top tab
-                    TabLayout.Tab storeTab = binding.topTabs.getTabAt(0);
-                    if (storeTab != null) storeTab.select();
+                    // Switch back to Store panel
+                    binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
                 })
                 .show();
     }
@@ -392,10 +399,9 @@ public class HomeActivity extends AppCompatActivity {
                 partText.setVisibility(View.VISIBLE);
             }
 
-            // Click service -> open Book Appointment tab at the top directly
+            // Click service -> open Book Appointment in bottom nav
             itemView.setOnClickListener(v -> {
-                TabLayout.Tab bookTab = binding.topTabs.getTabAt(1);
-                if (bookTab != null) bookTab.select();
+                binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
             });
 
             binding.servicesContainer.addView(itemView);
@@ -442,10 +448,9 @@ public class HomeActivity extends AppCompatActivity {
                 statusBadge.setTextColor(getResources().getColor(R.color.error, null));
             }
 
-            // Click part -> open Book Appointment tab at the top
+            // Click part -> open Book Appointment in bottom nav
             itemView.setOnClickListener(v -> {
-                TabLayout.Tab bookTab = binding.topTabs.getTabAt(1);
-                if (bookTab != null) bookTab.select();
+                binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
             });
 
             binding.partsContainer.addView(itemView);
