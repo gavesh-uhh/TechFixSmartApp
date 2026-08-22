@@ -111,12 +111,12 @@ public class AdminFragment extends Fragment {
         // Manual Cloud Sync button
         binding.btnSyncFirebaseNow.setOnClickListener(v -> {
             binding.btnSyncFirebaseNow.setEnabled(false);
-            binding.btnSyncFirebaseNow.setText("⏳ Syncing with Cloud...");
+            binding.btnSyncFirebaseNow.setText("Syncing with Cloud...");
             com.techfix.app.sync.FirebaseSyncManager.getInstance().sync(requireContext(), (success, message) -> {
                 binding.btnSyncFirebaseNow.setEnabled(true);
-                binding.btnSyncFirebaseNow.setText("☁️ Sync with Firebase Cloud Now");
+                binding.btnSyncFirebaseNow.setText("Sync with Firebase Cloud Now");
                 refresh();
-                Snackbar.make(binding.getRoot(), success ? "✅ Sync Complete: SQLite & Firebase matched!" : "⚠️ " + message, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(binding.getRoot(), success ? "Sync Complete: SQLite and Firebase matched!" : "Sync note: " + message, Snackbar.LENGTH_LONG).show();
             });
         });
 

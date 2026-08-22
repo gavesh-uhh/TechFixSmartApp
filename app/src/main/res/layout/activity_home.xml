@@ -13,9 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:paddingHorizontal="@dimen/space_16"
-        android:paddingTop="@dimen/space_16"
-        android:paddingBottom="@dimen/space_12"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="14dp"
         android:background="@color/white">
 
         <TextView
@@ -23,8 +23,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="TechFix Store"
-            android:textColor="@color/navy_900"
-            android:textSize="20sp"
+            android:textColor="@color/ink"
+            android:textSize="22sp"
             android:textStyle="bold" />
 
         <TextView
@@ -34,7 +34,7 @@
             android:layout_marginTop="2dp"
             android:text="Computer &amp; Mobile Phone Repairs"
             android:textColor="@color/muted_text"
-            android:textSize="12sp" />
+            android:textSize="13sp" />
     </LinearLayout>
 
     <!-- Divider Line -->
@@ -62,16 +62,57 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:paddingBottom="@dimen/space_24">
+                android:paddingHorizontal="@dimen/screen_padding"
+                android:paddingVertical="@dimen/space_16">
+
+                <!-- Hero Store Banner Card -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardBackgroundColor="@color/surface">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_hero_card"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="EXPRESS WORKSHOP"
+                            android:textColor="#D8CEEE"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="10dp"
+                            android:text="Smart Repairs, Done Right"
+                            android:textColor="@color/white"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Certified technicians &amp; genuine replacement parts in Colombo &amp; Galle."
+                            android:textColor="#D8CEEE"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Round Categories Selector Header -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/space_16"
-                    android:layout_marginTop="@dimen/space_16"
-                    android:layout_marginBottom="@dimen/space_8"
-                    android:text="Categories"
+                    android:layout_marginBottom="10dp"
+                    android:text="Explore Categories"
                     style="@style/Widget.TechFix.SectionTitle" />
 
                 <!-- Evenly Spaced Round Categories Row -->
@@ -79,8 +120,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:paddingHorizontal="@dimen/space_12"
-                    android:paddingVertical="@dimen/space_4"
+                    android:paddingVertical="4dp"
                     android:weightSum="5">
 
                     <!-- Category 1: All -->
@@ -96,10 +136,10 @@
 
                         <FrameLayout
                             android:id="@+id/circleCatAll"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
                             android:background="@drawable/bg_circle_category_selected"
-                            android:padding="13dp">
+                            android:padding="14dp">
 
                             <ImageView
                                 android:id="@+id/iconCatAll"
@@ -117,8 +157,8 @@
                             android:maxLines="1"
                             android:ellipsize="end"
                             android:text="All"
-                            android:textColor="@color/navy_900"
-                            android:textSize="11sp"
+                            android:textColor="@color/ink"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
                     </LinearLayout>
 
@@ -135,16 +175,16 @@
 
                         <FrameLayout
                             android:id="@+id/circleCatPhones"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
                             android:background="@drawable/bg_circle_category"
-                            android:padding="12dp">
+                            android:padding="14dp">
 
                             <ImageView
                                 android:id="@+id/iconCatPhones"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/ic_store_phone_screen" />
+                                android:src="@drawable/ic_cat_phones" />
                         </FrameLayout>
 
                         <TextView
@@ -157,10 +197,10 @@
                             android:ellipsize="end"
                             android:text="Phones"
                             android:textColor="@color/muted_text"
-                            android:textSize="11sp" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
-                    <!-- Category 3: Computers & Laptops -->
+                    <!-- Category 3: Computers -->
                     <LinearLayout
                         android:id="@+id/catComputers"
                         android:layout_width="0dp"
@@ -173,16 +213,16 @@
 
                         <FrameLayout
                             android:id="@+id/circleCatComputers"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
                             android:background="@drawable/bg_circle_category"
-                            android:padding="12dp">
+                            android:padding="14dp">
 
                             <ImageView
                                 android:id="@+id/iconCatComputers"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/ic_store_laptop_diagnostics" />
+                                android:src="@drawable/ic_cat_computers" />
                         </FrameLayout>
 
                         <TextView
@@ -193,9 +233,9 @@
                             android:gravity="center"
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:text="Computers"
+                            android:text="PC / Mac"
                             android:textColor="@color/muted_text"
-                            android:textSize="11sp" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <!-- Category 4: Screens -->
@@ -211,16 +251,16 @@
 
                         <FrameLayout
                             android:id="@+id/circleCatScreens"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
                             android:background="@drawable/bg_circle_category"
-                            android:padding="12dp">
+                            android:padding="14dp">
 
                             <ImageView
                                 android:id="@+id/iconCatScreens"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/ic_store_phone_screen" />
+                                android:src="@drawable/ic_cat_screens" />
                         </FrameLayout>
 
                         <TextView
@@ -233,7 +273,7 @@
                             android:ellipsize="end"
                             android:text="Screens"
                             android:textColor="@color/muted_text"
-                            android:textSize="11sp" />
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <!-- Category 5: Batteries -->
@@ -249,16 +289,16 @@
 
                         <FrameLayout
                             android:id="@+id/circleCatBatteries"
-                            android:layout_width="50dp"
-                            android:layout_height="50dp"
+                            android:layout_width="52dp"
+                            android:layout_height="52dp"
                             android:background="@drawable/bg_circle_category"
-                            android:padding="12dp">
+                            android:padding="14dp">
 
                             <ImageView
                                 android:id="@+id/iconCatBatteries"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:src="@drawable/ic_store_battery" />
+                                android:src="@drawable/ic_cat_batteries" />
                         </FrameLayout>
 
                         <TextView
@@ -269,60 +309,58 @@
                             android:gravity="center"
                             android:maxLines="1"
                             android:ellipsize="end"
-                            android:text="Batteries"
+                            android:text="Battery"
                             android:textColor="@color/muted_text"
-                            android:textSize="11sp" />
+                            android:textSize="12sp" />
                     </LinearLayout>
-
                 </LinearLayout>
 
-                <!-- Main Body Container -->
+                <!-- Services List Header -->
+                <TextView
+                    android:id="@+id/servicesHeaderTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:text="Available Repair Services"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <TextView
+                    android:id="@+id/servicesHeaderSubtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Select any service to book in workshop."
+                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+                <!-- Services Dynamic Container -->
                 <LinearLayout
+                    android:id="@+id/servicesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical" />
+
+                <!-- Showcase Samples Gallery Header -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Recent Workshop Showcases"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <!-- Samples Gallery Container -->
+                <LinearLayout
+                    android:id="@+id/samplesContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical"
-                    android:paddingHorizontal="@dimen/space_16"
-                    android:paddingTop="@dimen/space_16">
+                    android:paddingBottom="24dp" />
 
-                    <!-- Available Repair Services Section Header -->
-                    <TextView
-                        android:id="@+id/servicesHeaderTitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Available Repair Services"
-                        style="@style/Widget.TechFix.SectionTitle" />
-
-                    <TextView
-                        android:id="@+id/servicesHeaderSubtitle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:layout_marginBottom="@dimen/space_8"
-                        android:text="Select a repair service to book an appointment:"
-                        android:textAppearance="@style/TextAppearance.TechFix.Body" />
-
-                    <!-- Dynamic Services Container (populated in HomeActivity) -->
-                    <LinearLayout
-                        android:id="@+id/servicesContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical" />
-
-                    <!-- Simple Footer -->
-                    <TextView
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_24"
-                        android:gravity="center"
-                        android:text="TechFix Repair Shop • Fast &amp; Reliable Smart Device Service"
-                        android:textColor="@color/muted_text"
-                        android:textSize="11sp" />
-
-                </LinearLayout>
             </LinearLayout>
         </ScrollView>
 
-        <!-- ================= PANEL 2: SPARE PARTS INVENTORY ================= -->
+        <!-- ================= PANEL 2: PARTS CATALOG ================= -->
         <ScrollView
             android:id="@+id/partsPanel"
             android:layout_width="match_parent"
@@ -334,9 +372,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/screen_padding">
+                android:paddingHorizontal="@dimen/screen_padding"
+                android:paddingVertical="@dimen/space_16">
 
-                <!-- Header Info Card -->
+                <!-- Parts Search Card -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -346,29 +385,21 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="@dimen/space_16">
+                        android:padding="16dp">
 
-                        <TextView
-                            android:layout_width="wrap_content"
+                        <EditText
+                            android:id="@+id/searchHomePartsInput"
+                            style="@style/Widget.TechFix.Input"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:text="Workshop Spare Parts"
-                            android:textColor="@color/navy_900"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
+                            android:hint="Search spare part name (e.g. Screen, Battery)..."
+                            android:inputType="text"
+                            android:maxLines="1" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Genuine replacement parts in stock at our Colombo &amp; Galle service centers."
-                            android:textColor="@color/muted_text"
-                            android:textSize="12sp" />
-
-                        <!-- Branch Filter & Search -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
+                            android:layout_marginTop="12dp"
                             android:gravity="center_vertical"
                             android:orientation="horizontal">
 
@@ -377,60 +408,50 @@
                                 android:layout_height="18dp"
                                 android:contentDescription="@null"
                                 android:src="@drawable/ic_nav_location"
-                                app:tint="@color/muted_text" />
+                                app:tint="@color/primary" />
 
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="4dp"
-                                android:text="Branch:"
-                                android:textColor="@color/muted_text"
-                                android:textSize="12sp"
+                                android:layout_marginStart="6dp"
+                                android:text="Branch Filter:"
+                                android:textColor="@color/ink"
+                                android:textSize="13sp"
                                 android:textStyle="bold" />
 
                             <Spinner
                                 android:id="@+id/homePartsBranchSpinner"
                                 style="@style/Widget.TechFix.Spinner"
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="@dimen/space_8"
+                                android:layout_height="48dp"
+                                android:layout_marginStart="8dp"
                                 android:layout_weight="1" />
                         </LinearLayout>
-
-                        <EditText
-                            android:id="@+id/searchHomePartsInput"
-                            style="@style/Widget.TechFix.Input"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_8"
-                            android:hint="Search parts (e.g. display, battery)..."
-                            android:inputType="text"
-                            android:maxLines="1" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Section Title -->
+                <!-- Parts Container Title -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_16"
-                    android:layout_marginBottom="6dp"
-                    android:text="Available Parts In Stock"
+                    android:layout_marginTop="20dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Stock Availability"
                     style="@style/Widget.TechFix.SectionTitle" />
 
-                <!-- Empty State -->
+                <!-- Empty Parts Container -->
                 <LinearLayout
                     android:id="@+id/emptyHomePartsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:orientation="vertical"
-                    android:padding="@dimen/space_24"
+                    android:padding="32dp"
                     android:visibility="gone">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
                         android:contentDescription="@null"
                         android:src="@drawable/ic_nav_inventory"
                         app:tint="@color/muted_text" />
@@ -438,24 +459,24 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_8"
-                        android:text="No spare parts match your search"
-                        android:textColor="@color/navy_900"
+                        android:layout_marginTop="12dp"
+                        android:text="No parts found"
+                        android:textColor="@color/ink"
                         android:textSize="16sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Dynamic Parts Container -->
                 <LinearLayout
                     android:id="@+id/homePartsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical" />
+                    android:orientation="vertical"
+                    android:paddingBottom="24dp" />
 
             </LinearLayout>
         </ScrollView>
 
-        <!-- ================= PANEL 3: BOOK APPOINTMENT FORM ================= -->
+        <!-- ================= PANEL 3: BOOK APPOINTMENT ================= -->
         <ScrollView
             android:id="@+id/bookAppointmentPanel"
             android:layout_width="match_parent"
@@ -467,9 +488,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/screen_padding">
+                android:paddingHorizontal="@dimen/screen_padding"
+                android:paddingVertical="@dimen/space_16">
 
-                <!-- Card container for booking form -->
+                <!-- Booking Hero Card -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -479,49 +501,49 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="@dimen/card_padding">
+                        android:padding="20dp">
 
-                        <!-- 1. Service Type -->
+                        <!-- Service Selector -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Service Type"
-                            android:textColor="@color/navy_900"
-                            android:textSize="12sp"
+                            android:text="Select Repair Service"
+                            android:textColor="@color/ink"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <Spinner
                             android:id="@+id/bookingServiceSpinner"
                             style="@style/Widget.TechFix.Spinner"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4" />
+                            android:layout_height="52dp"
+                            android:layout_marginTop="4dp" />
 
-                        <!-- 2. Device Category -->
+                        <!-- Device Category -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
-                            android:text="Device Type"
-                            android:textColor="@color/navy_900"
-                            android:textSize="12sp"
+                            android:layout_marginTop="14dp"
+                            android:text="Device Category"
+                            android:textColor="@color/ink"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <Spinner
                             android:id="@+id/bookingDeviceSpinner"
                             style="@style/Widget.TechFix.Spinner"
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4" />
+                            android:layout_height="52dp"
+                            android:layout_marginTop="4dp" />
 
-                        <!-- 3. Device Model / Name -->
+                        <!-- Model Input -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
-                            android:text="Device Model / Brand"
-                            android:textColor="@color/navy_900"
-                            android:textSize="12sp"
+                            android:layout_marginTop="14dp"
+                            android:text="Device Brand &amp; Model"
+                            android:textColor="@color/ink"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -529,18 +551,18 @@
                             style="@style/Widget.TechFix.Input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4"
-                            android:inputType="text"
-                            android:maxLines="1" />
+                            android:layout_marginTop="4dp"
+                            android:hint="e.g. iPhone 13 Pro, ThinkPad X1"
+                            android:inputType="text" />
 
-                        <!-- 4. Problem Description -->
+                        <!-- Problem Description -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
-                            android:text="Problem Description"
-                            android:textColor="@color/navy_900"
-                            android:textSize="12sp"
+                            android:layout_marginTop="14dp"
+                            android:text="Issue Description"
+                            android:textColor="@color/ink"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -548,40 +570,51 @@
                             style="@style/Widget.TechFix.Input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4"
+                            android:layout_marginTop="4dp"
+                            android:gravity="top"
+                            android:hint="Describe the problem..."
                             android:inputType="textMultiLine"
-                            android:minLines="3"
-                            android:gravity="top" />
+                            android:minLines="3" />
 
-                        <!-- 5. Photos of Device -->
+                        <!-- Branch Location -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
-                            android:text="Photos of the Device"
-                            android:textColor="@color/navy_900"
-                            android:textSize="12sp"
+                            android:layout_marginTop="14dp"
+                            android:text="Workshop Branch"
+                            android:textColor="@color/ink"
+                            android:textSize="13sp"
                             android:textStyle="bold" />
 
+                        <Spinner
+                            android:id="@+id/bookingBranchSpinner"
+                            style="@style/Widget.TechFix.Spinner"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:layout_marginTop="4dp" />
+
+                        <!-- Attach Photo Drop Zone -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:layout_marginTop="14dp"
+                            android:background="@drawable/bg_dashed_border"
+                            android:gravity="center"
+                            android:orientation="vertical"
+                            android:padding="16dp">
 
                             <Button
                                 android:id="@+id/bookingPhotoButton"
-                                style="@style/Widget.TechFix.Secondary"
+                                style="@style/Widget.TechFix.Button.Secondary"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="Attach / Take Photo" />
+                                android:layout_height="42dp"
+                                android:text="Attach Photo" />
 
                             <TextView
                                 android:id="@+id/photoStatusText"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/space_12"
+                                android:layout_marginTop="6dp"
                                 android:text="No photo attached"
                                 android:textColor="@color/muted_text"
                                 android:textSize="12sp" />
@@ -591,8 +624,8 @@
                         <FrameLayout
                             android:id="@+id/photoPreviewContainer"
                             android:layout_width="match_parent"
-                            android:layout_height="180dp"
-                            android:layout_marginTop="@dimen/space_8"
+                            android:layout_height="160dp"
+                            android:layout_marginTop="10dp"
                             android:background="@drawable/bg_field"
                             android:visibility="gone">
 
@@ -600,8 +633,8 @@
                                 android:id="@+id/bookingPhotoPreview"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
-                                android:scaleType="centerCrop"
-                                android:contentDescription="Attached Device Photo" />
+                                android:contentDescription="Photo Preview"
+                                android:scaleType="centerCrop" />
 
                             <Button
                                 android:id="@+id/removePhotoButton"
@@ -609,43 +642,25 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top|end"
-                                android:text="âœ• Remove"
+                                android:text="Remove"
                                 android:textColor="@color/error" />
                         </FrameLayout>
 
-                        <!-- 6. Branch Location Selection -->
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
-                            android:text="Preferred Branch"
-                            android:textColor="@color/navy_900"
-                            android:textSize="12sp"
-                            android:textStyle="bold" />
-
-                        <Spinner
-                            android:id="@+id/bookingBranchSpinner"
-                            style="@style/Widget.TechFix.Spinner"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_4" />
-
-                        <!-- Submit Button -->
+                        <!-- Confirm Booking Button -->
                         <Button
                             android:id="@+id/submitBookingButton"
                             style="@style/Widget.TechFix.Button.Filled"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_24"
-                            android:text="Confirm &amp; Book Appointment" />
-
+                            android:layout_marginTop="20dp"
+                            android:text="Schedule Repair Appointment" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
             </LinearLayout>
         </ScrollView>
 
-        <!-- ================= PANEL 4: DEDICATED STORE BRANCHES ================= -->
+        <!-- ================= PANEL 4: BRANCH LOCATIONS ================= -->
         <ScrollView
             android:id="@+id/branchesPanel"
             android:layout_width="match_parent"
@@ -657,10 +672,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/screen_padding">
+                android:paddingHorizontal="@dimen/screen_padding"
+                android:paddingVertical="@dimen/space_16">
 
-                <!-- Header Info Banner -->
+                <!-- Colombo Branch Card -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/branchColomboCard"
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content">
@@ -669,262 +686,106 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="@dimen/space_16">
+                        android:padding="20dp">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Our Official Store Branches"
-                            android:textColor="@color/navy_900"
-                            android:textSize="20sp"
+                            android:text="Colombo Flagship Workshop"
+                            android:textColor="@color/ink"
+                            android:textSize="18sp"
                             android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Visit our official repair centers or tap a branch to open GPS navigation on Google Maps."
-                            android:textColor="@color/muted_text"
-                            android:textSize="12sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Section Header -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_16"
-                    android:layout_marginBottom="6dp"
-                    android:text="Service Center Locations"
-                    style="@style/Widget.TechFix.SectionTitle" />
-
-                <!-- 1. COLOMBO BRANCH CARD -->
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.TechFix.ShadowCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_8">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/space_16">
-
-                        <!-- Top Title & Badge -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Colombo Branch"
-                                android:textColor="@color/navy_900"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                style="@style/Widget.TechFix.Stamp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/bg_field"
-                                android:paddingHorizontal="8dp"
-                                android:paddingVertical="2dp"
-                                android:text="OPEN DAILY"
-                                android:textColor="@color/success"
-                                android:textSize="10sp" />
-                        </LinearLayout>
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="📍 Colombo City Center • Western Province"
-                            android:textColor="@color/navy_700"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Full range repair center for Mobile Phones &amp; Laptops. Express diagnostics, screen &amp; battery replacements."
+                            android:text="123 Galle Road, Bambalapitiya, Colombo 04\nPhone: 011 234 5678\nOpen Daily: 9:00 AM - 7:00 PM"
                             android:textColor="@color/muted_text"
-                            android:textSize="12sp" />
+                            android:textSize="13sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="📞 Hotline: 011 234 5678  •  Operating: 9:00 AM - 7:00 PM"
-                            android:textColor="@color/muted_text"
-                            android:textSize="11sp" />
-
-                        <!-- Action Buttons Row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
+                            android:layout_marginTop="14dp"
                             android:orientation="horizontal">
-
-                            <Button
-                                android:id="@+id/btnColomboMap"
-                                style="@style/Widget.Material3.Button.OutlinedButton"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginEnd="4dp"
-                                android:layout_weight="1"
-                                android:paddingHorizontal="8dp"
-                                android:text="📍 View Map"
-                                android:textColor="@color/navy_700"
-                                android:textSize="12sp" />
 
                             <Button
                                 android:id="@+id/btnColomboBook"
                                 style="@style/Widget.TechFix.Button.Filled"
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="4dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
                                 android:layout_weight="1"
-                                android:paddingHorizontal="8dp"
-                                android:text="📅 Book Here"
-                                android:textSize="12sp" />
+                                android:text="Book Here" />
+
+                            <Button
+                                android:id="@+id/btnColomboMap"
+                                style="@style/Widget.TechFix.Button.Secondary"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                android:text="View Map" />
                         </LinearLayout>
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- 2. GALLE BRANCH CARD -->
+                <!-- Galle Branch Card -->
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/branchGalleCard"
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_12">
+                    android:layout_marginTop="14dp"
+                    android:layout_marginBottom="24dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="@dimen/space_16">
+                        android:padding="20dp">
 
-                        <!-- Top Title & Badge -->
-                        <LinearLayout
-                            android:layout_width="match_parent"
+                        <TextView
+                            android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:gravity="center_vertical"
-                            android:orientation="horizontal">
-
-                            <TextView
-                                android:layout_width="0dp"
-                                android:layout_height="wrap_content"
-                                android:layout_weight="1"
-                                android:text="Galle Branch"
-                                android:textColor="@color/navy_900"
-                                android:textSize="18sp"
-                                android:textStyle="bold" />
-
-                            <TextView
-                                style="@style/Widget.TechFix.Stamp"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:background="@drawable/bg_field"
-                                android:paddingHorizontal="8dp"
-                                android:paddingVertical="2dp"
-                                android:text="OPEN DAILY"
-                                android:textColor="@color/success"
-                                android:textSize="10sp" />
-                        </LinearLayout>
+                            android:text="Galle Service Center"
+                            android:textColor="@color/ink"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:text="📍 Galle Fort Area • Southern Province"
-                            android:textColor="@color/navy_700"
-                            android:textSize="13sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Specialized Mobile Phone &amp; Smart Device service center. Fast turnaround display &amp; power repairs."
+                            android:text="45 Main Street, Galle Fort, Galle\nPhone: 091 223 4567\nOpen Daily: 9:00 AM - 6:00 PM"
                             android:textColor="@color/muted_text"
-                            android:textSize="12sp" />
+                            android:textSize="13sp" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="6dp"
-                            android:text="📞 Hotline: 091 234 5678  •  Operating: 9:00 AM - 7:00 PM"
-                            android:textColor="@color/muted_text"
-                            android:textSize="11sp" />
-
-                        <!-- Action Buttons Row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/space_12"
+                            android:layout_marginTop="14dp"
                             android:orientation="horizontal">
-
-                            <Button
-                                android:id="@+id/btnGalleMap"
-                                style="@style/Widget.Material3.Button.OutlinedButton"
-                                android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginEnd="4dp"
-                                android:layout_weight="1"
-                                android:paddingHorizontal="8dp"
-                                android:text="📍 View Map"
-                                android:textColor="@color/navy_700"
-                                android:textSize="12sp" />
 
                             <Button
                                 android:id="@+id/btnGalleBook"
                                 style="@style/Widget.TechFix.Button.Filled"
                                 android:layout_width="0dp"
-                                android:layout_height="40dp"
-                                android:layout_marginStart="4dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="6dp"
                                 android:layout_weight="1"
-                                android:paddingHorizontal="8dp"
-                                android:text="📅 Book Here"
-                                android:textSize="12sp" />
+                                android:text="Book Here" />
+
+                            <Button
+                                android:id="@+id/btnGalleMap"
+                                style="@style/Widget.TechFix.Button.Secondary"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:layout_weight="1"
+                                android:text="View Map" />
                         </LinearLayout>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Help & Support Notice -->
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.TechFix.ShadowCard"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_16"
-                    android:layout_marginBottom="@dimen/space_16">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="@dimen/space_16">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Customer Helpline &amp; Support"
-                            android:textColor="@color/navy_900"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Have questions about service options or repair status?\nCall 011 234 5678 or email support@techfix.lk"
-                            android:textColor="@color/muted_text"
-                            android:textSize="12sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -940,8 +801,9 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:elevation="8dp"
-        app:itemIconTint="@color/techfix_blue"
-        app:itemTextColor="@color/navy_900"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemTextColor="@color/nav_item_color"
+        app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_nav_home" />
 
 </LinearLayout>

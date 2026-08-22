@@ -2,33 +2,34 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:background="@color/surface"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="24dp">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Add / Restock Workshop Part"
-        android:textColor="@color/navy_900"
-        android:textSize="18sp"
+        android:textColor="@color/ink"
+        android:textSize="20sp"
         android:textStyle="bold" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="Enter the part details and stock quantity to update inventory."
+        android:layout_marginTop="3dp"
+        android:text="Enter the spare component details and initial inventory quantity."
         android:textColor="@color/muted_text"
-        android:textSize="12sp" />
+        android:textSize="13sp" />
 
     <!-- Part Name Field -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="18dp"
         android:text="Part Name"
-        android:textColor="@color/navy_900"
-        android:textSize="12sp"
+        android:textColor="@color/ink"
+        android:textSize="13sp"
         android:textStyle="bold" />
 
     <EditText
@@ -36,24 +37,16 @@
         style="@style/Widget.TechFix.Input"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:hint="Part Name"
+        android:layout_marginTop="6dp"
+        android:hint="e.g. iPhone 14 Display, MacBook Battery"
         android:inputType="text"
         android:maxLines="1" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="2dp"
-        android:text="e.g. iPhone Screen, Type-C Port, MacBook Battery"
-        android:textColor="@color/muted_text"
-        android:textSize="11sp" />
 
     <!-- Branch & Quantity Row -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="14dp"
         android:orientation="horizontal">
 
         <!-- Branch Column -->
@@ -68,16 +61,16 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Branch"
-                android:textColor="@color/navy_900"
-                android:textSize="12sp"
+                android:textColor="@color/ink"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
             <Spinner
                 android:id="@+id/dialogPartBranchSpinner"
                 style="@style/Widget.TechFix.Spinner"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp" />
+                android:layout_height="52dp"
+                android:layout_marginTop="6dp" />
         </LinearLayout>
 
         <!-- Quantity Column -->
@@ -92,8 +85,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Quantity"
-                android:textColor="@color/navy_900"
-                android:textSize="12sp"
+                android:textColor="@color/ink"
+                android:textSize="13sp"
                 android:textStyle="bold" />
 
             <EditText
@@ -101,8 +94,8 @@
                 style="@style/Widget.TechFix.Input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:hint="Quantity"
+                android:layout_marginTop="6dp"
+                android:hint="Qty"
                 android:inputType="number"
                 android:text="5" />
         </LinearLayout>

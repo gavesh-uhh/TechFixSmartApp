@@ -57,8 +57,11 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
         com.techfix.app.sync.FirebaseSyncManager.getInstance().init(this);
 
         // 3. Header & Navigation
-        binding.staffHomeStoreButton.setOnClickListener(v ->
-                startActivity(new Intent(StaffActivity.this, HomeActivity.class)));
+        binding.staffHomeStoreButton.setOnClickListener(v -> {
+            Intent intent = new Intent(StaffActivity.this, HomeActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+            startActivity(intent);
+        });
         binding.staffLogoutButton.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
                     .setTitle("Log Out")

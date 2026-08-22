@@ -61,7 +61,7 @@ public class InventoryFragment extends Fragment {
 
         FirebaseSyncManager.getInstance().addListener(syncListener);
 
-        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).namesArrayWithAll();
+        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).filterNamesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.inventoryBranchSpinner.setAdapter(branchAdapter);
@@ -108,7 +108,7 @@ public class InventoryFragment extends Fragment {
     }
 
     /**
-     * Opens the popup dialog for adding/restocking a workshop part.
+     * Shows a popup dialog to add a new spare part component into the database.
      */
     private void showAddPartDialog() {
         View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_part, null);
@@ -116,24 +116,16 @@ public class InventoryFragment extends Fragment {
         Spinner spinnerBranch = dialogView.findViewById(R.id.dialogPartBranchSpinner);
         EditText inputQty = dialogView.findViewById(R.id.dialogPartQtyInput);
 
-        String[] branchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).namesArray();
-        ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
-        branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
-        spinnerBranch.setAdapter(branchAdapter);
-
-        // Pre-select branch based on current active branch filter if applicable
-        String currentFilter = (String) binding.inventoryBranchSpinner.getSelectedItem();
-        if ("Galle branch".equalsIgnoreCase(currentFilter)) {
-            spinnerBranch.setSelection(1);
-        } else {
-            spinnerBranch.setSelection(0);
-        }
+        String[] branchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).displayNamesArray();
+        ArrayAdapter<String> dialogBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
+        dialogBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        spinnerBranch.setAdapter(dialogBranchAdapter);
 
         new AlertDialog.Builder(requireContext())
                 .setView(dialogView)
-                .setPositiveButton("Save Part to Inventory", (dialog, which) -> {
+                .setPositiveButton("Save Part", (dialog, which) -> {
                     String name = inputName.getText().toString().trim();
-                    String branch = (String) spinnerBranch.getSelectedItem();
+                    String branch = com.techfix.app.database.BranchDAO.toDbName((String) spinnerBranch.getSelectedItem());
                     String qtyStr = inputQty.getText().toString().trim();
 
                     if (name.isEmpty()) {
@@ -146,7 +138,7 @@ public class InventoryFragment extends Fragment {
                         if (!qtyStr.isEmpty()) qty = Integer.parseInt(qtyStr);
                     } catch (Exception ignored) {}
 
-                    sparePartDAO.add(name, branch != null ? branch : "Colombo branch", qty);
+                    sparePartDAO.add(name, branch, qty);
                     FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();
                     Snackbar.make(binding.getRoot(), "Saved " + name + " to " + branch + " inventory", Snackbar.LENGTH_LONG).show();
@@ -156,7 +148,7 @@ public class InventoryFragment extends Fragment {
     }
 
     private void refresh() {
-        String branch = (String) binding.inventoryBranchSpinner.getSelectedItem();
+        String branch = com.techfix.app.database.BranchDAO.toDbName((String) binding.inventoryBranchSpinner.getSelectedItem());
         List<SparePart> parts = sparePartDAO.allByBranch(branch);
 
         sparePartAdapter.submit(parts);

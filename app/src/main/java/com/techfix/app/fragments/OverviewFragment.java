@@ -75,17 +75,19 @@ public class OverviewFragment extends Fragment {
 
         selectedBranch = host().getSelectedBranch();
 
-        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).namesArrayWithAll();
+        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).filterNamesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.overviewBranchSpinner.setAdapter(branchAdapter);
         for (int i = 0; i < branches.length; i++) {
-            if (branches[i].equals(selectedBranch)) binding.overviewBranchSpinner.setSelection(i);
+            if (com.techfix.app.database.BranchDAO.toDbName(branches[i]).equalsIgnoreCase(selectedBranch)) {
+                binding.overviewBranchSpinner.setSelection(i);
+            }
         }
         binding.overviewBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedBranch = branches[position];
+                selectedBranch = com.techfix.app.database.BranchDAO.toDbName(branches[position]);
                 host().setSelectedBranch(selectedBranch);
                 host().setHeaderBadge(selectedBranch.toUpperCase());
                 refresh();
@@ -94,6 +96,10 @@ public class OverviewFragment extends Fragment {
         });
 
         // Quick Actions
+        binding.btnRefreshOverview.setOnClickListener(v -> {
+            refresh();
+            com.google.android.material.snackbar.Snackbar.make(binding.getRoot(), "Analytics refreshed", com.google.android.material.snackbar.Snackbar.LENGTH_SHORT).show();
+        });
         binding.btnQuickWalkIn.setOnClickListener(v -> showWalkInDocketDialog());
         binding.btnQuickRestock.setOnClickListener(v -> host().switchToTab(2));
         binding.btnQuickAddService.setOnClickListener(v -> host().switchToTab(3));
@@ -117,14 +123,20 @@ public class OverviewFragment extends Fragment {
         binding.kpiActiveDocketsSub.setText("Awaiting collection & repair");
 
         binding.kpiRevenueCollected.setText("Rs " + String.format("%,.0f", paidRevenue));
-        binding.kpiRevenuePending.setText("Rs " + String.format("%,.0f", pendingRevenue));
+        if (pendingRevenue > 0) {
+            binding.kpiRevenuePending.setText("Rs " + String.format("%,.0f", pendingRevenue) + " pending");
+            binding.kpiRevenuePending.setTextColor(requireContext().getColor(R.color.warning));
+        } else {
+            binding.kpiRevenuePending.setText("All invoices settled");
+            binding.kpiRevenuePending.setTextColor(requireContext().getColor(R.color.muted_text));
+        }
 
         if (lowStockCount > 0) {
             binding.kpiLowStockAlert.setText(lowStockCount + " Parts Low in Stock!");
             binding.kpiLowStockAlert.setTextColor(requireContext().getColor(R.color.warning));
         } else {
             binding.kpiLowStockAlert.setText("Inventory: All parts in stock");
-            binding.kpiLowStockAlert.setTextColor(requireContext().getColor(R.color.navy_900));
+            binding.kpiLowStockAlert.setTextColor(requireContext().getColor(R.color.ink));
         }
 
         List<Technician> techList = technicianDAO.allByBranch(selectedBranch);
@@ -144,23 +156,47 @@ public class OverviewFragment extends Fragment {
 
         final EditText inputCustomer = new EditText(requireContext());
         inputCustomer.setHint("Customer Name (e.g. Ruwan Silva)");
+        inputCustomer.setBackgroundResource(R.drawable.bg_field);
+        inputCustomer.setPadding(36, 28, 36, 28);
+        inputCustomer.setTextColor(requireContext().getColor(R.color.ink));
+        inputCustomer.setHintTextColor(requireContext().getColor(R.color.muted_text));
+        inputCustomer.setTextSize(14);
         layout.addView(inputCustomer);
 
         final EditText inputDevice = new EditText(requireContext());
         inputDevice.setHint("Device (e.g. iPhone 14 Pro, ThinkPad X1)");
-        layout.addView(inputDevice);
+        inputDevice.setBackgroundResource(R.drawable.bg_field);
+        inputDevice.setPadding(36, 28, 36, 28);
+        inputDevice.setTextColor(requireContext().getColor(R.color.ink));
+        inputDevice.setHintTextColor(requireContext().getColor(R.color.muted_text));
+        inputDevice.setTextSize(14);
+        android.widget.LinearLayout.LayoutParams lpDevice = new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        lpDevice.topMargin = (int) (10 * getResources().getDisplayMetrics().density);
+        layout.addView(inputDevice, lpDevice);
 
         final EditText inputProblem = new EditText(requireContext());
         inputProblem.setHint("Problem Description (e.g. Cracked screen, battery drain)");
-        layout.addView(inputProblem);
+        inputProblem.setBackgroundResource(R.drawable.bg_field);
+        inputProblem.setPadding(36, 28, 36, 28);
+        inputProblem.setTextColor(requireContext().getColor(R.color.ink));
+        inputProblem.setHintTextColor(requireContext().getColor(R.color.muted_text));
+        inputProblem.setTextSize(14);
+        android.widget.LinearLayout.LayoutParams lpProblem = new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, android.view.ViewGroup.LayoutParams.WRAP_CONTENT);
+        lpProblem.topMargin = (int) (10 * getResources().getDisplayMetrics().density);
+        layout.addView(inputProblem, lpProblem);
 
         final Spinner spinnerBranch = new Spinner(requireContext());
         spinnerBranch.setBackgroundResource(R.drawable.bg_spinner);
-        String[] branchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).namesArray();
+        String[] branchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).displayNamesArray();
         ArrayAdapter<String> dialogBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
         dialogBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         spinnerBranch.setAdapter(dialogBranchAdapter);
-        layout.addView(spinnerBranch);
+        android.widget.LinearLayout.LayoutParams lpBranch = new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, (int) (48 * getResources().getDisplayMetrics().density));
+        lpBranch.topMargin = (int) (10 * getResources().getDisplayMetrics().density);
+        layout.addView(spinnerBranch, lpBranch);
 
         final Spinner spinnerService = new Spinner(requireContext());
         spinnerService.setBackgroundResource(R.drawable.bg_spinner);
@@ -168,16 +204,19 @@ public class OverviewFragment extends Fragment {
         ArrayAdapter<String> dialogServiceAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, serviceNames);
         dialogServiceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         spinnerService.setAdapter(dialogServiceAdapter);
-        layout.addView(spinnerService);
+        android.widget.LinearLayout.LayoutParams lpService = new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT, (int) (48 * getResources().getDisplayMetrics().density));
+        lpService.topMargin = (int) (10 * getResources().getDisplayMetrics().density);
+        layout.addView(spinnerService, lpService);
 
         new AlertDialog.Builder(requireContext())
-                .setTitle("➕ New Walk-in Repair Docket")
+                .setTitle("New Walk-in Repair Docket")
                 .setView(layout)
                 .setPositiveButton("Create Docket", (dialog, which) -> {
                     String customer = inputCustomer.getText().toString().trim();
                     String device = inputDevice.getText().toString().trim();
                     String problem = inputProblem.getText().toString().trim();
-                    String branch = (String) spinnerBranch.getSelectedItem();
+                    String branch = com.techfix.app.database.BranchDAO.toDbName((String) spinnerBranch.getSelectedItem());
                     String selectedService = (String) spinnerService.getSelectedItem();
 
                     if (device.isEmpty() || problem.isEmpty() || selectedService == null) {

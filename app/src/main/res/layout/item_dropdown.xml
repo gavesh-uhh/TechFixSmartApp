@@ -9,5 +9,5 @@
     android:maxLines="1"
     android:paddingStart="4dp"
     android:paddingEnd="32dp"
-    android:textColor="@color/navy_900"
+    android:textColor="@color/ink"
     android:textSize="14sp" />
