@@ -31,12 +31,15 @@
         </activity>
 
         <activity android:name=".activities.HomeActivity" android:exported="false"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.LoginActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.CustomerActivity" android:exported="false"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.StaffActivity" android:exported="false"
+            android:launchMode="singleTop"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.AppointmentDetailActivity" android:exported="false"
             android:parentActivityName=".activities.CustomerActivity" />

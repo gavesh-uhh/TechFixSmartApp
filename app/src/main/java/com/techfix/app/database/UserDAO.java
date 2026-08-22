@@ -70,6 +70,13 @@ public class UserDAO {
         return list;
     }
 
+    /** Promotes/demotes a user's role (e.g. CUSTOMER -> STAFF from the Admin directory). */
+    public boolean setRole(long id, String role) {
+        ContentValues v = new ContentValues();
+        v.put("role", role);
+        return helper.getWritableDatabase().update("users", v, "id=?", new String[]{String.valueOf(id)}) > 0;
+    }
+
     public List<User> searchCustomers(String query) {
         if (query == null || query.trim().isEmpty()) return allCustomers();
         String q = "%" + query.trim().toLowerCase() + "%";

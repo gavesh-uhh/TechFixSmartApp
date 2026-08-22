@@ -63,6 +63,7 @@ public class HomeActivity extends AppCompatActivity {
     // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES"
     private String currentCategory = "ALL";
     private String currentPartsBranch = "All Branches";
+    private boolean resumedOnce = false;
 
     private final FirebaseSyncManager.SyncListener syncListener = (isSyncing, success) -> {
         if (!isSyncing && success) {
@@ -76,11 +77,23 @@ public class HomeActivity extends AppCompatActivity {
     // Attached device photo URI & temp camera URI
     private Uri selectedPhotoUri = null;
     private Uri tempCameraUri = null;
+    private boolean locationPermissionRequested = false;
 
-    // 1. Photo Picker Launcher (Gallery)
-    private final ActivityResultLauncher<String> photoPickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
+    // Location permission launcher for nearest-branch detection
+    private final ActivityResultLauncher<String> locationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), (Boolean isGranted) -> {
+                if (Boolean.TRUE.equals(isGranted)) {
+                    suggestNearestBranch();
+                }
+            });
+
+    // 1. Photo Picker Launcher (Gallery) — OpenDocument so the URI permission is persistable
+    private final ActivityResultLauncher<String[]> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(), (Uri uri) -> {
                 if (uri != null) {
+                    try {
+                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } catch (SecurityException ignored) { }
                     onPhotoReady(uri);
                 }
             });
@@ -119,7 +132,7 @@ public class HomeActivity extends AppCompatActivity {
                     if (which == 0) {
                         checkCameraPermissionAndLaunch();
                     } else {
-                        photoPickerLauncher.launch("image/*");
+                        photoPickerLauncher.launch(new String[]{"image/*"});
                     }
                 })
                 .setNegativeButton("Cancel", null)
@@ -186,8 +199,13 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         session = new SessionManager(this);
-        showStorePanel();
-        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+        // Only reset to the Store panel on first entry; keep the user's place
+        // when returning from Maps/Login/etc.
+        if (!resumedOnce) {
+            resumedOnce = true;
+            showStorePanel();
+            binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+        }
     }
 
     /**
@@ -226,7 +244,9 @@ public class HomeActivity extends AppCompatActivity {
                 SessionManager currentSession = new SessionManager(HomeActivity.this);
                 if (currentSession.isLoggedIn()) {
                     Class<?> target = currentSession.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
-                    startActivity(new Intent(HomeActivity.this, target));
+                    Intent intent = new Intent(HomeActivity.this, target);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                    startActivity(intent);
                 } else {
                     Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -297,6 +317,29 @@ public class HomeActivity extends AppCompatActivity {
         binding.branchesPanel.setVisibility(View.GONE);
         binding.topBarTitle.setText("Book Appointment");
         binding.topBarSubtitle.setText("Repair request & device details");
+        suggestNearestBranch();
+    }
+
+    /**
+     * If location permission is granted, auto-selects the nearest branch and tells
+     * the customer how far away it is. Requests permission once if needed.
+     */
+    private void suggestNearestBranch() {
+        if (com.techfix.app.util.NearestBranch.hasPermission(this)) {
+            com.techfix.app.util.NearestBranch.resolve(this, dbHelper, (branchName, km) -> runOnUiThread(() -> {
+                if (branchName == null) return;
+                ArrayAdapter adapter = (ArrayAdapter) binding.bookingBranchSpinner.getAdapter();
+                if (adapter == null) return;
+                int pos = adapter.getPosition(branchName);
+                if (pos >= 0 && binding.bookingBranchSpinner.getSelectedItemPosition() != pos) {
+                    binding.bookingBranchSpinner.setSelection(pos, false);
+                    Toast.makeText(this, String.format("Nearest branch: %s (%.1f km away)", branchName, km), Toast.LENGTH_LONG).show();
+                }
+            }));
+        } else if (!locationPermissionRequested) {
+            locationPermissionRequested = true;
+            locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION);
+        }
     }
 
     /**
@@ -315,17 +358,15 @@ public class HomeActivity extends AppCompatActivity {
      * Setup the Book Repair Appointment form with service dropdown, device info, photo picker, and submit button.
      */
     private void setupBookingForm() {
-        // 1. Setup Service Type Dropdown
+        // 1. Setup Service Type Dropdown (no mock fallback — disable if DB is empty)
         List<String> serviceOptions = serviceDAO.all();
         if (serviceOptions.isEmpty()) {
-            serviceOptions.add("Screen replacement · Rs 8500");
-            serviceOptions.add("Battery replacement · Rs 4500");
-            serviceOptions.add("Laptop diagnostics · Rs 3000");
-            serviceOptions.add("Operating system repair · Rs 6500");
+            serviceOptions.add("No services available right now");
         }
         ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
         serviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.bookingServiceSpinner.setAdapter(serviceAdapter);
+        binding.bookingServiceSpinner.setEnabled(!serviceDAO.all().isEmpty());
 
         // 2. Setup Device Category Dropdown
         String[] deviceCategories = {"Mobile phone", "Laptop / computer", "Tablet", "Other smart device"};
@@ -333,8 +374,8 @@ public class HomeActivity extends AppCompatActivity {
         deviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.bookingDeviceSpinner.setAdapter(deviceAdapter);
 
-        // 3. Setup Branch Dropdown & Dynamic Service Loading
-        String[] branches = {"Colombo branch", "Galle branch"};
+        // 3. Setup Branch Dropdown & Dynamic Service Loading (from BranchDAO — single source of truth)
+        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).namesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.bookingBranchSpinner.setAdapter(branchAdapter);
@@ -424,36 +465,66 @@ public class HomeActivity extends AppCompatActivity {
         // 5. Get logged-in user ID
         long userId = session.getUserId();
 
-        // 6. Auto-assign available technician for the branch
-        String technician = new TechnicianDAO(dbHelper).availableFor(branch, deviceCategory);
-
-        // 7. Insert appointment into SQLite database
-        long appointmentId = appointmentDAO.add(userId, fullDeviceInfo, problemDescription, branch, serviceName, price, technician, "");
-
-        // 8. Save attached photo URI if provided
-        if (selectedPhotoUri != null && appointmentId > 0) {
-            appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
+        // 5b. Reserve the service's required spare part at this branch, if it needs one
+        com.techfix.app.database.SparePartDAO sparePartDAO = new com.techfix.app.database.SparePartDAO(dbHelper);
+        String requiredPart = serviceDAO.requiredPart(serviceName);
+        if (requiredPart != null && !requiredPart.isEmpty()) {
+            if (sparePartDAO.quantity(requiredPart, branch) <= 0) {
+                Toast.makeText(this, "Required part '" + requiredPart + "' is out of stock at " + branch + ". Please choose another branch or contact the counter.", Toast.LENGTH_LONG).show();
+                return;
+            }
         }
 
-        // Trigger instant cloud sync to Firebase if online
-        FirebaseSyncManager.getInstance().sync(this, null);
+        // 6. Auto-assign available technician for the branch
+        String technician = new TechnicianDAO(dbHelper).availableFor(branch, deviceCategory);
+        if (technician == null || technician.trim().isEmpty()) {
+            technician = "Unassigned";
+        }
 
-        // 9. Show Success Confirmation Dialog
-        new AlertDialog.Builder(this)
-                .setTitle("Appointment Booked!")
-                .setMessage("Your repair appointment #" + appointmentId + " has been booked successfully at " + branch + ".\n\nTechnician assigned: " + technician + "\nService: " + serviceName + " (Rs " + (long) price + ")")
-                .setPositiveButton("OK", (dialog, which) -> {
-                    // Reset form fields
-                    binding.bookingModelInput.setText("");
-                    binding.bookingProblemInput.setText("");
-                    selectedPhotoUri = null;
-                    binding.photoPreviewContainer.setVisibility(View.GONE);
-                    binding.photoStatusText.setText("No photo attached");
+        // 7-9. DB writes + sync off the main thread; dialog returns via runOnUiThread
+        final String fServiceName = serviceName;
+        final double fPrice = price;
+        final String fDeviceInfo = fullDeviceInfo;
+        final String fRequiredPart = requiredPart;
+        final String fTechnician = technician;
+        final long fUserId = userId;
+        com.techfix.app.util.AppExecutors.run(() -> {
+            long appointmentId = appointmentDAO.add(fUserId, fDeviceInfo, problemDescription, branch, fServiceName, fPrice, fTechnician, "");
 
-                    // Switch back to Store panel
-                    binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
-                })
-                .show();
+            boolean partReserved = false;
+            if (appointmentId > 0 && fRequiredPart != null && !fRequiredPart.isEmpty()) {
+                partReserved = sparePartDAO.consume(fRequiredPart, branch);
+            }
+
+            if (selectedPhotoUri != null && appointmentId > 0) {
+                appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
+            }
+
+            // Trigger instant cloud sync to Firebase if online
+            FirebaseSyncManager.getInstance().sync(this, null);
+            com.techfix.app.util.Analytics.log(this, "booking_created", "branch", branch);
+
+            final boolean fPartReserved = partReserved;
+            final long fAppointmentId = appointmentId;
+            runOnUiThread(() -> {
+                new AlertDialog.Builder(this)
+                        .setTitle("Appointment Booked!")
+                        .setMessage("Your repair appointment #" + fAppointmentId + " has been booked successfully at " + branch + ".\n\nTechnician assigned: " + ("Unassigned".equals(fTechnician) ? "will be assigned at the counter" : fTechnician) + "\nService: " + fServiceName + " (Rs " + (long) fPrice + ")"
+                                + (fPartReserved ? "\nPart reserved: " + fRequiredPart : ""))
+                        .setPositiveButton("OK", (dialog, which) -> {
+                            // Reset form fields
+                            binding.bookingModelInput.setText("");
+                            binding.bookingProblemInput.setText("");
+                            selectedPhotoUri = null;
+                            binding.photoPreviewContainer.setVisibility(View.GONE);
+                            binding.photoStatusText.setText("No photo attached");
+
+                            // Switch back to Store panel
+                            binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+                        })
+                        .show();
+            });
+        });
     }
 
     /**
@@ -639,7 +710,7 @@ public class HomeActivity extends AppCompatActivity {
      * Setup the Spare Parts panel: branch filter dropdown & real-time search input.
      */
     private void setupPartsPanel() {
-        String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
+        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).namesArrayWithAll();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.homePartsBranchSpinner.setAdapter(branchAdapter);

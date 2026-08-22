@@ -58,6 +58,16 @@ public class AppointmentDetailActivity extends AppCompatActivity {
 
         List<RepairStatus> history = appointments.statusHistory(id);
         binding.timelineList.removeAllViews();
+        if (history.isEmpty()) {
+            TextView empty = new TextView(this);
+            empty.setText("No status updates yet — the workshop will update this docket once work begins.");
+            empty.setTextSize(13);
+            empty.setTextColor(getColor(R.color.techfix_muted));
+            empty.setBackgroundResource(R.drawable.bg_field);
+            empty.setPadding(18, 14, 18, 14);
+            binding.timelineList.addView(empty);
+            return;
+        }
         for (int i = 0; i < history.size(); i++) {
             RepairStatus step = history.get(i);
             TextView row = new TextView(this);
@@ -82,7 +92,10 @@ public class AppointmentDetailActivity extends AppCompatActivity {
                 .setTitle("Pay Rs " + (long) a.price + " \u00B7 " + a.service)
                 .setItems(methods, (d, w) -> {
                     boolean ok = appointments.pay(id, a.price, methods[w]);
-                    if (ok) Feedback.success(binding.getRoot(), "Payment recorded \u00B7 " + methods[w]);
+                    if (ok) {
+                        Feedback.success(binding.getRoot(), "Payment recorded \u00B7 " + methods[w]);
+                        com.techfix.app.util.Analytics.log(this, "payment_made", "method", methods[w]);
+                    }
                     else Feedback.error(binding.getRoot(), "Payment failed");
                     binding.detailPayButton.setVisibility(android.view.View.GONE);
                     render(id);

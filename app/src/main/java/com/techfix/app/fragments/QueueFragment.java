@@ -205,6 +205,7 @@ public class QueueFragment extends Fragment {
                 .setItems(labels, (dialog, which) -> {
                     String newStatus = labels[which];
                     appointmentDAO.updateStatus(a.id, newStatus);
+        com.techfix.app.util.Analytics.log(requireContext(), "status_updated", "status", newStatus);
                     FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();
                     Snackbar.make(binding.getRoot(), "Docket #" + a.id + " updated to " + newStatus, Snackbar.LENGTH_LONG).show();
@@ -214,16 +215,37 @@ public class QueueFragment extends Fragment {
     }
 
     private void showTechnicianPicker(Appointment a) {
-        List<com.techfix.app.models.Technician> techList = technicianDAO.all();
-        String[] techNames = new String[techList.size()];
-        for (int i = 0; i < techList.size(); i++) {
-            techNames[i] = techList.get(i).name + " (" + techList.get(i).branch + ")";
+        // Only offer AVAILABLE technicians; prefer ones at the appointment's branch
+        List<com.techfix.app.models.Technician> available = new ArrayList<>();
+        for (com.techfix.app.models.Technician t : technicianDAO.all()) {
+            if (t.available) available.add(t);
+        }
+        available.sort((t1, t2) -> {
+            boolean b1 = t1.branch != null && t1.branch.equals(a.branch);
+            boolean b2 = t2.branch != null && t2.branch.equals(a.branch);
+            return b1 == b2 ? t1.name.compareTo(t2.name) : (b1 ? -1 : 1);
+        });
+
+        if (available.isEmpty()) {
+            new AlertDialog.Builder(requireContext())
+                    .setTitle("Assign Technician · #" + a.id)
+                    .setMessage("No technicians are currently on duty. Toggle a technician's availability in the Catalog tab first.")
+                    .setPositiveButton("OK", null)
+                    .show();
+            return;
+        }
+
+        String[] techNames = new String[available.size()];
+        for (int i = 0; i < available.size(); i++) {
+            com.techfix.app.models.Technician t = available.get(i);
+            boolean sameBranch = t.branch != null && t.branch.equals(a.branch);
+            techNames[i] = t.name + " (" + t.branch + (sameBranch ? " · this branch" : "") + ")";
         }
 
         new AlertDialog.Builder(requireContext())
                 .setTitle("Assign Technician · #" + a.id)
                 .setItems(techNames, (dialog, which) -> {
-                    String chosenTech = techList.get(which).name;
+                    String chosenTech = available.get(which).name;
                     appointmentDAO.updateTechnician(a.id, chosenTech);
                     FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();

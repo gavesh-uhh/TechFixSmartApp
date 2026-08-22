@@ -61,7 +61,7 @@ public class InventoryFragment extends Fragment {
 
         FirebaseSyncManager.getInstance().addListener(syncListener);
 
-        String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
+        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).namesArrayWithAll();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.inventoryBranchSpinner.setAdapter(branchAdapter);
@@ -116,7 +116,7 @@ public class InventoryFragment extends Fragment {
         Spinner spinnerBranch = dialogView.findViewById(R.id.dialogPartBranchSpinner);
         EditText inputQty = dialogView.findViewById(R.id.dialogPartQtyInput);
 
-        String[] branchOptions = {"Colombo branch", "Galle branch"};
+        String[] branchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).namesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         spinnerBranch.setAdapter(branchAdapter);

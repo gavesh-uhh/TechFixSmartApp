@@ -67,7 +67,31 @@ public class AdminFragment extends Fragment {
 
         userDirectoryAdapter = new UserDirectoryAdapter(
                 userId -> userDAO.getRepairCountForUser(userId),
-                user -> Toast.makeText(requireContext(), "Customer: " + user.name + " (" + user.email + ")", Toast.LENGTH_SHORT).show()
+                user -> {
+                    if (user.role == com.techfix.app.models.UserRole.STAFF) {
+                        Toast.makeText(requireContext(), user.name + " is already staff", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    new AlertDialog.Builder(requireContext())
+                            .setTitle("Promote to Staff?")
+                            .setMessage("Give " + user.name + " (" + user.email + ") access to the Admin workspace?")
+                            .setPositiveButton("Promote", (d, w) -> com.techfix.app.util.AppExecutors.run(() -> {
+                                boolean ok = userDAO.setRole(user.id, "STAFF");
+                                if (getActivity() != null) {
+                                    requireActivity().runOnUiThread(() -> {
+                                        if (ok) {
+                                            com.techfix.app.sync.FirebaseSyncManager.getInstance().sync(requireContext(), null);
+                                            refresh();
+                                            Snackbar.make(binding.getRoot(), user.name + " is now staff — they can sign in with their existing password", Snackbar.LENGTH_LONG).show();
+                                        } else {
+                                            Snackbar.make(binding.getRoot(), "Could not update role", Snackbar.LENGTH_LONG).show();
+                                        }
+                                    });
+                                }
+                            }))
+                            .setNegativeButton("Cancel", null)
+                            .show();
+                }
         );
 
         binding.customersList.setLayoutManager(new LinearLayoutManager(requireContext()));
