@@ -20,10 +20,13 @@ import com.techfix.app.util.WindowInsetsHelper;
 import java.util.List;
 
 /**
- * HomeActivity - Landing Page for TechFix Store with Bottom Navigation.
+ * HomeActivity - Landing Page for TechFix Store.
  * TechFix is a newly established computer and mobile phone repair shop.
- * This screen displays the store showcase with images, available repair services,
- * in-stock spare parts, branch locations, and bottom navigation.
+ * Features:
+ * - Round category buttons for quick filtering
+ * - Visual repair services catalog and in-stock spare parts
+ * - Branch locations with Google Maps navigation
+ * - Bottom navigation bar
  */
 public class HomeActivity extends AppCompatActivity {
 
@@ -33,6 +36,9 @@ public class HomeActivity extends AppCompatActivity {
     // Database access objects
     private ServiceDAO serviceDAO;
     private SparePartDAO sparePartDAO;
+
+    // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES", "PARTS"
+    private String currentCategory = "ALL";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,81 +54,130 @@ public class HomeActivity extends AppCompatActivity {
         serviceDAO = new ServiceDAO(dbHelper);
         sparePartDAO = new SparePartDAO(dbHelper);
 
-        // 3. Setup Buttons & Bottom Navigation
-        setupButtons();
+        // 3. Setup UI components
+        setupBranchButtons();
         setupBottomNavigation();
+        setupRoundCategories();
 
-        // 4. Load and display store items with images
-        loadAvailableServices();
-        loadAvailableSpareParts();
+        // 4. Load initial store items
+        loadItemsForCategory("ALL");
     }
 
     /**
-     * Setup navigation button listeners.
+     * Setup round category click listeners.
      */
-    private void setupButtons() {
-        // "Get Started / Book a Repair" button -> opens Login / Sign-up screen
-        binding.continueButton.setOnClickListener(v -> {
-            Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-            startActivity(intent);
-        });
-
-        // Colombo Branch -> Open location in Google Maps
-        binding.colomboChip.setOnClickListener(v -> {
-            openLocationInMaps("6.9271,79.8612", "TechFix Colombo Branch");
-        });
-
-        // Galle Branch -> Open location in Google Maps
-        binding.galleChip.setOnClickListener(v -> {
-            openLocationInMaps("6.0329,80.2168", "TechFix Galle Branch");
-        });
+    private void setupRoundCategories() {
+        binding.catAll.setOnClickListener(v -> selectCategory("ALL"));
+        binding.catPhones.setOnClickListener(v -> selectCategory("PHONES"));
+        binding.catComputers.setOnClickListener(v -> selectCategory("COMPUTERS"));
+        binding.catScreens.setOnClickListener(v -> selectCategory("SCREENS"));
+        binding.catBatteries.setOnClickListener(v -> selectCategory("BATTERIES"));
+        binding.catParts.setOnClickListener(v -> selectCategory("PARTS"));
     }
 
     /**
-     * Setup bottom navigation bar (Store, Branches, Account).
+     * Updates visual state of round category circles and re-filters the store items.
      */
-    private void setupBottomNavigation() {
-        // Select 'Store' as default selected tab
-        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+    private void selectCategory(String categoryKey) {
+        currentCategory = categoryKey;
 
-        binding.bottomNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
+        // Reset all category circles to default (unselected) style
+        resetCategoryStyles();
 
-            if (itemId == R.id.nav_home_store) {
-                // Scroll up to top to view repair store services & items
-                binding.homeScrollView.smoothScrollTo(0, 0);
-                return true;
+        // Highlight the chosen category circle
+        if ("ALL".equals(categoryKey)) {
+            highlightCategory(binding.circleCatAll, binding.iconCatAll, binding.labelCatAll);
+        } else if ("PHONES".equals(categoryKey)) {
+            highlightCategory(binding.circleCatPhones, binding.iconCatPhones, binding.labelCatPhones);
+        } else if ("COMPUTERS".equals(categoryKey)) {
+            highlightCategory(binding.circleCatComputers, binding.iconCatComputers, binding.labelCatComputers);
+        } else if ("SCREENS".equals(categoryKey)) {
+            highlightCategory(binding.circleCatScreens, binding.iconCatScreens, binding.labelCatScreens);
+        } else if ("BATTERIES".equals(categoryKey)) {
+            highlightCategory(binding.circleCatBatteries, binding.iconCatBatteries, binding.labelCatBatteries);
+        } else if ("PARTS".equals(categoryKey)) {
+            highlightCategory(binding.circleCatParts, binding.iconCatParts, binding.labelCatParts);
+        }
 
-            } else if (itemId == R.id.nav_home_branches) {
-                // Scroll down to the branch locations section
-                binding.homeScrollView.post(() -> {
-                    int targetY = binding.branchesSectionTitle.getTop();
-                    binding.homeScrollView.smoothScrollTo(0, targetY);
-                });
-                return true;
-
-            } else if (itemId == R.id.nav_home_account) {
-                // Open Customer & Staff login / account screen
-                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                startActivity(intent);
-                return false; // keep tab selected on home
-            }
-
-            return false;
-        });
+        // Reload services and spare parts according to the selected filter
+        loadItemsForCategory(categoryKey);
     }
 
     /**
-     * Load all available computer and mobile phone repair services
-     * from the database and add them to the landing page with images.
+     * Reset all category circles to unselected appearance.
      */
-    private void loadAvailableServices() {
+    private void resetCategoryStyles() {
+        int unselectedBg = R.drawable.bg_circle_category;
+        int mutedColor = getResources().getColor(R.color.muted_text, null);
+
+        binding.circleCatAll.setBackgroundResource(unselectedBg);
+        binding.iconCatAll.clearColorFilter();
+        binding.labelCatAll.setTextColor(mutedColor);
+
+        binding.circleCatPhones.setBackgroundResource(unselectedBg);
+        binding.iconCatPhones.clearColorFilter();
+        binding.labelCatPhones.setTextColor(mutedColor);
+
+        binding.circleCatComputers.setBackgroundResource(unselectedBg);
+        binding.iconCatComputers.clearColorFilter();
+        binding.labelCatComputers.setTextColor(mutedColor);
+
+        binding.circleCatScreens.setBackgroundResource(unselectedBg);
+        binding.iconCatScreens.clearColorFilter();
+        binding.labelCatScreens.setTextColor(mutedColor);
+
+        binding.circleCatBatteries.setBackgroundResource(unselectedBg);
+        binding.iconCatBatteries.clearColorFilter();
+        binding.labelCatBatteries.setTextColor(mutedColor);
+
+        binding.circleCatParts.setBackgroundResource(unselectedBg);
+        binding.iconCatParts.clearColorFilter();
+        binding.labelCatParts.setTextColor(mutedColor);
+    }
+
+    /**
+     * Highlight a single category circle when active.
+     */
+    private void highlightCategory(View circleView, ImageView iconView, TextView labelView) {
+        circleView.setBackgroundResource(R.drawable.bg_circle_category_selected);
+        iconView.setColorFilter(getResources().getColor(R.color.white, null));
+        labelView.setTextColor(getResources().getColor(R.color.navy_900, null));
+    }
+
+    /**
+     * Loads and filters repair services and spare parts for the given category.
+     */
+    private void loadItemsForCategory(String filter) {
+        loadAvailableServices(filter);
+        loadAvailableSpareParts(filter);
+    }
+
+    /**
+     * Load repair services with filtering.
+     */
+    private void loadAvailableServices(String filter) {
         binding.servicesContainer.removeAllViews();
+
+        if ("PARTS".equals(filter)) {
+            // Hide services section when filtering parts only
+            binding.servicesHeaderTitle.setVisibility(View.GONE);
+            binding.servicesHeaderSubtitle.setVisibility(View.GONE);
+            binding.servicesContainer.setVisibility(View.GONE);
+            return;
+        }
+
+        binding.servicesHeaderTitle.setVisibility(View.VISIBLE);
+        binding.servicesHeaderSubtitle.setVisibility(View.VISIBLE);
+        binding.servicesContainer.setVisibility(View.VISIBLE);
 
         List<Service> services = serviceDAO.list();
 
         for (Service service : services) {
-            // Inflate service item layout
+            // Check if service matches filter
+            if (!matchesFilter(service.name, service.category, filter)) {
+                continue;
+            }
+
             View itemView = getLayoutInflater().inflate(R.layout.item_home_service, binding.servicesContainer, false);
 
             ImageView imageView = itemView.findViewById(R.id.serviceImageView);
@@ -131,10 +186,7 @@ public class HomeActivity extends AppCompatActivity {
             TextView categoryText = itemView.findViewById(R.id.serviceCategoryText);
             TextView partText = itemView.findViewById(R.id.servicePartText);
 
-            // Set image according to service type
             imageView.setImageResource(getServiceImageResource(service.name, service.category));
-
-            // Set service details
             nameText.setText(service.name);
             priceText.setText("Rs " + (long) service.price);
             categoryText.setText(service.category);
@@ -143,32 +195,34 @@ public class HomeActivity extends AppCompatActivity {
                 partText.setText("Includes part: " + service.requiredPart);
                 partText.setVisibility(View.VISIBLE);
             } else {
-                partText.setText("Full diagnostic & service");
+                partText.setText("Full diagnostic & repair");
                 partText.setVisibility(View.VISIBLE);
             }
 
-            // Click service item -> open login to book
+            // Click service -> open login / booking flow
             itemView.setOnClickListener(v -> {
                 Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                 startActivity(intent);
             });
 
-            // Add the item view into the container
             binding.servicesContainer.addView(itemView);
         }
     }
 
     /**
-     * Load all in-stock spare parts and store items
-     * from the database and add them to the landing page with images.
+     * Load spare parts with filtering.
      */
-    private void loadAvailableSpareParts() {
+    private void loadAvailableSpareParts(String filter) {
         binding.partsContainer.removeAllViews();
 
         List<SparePart> parts = sparePartDAO.all();
 
         for (SparePart part : parts) {
-            // Inflate spare part item layout
+            // Check if spare part matches filter
+            if (!matchesFilter(part.name, part.branch, filter)) {
+                continue;
+            }
+
             View itemView = getLayoutInflater().inflate(R.layout.item_home_part, binding.partsContainer, false);
 
             ImageView imageView = itemView.findViewById(R.id.partImageView);
@@ -177,15 +231,11 @@ public class HomeActivity extends AppCompatActivity {
             TextView quantityText = itemView.findViewById(R.id.partQuantityText);
             TextView branchText = itemView.findViewById(R.id.partBranchText);
 
-            // Set product image
             imageView.setImageResource(getPartImageResource(part.name));
-
-            // Set part details
             nameText.setText(part.name);
             quantityText.setText("Stock: " + part.quantity + " units available");
             branchText.setText(part.branch);
 
-            // Show stock status
             if (part.quantity > 0) {
                 statusBadge.setText("In Stock");
                 statusBadge.setTextColor(getResources().getColor(R.color.success, null));
@@ -194,9 +244,75 @@ public class HomeActivity extends AppCompatActivity {
                 statusBadge.setTextColor(getResources().getColor(R.color.error, null));
             }
 
-            // Add the item view into the container
+            // Click part -> open login / booking flow
+            itemView.setOnClickListener(v -> {
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+            });
+
             binding.partsContainer.addView(itemView);
         }
+    }
+
+    /**
+     * Checks if an item title or category matches the current active filter.
+     */
+    private boolean matchesFilter(String name, String extra, String filter) {
+        if ("ALL".equals(filter)) return true;
+        String combined = (name + " " + extra).toLowerCase();
+
+        switch (filter) {
+            case "PHONES":
+                return combined.contains("phone") || combined.contains("mobile");
+            case "COMPUTERS":
+                return combined.contains("laptop") || combined.contains("computer");
+            case "SCREENS":
+                return combined.contains("screen") || combined.contains("display");
+            case "BATTERIES":
+                return combined.contains("battery");
+            case "PARTS":
+                return true;
+            default:
+                return true;
+        }
+    }
+
+    /**
+     * Setup Branch click listeners for Google Maps.
+     */
+    private void setupBranchButtons() {
+        binding.colomboChip.setOnClickListener(v -> openLocationInMaps("6.9271,79.8612", "TechFix Colombo Branch"));
+        binding.galleChip.setOnClickListener(v -> openLocationInMaps("6.0329,80.2168", "TechFix Galle Branch"));
+    }
+
+    /**
+     * Setup bottom navigation bar (Store, Branches, Account).
+     */
+    private void setupBottomNavigation() {
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+
+        binding.bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_home_store) {
+                binding.homeScrollView.smoothScrollTo(0, 0);
+                return true;
+
+            } else if (itemId == R.id.nav_home_branches) {
+                binding.homeScrollView.post(() -> {
+                    int targetY = binding.branchesSectionTitle.getTop();
+                    binding.homeScrollView.smoothScrollTo(0, targetY);
+                });
+                return true;
+
+            } else if (itemId == R.id.nav_home_account) {
+                Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                startActivity(intent);
+                return false;
+            }
+
+            return false;
+        });
     }
 
     /**
