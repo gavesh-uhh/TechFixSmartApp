@@ -24,6 +24,7 @@ import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.BranchDAO;
 import com.techfix.app.database.DatabaseHelper;
 import com.techfix.app.database.ServiceDAO;
+import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.database.UserDAO;
 import com.techfix.app.databinding.ActivityCustomerBinding;
@@ -67,11 +68,23 @@ public class CustomerActivity extends AppCompatActivity {
     // Photo capture / selection
     private Uri selectedPhotoUri = null;
     private Uri tempCameraUri = null;
+    private String repairFilter = "Active";
 
-    // 1. Photo picker launcher (Gallery)
-    private final ActivityResultLauncher<String> photoPickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
+    // 3. Location permission launcher for nearest-branch detection
+    private final ActivityResultLauncher<String> locationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), (Boolean isGranted) -> {
+                if (Boolean.TRUE.equals(isGranted)) {
+                    suggestNearestBranch();
+                }
+            });
+
+    // 1. Photo picker launcher (Gallery) — OpenDocument so the URI permission is persistable
+    private final ActivityResultLauncher<String[]> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.OpenDocument(), (Uri uri) -> {
                 if (uri != null) {
+                    try {
+                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    } catch (SecurityException ignored) { }
                     onPhotoReady(uri);
                 }
             });
@@ -110,7 +123,7 @@ public class CustomerActivity extends AppCompatActivity {
                     if (which == 0) {
                         checkCameraPermissionAndLaunch();
                     } else {
-                        photoPickerLauncher.launch("image/*");
+                        photoPickerLauncher.launch(new String[]{"image/*"});
                     }
                 })
                 .setNegativeButton("Cancel", null)
@@ -193,7 +206,10 @@ public class CustomerActivity extends AppCompatActivity {
         super.onResume();
         if (!session.isLoggedIn()) {
             goHome();
+            return;
         }
+        // Refresh repair statuses so returning from detail/payment shows current state
+        refreshRepairs();
     }
 
     /**
@@ -249,6 +265,7 @@ public class CustomerActivity extends AppCompatActivity {
                 return true;
             } else if (itemId == R.id.nav_customer_book) {
                 showPanel(1);
+                suggestNearestBranch();
                 return true;
             } else if (itemId == R.id.nav_customer_profile) {
                 showPanel(2);
@@ -264,6 +281,32 @@ public class CustomerActivity extends AppCompatActivity {
 
         // Pay pending repairs button
         binding.payButton.setOnClickListener(this::payFirstPending);
+
+        // Repairs filter chips
+        binding.chipFilterActive.setOnClickListener(v -> { repairFilter = "Active"; refreshRepairs(); });
+        binding.chipFilterCompleted.setOnClickListener(v -> { repairFilter = "Completed"; refreshRepairs(); });
+        binding.chipFilterAll.setOnClickListener(v -> { repairFilter = "All"; refreshRepairs(); });
+    }
+
+    /**
+     * If location permission is granted, auto-selects the nearest branch in the
+     * booking form and tells the customer how far away it is. Silent on failure.
+     */
+    private void suggestNearestBranch() {
+        if (com.techfix.app.util.NearestBranch.hasPermission(this)) {
+            com.techfix.app.util.NearestBranch.resolve(this, dbHelper, (branchName, km) -> runOnUiThread(() -> {
+                if (branchName == null) return;
+                ArrayAdapter adapter = (ArrayAdapter) binding.branchSpinner.getAdapter();
+                if (adapter == null) return;
+                int pos = adapter.getPosition(branchName);
+                if (pos >= 0 && binding.branchSpinner.getSelectedItemPosition() != pos) {
+                    binding.branchSpinner.setSelection(pos, false);
+                    Toast.makeText(this, String.format("Nearest branch: %s (%.1f km away)", branchName, km), Toast.LENGTH_LONG).show();
+                }
+            }));
+        } else {
+            locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION);
+        }
     }
 
     /**
@@ -298,9 +341,18 @@ public class CustomerActivity extends AppCompatActivity {
      */
     private void refreshRepairs() {
         List<Appointment> repairs = appointmentDAO.forUser(session.getUserId());
-        appointmentAdapter.submitList(repairs);
 
-        boolean hasRepairs = !repairs.isEmpty();
+        // Apply the Active / Completed / All filter
+        List<Appointment> filtered = new java.util.ArrayList<>();
+        for (Appointment a : repairs) {
+            boolean completed = com.techfix.app.models.AppointmentStatus.COMPLETED.label.equals(a.status);
+            if ("Active".equals(repairFilter) && completed) continue;
+            if ("Completed".equals(repairFilter) && !completed) continue;
+            filtered.add(a);
+        }
+        appointmentAdapter.submitList(filtered);
+
+        boolean hasRepairs = !filtered.isEmpty();
         binding.repairList.setVisibility(hasRepairs ? View.VISIBLE : View.GONE);
         binding.emptyStateContainer.setVisibility(hasRepairs ? View.GONE : View.VISIBLE);
 
@@ -322,10 +374,7 @@ public class CustomerActivity extends AppCompatActivity {
         // 1. Service Type Dropdown
         List<String> serviceOptions = serviceDAO.all();
         if (serviceOptions.isEmpty()) {
-            serviceOptions.add("Screen replacement · Rs 8500");
-            serviceOptions.add("Battery replacement · Rs 4500");
-            serviceOptions.add("Laptop diagnostics · Rs 3000");
-            serviceOptions.add("Operating system repair · Rs 6500");
+            serviceOptions.add("No services available right now");
         }
         ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
         serviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
@@ -337,8 +386,8 @@ public class CustomerActivity extends AppCompatActivity {
         deviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.deviceSpinner.setAdapter(deviceAdapter);
 
-        // 3. Branch Dropdown & Dynamic Service Loading
-        String[] branches = {"Colombo branch", "Galle branch"};
+        // 3. Branch Dropdown & Dynamic Service Loading (from BranchDAO — single source of truth)
+        String[] branches = new BranchDAO(dbHelper).namesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.branchSpinner.setAdapter(branchAdapter);
@@ -375,9 +424,14 @@ public class CustomerActivity extends AppCompatActivity {
         if (serviceOptions.isEmpty()) {
             serviceOptions = serviceDAO.all();
         }
+        if (serviceOptions.isEmpty()) {
+            serviceOptions.add("No services available right now");
+        }
         ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
         serviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.serviceSpinner.setAdapter(serviceAdapter);
+        binding.serviceSpinner.setEnabled(!serviceOptions.isEmpty()
+                && !"No services available right now".equals(serviceOptions.get(0)));
     }
 
     /**
@@ -406,35 +460,65 @@ public class CustomerActivity extends AppCompatActivity {
         double price = serviceDAO.price(serviceSelection != null ? serviceSelection : "0");
         String fullDeviceInfo = deviceCategory + " (" + deviceModel + ")";
 
-        // Auto-assign available technician for branch
-        String technician = new TechnicianDAO(dbHelper).availableFor(branch, deviceCategory);
-
-        // Save appointment to SQLite database
-        long appointmentId = appointmentDAO.add(session.getUserId(), fullDeviceInfo, problem, branch, serviceName, price, technician, "");
-
-        if (selectedPhotoUri != null && appointmentId > 0) {
-            appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
+        // Reserve the service's required spare part at this branch, if it needs one
+        SparePartDAO sparePartDAO = new SparePartDAO(dbHelper);
+        String requiredPart = new ServiceDAO(dbHelper).requiredPart(serviceName);
+        if (requiredPart != null && !requiredPart.isEmpty()) {
+            if (sparePartDAO.quantity(requiredPart, branch) <= 0) {
+                Feedback.error(binding.getRoot(), "Required part '" + requiredPart + "' is out of stock at " + branch
+                        + ". Please choose another branch or contact the counter.");
+                return;
+            }
         }
 
-        // Trigger instant cloud sync to Firebase if online
-        FirebaseSyncManager.getInstance().sync(this, null);
+        // Auto-assign available technician for branch
+        String technician = new TechnicianDAO(dbHelper).availableFor(branch, deviceCategory);
+        if (technician == null || technician.trim().isEmpty()) {
+            technician = "Unassigned";
+        }
 
-        // Show confirmation dialog
-        new AlertDialog.Builder(this)
-                .setTitle("Repair Booked!")
-                .setMessage("Appointment #" + appointmentId + " booked at " + branch + ".\nTechnician: " + technician + "\nEstimated Price: Rs " + (long) price)
-                .setPositiveButton("View Repairs", (dialog, which) -> {
-                    // Reset form
-                    binding.deviceModelInput.setText("");
-                    binding.problemInput.setText("");
-                    selectedPhotoUri = null;
-                    binding.customerPhotoPreviewContainer.setVisibility(View.GONE);
-                    binding.customerPhotoStatus.setText("No photo attached");
+        // All DB writes + sync run off the main thread; dialog comes back via runOnUiThread
+        final String fServiceName = serviceName;
+        final double fPrice = price;
+        final String fDeviceInfo = fullDeviceInfo;
+        final String fRequiredPart = requiredPart;
+        final String fTechnician = technician;
+        com.techfix.app.util.AppExecutors.run(() -> {
+            long appointmentId = appointmentDAO.add(session.getUserId(), fDeviceInfo, problem, branch, fServiceName, fPrice, fTechnician, "");
 
-                    // Switch to My Repairs bottom nav item
-                    binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_repairs);
-                })
-                .show();
+            boolean partReserved = false;
+            if (appointmentId > 0 && fRequiredPart != null && !fRequiredPart.isEmpty()) {
+                partReserved = sparePartDAO.consume(fRequiredPart, branch);
+            }
+
+            if (selectedPhotoUri != null && appointmentId > 0) {
+                appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
+            }
+
+            FirebaseSyncManager.getInstance().sync(this, null);
+            com.techfix.app.util.Analytics.log(this, "booking_created", "branch", branch);
+
+            final boolean fPartReserved = partReserved;
+            final long fAppointmentId = appointmentId;
+            runOnUiThread(() -> {
+                new AlertDialog.Builder(this)
+                        .setTitle("Repair Booked!")
+                        .setMessage("Appointment #" + fAppointmentId + " booked at " + branch + ".\nTechnician: " + ("Unassigned".equals(fTechnician) ? "will be assigned at the counter" : fTechnician) + "\nEstimated Price: Rs " + (long) fPrice
+                                + (fPartReserved ? "\nPart reserved: " + fRequiredPart : ""))
+                        .setPositiveButton("View Repairs", (dialog, which) -> {
+                            // Reset form
+                            binding.deviceModelInput.setText("");
+                            binding.problemInput.setText("");
+                            selectedPhotoUri = null;
+                            binding.customerPhotoPreviewContainer.setVisibility(View.GONE);
+                            binding.customerPhotoStatus.setText("No photo attached");
+
+                            // Switch to My Repairs bottom nav item
+                            binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_repairs);
+                        })
+                        .show();
+            });
+        });
     }
 
     /**
@@ -448,37 +532,44 @@ public class CustomerActivity extends AppCompatActivity {
     }
 
     /**
-     * Pays the oldest pending unpaid repair.
+     * Opens the specific unpaid repair the customer wants to pay for.
+     * If several are unpaid, lets them pick; payment itself happens on the
+     * detail screen so the customer always pays the docket they chose.
      */
     private void payFirstPending(View v) {
-        List<Appointment> userRepairs = appointmentDAO.forUser(session.getUserId());
-        Appointment target = null;
-        for (Appointment a : userRepairs) {
+        List<Appointment> unpaid = new java.util.ArrayList<>();
+        for (Appointment a : appointmentDAO.forUser(session.getUserId())) {
             if (PaymentStatus.PENDING.label.equalsIgnoreCase(a.payment)) {
-                target = a;
-                break;
+                unpaid.add(a);
             }
         }
 
-        final Appointment appointment = target;
-        if (appointment == null) {
+        if (unpaid.isEmpty()) {
             Feedback.error(v, "No unpaid repairs pending");
             return;
         }
 
-        String[] methods = {"Cash at counter", "Card", "Bank transfer"};
+        if (unpaid.size() == 1) {
+            openPaymentDetail(unpaid.get(0).id);
+            return;
+        }
+
+        // Multiple unpaid repairs — let the customer choose which one to pay
+        String[] labels = new String[unpaid.size()];
+        for (int i = 0; i < unpaid.size(); i++) {
+            Appointment a = unpaid.get(i);
+            labels[i] = "#" + a.id + " · " + a.device + " · Rs " + (long) a.price;
+        }
         new AlertDialog.Builder(this)
-                .setTitle("Pay Rs " + (long) appointment.price + " · " + appointment.service)
-                .setItems(methods, (d, which) -> {
-                    boolean ok = appointmentDAO.pay(appointment.id, appointment.price, methods[which]);
-                    refreshRepairs();
-                    if (ok) {
-                        Feedback.success(v, "Payment recorded (" + methods[which] + ")");
-                    } else {
-                        Feedback.error(v, "Payment failed");
-                    }
-                })
+                .setTitle("Choose a repair to pay")
+                .setItems(labels, (d, which) -> openPaymentDetail(unpaid.get(which).id))
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    private void openPaymentDetail(long appointmentId) {
+        Intent intent = new Intent(this, AppointmentDetailActivity.class);
+        intent.putExtra("appointmentId", appointmentId);
+        startActivity(intent);
     }
 }

@@ -19,6 +19,28 @@ public class BranchDAO {
         return out;
     }
 
+    /** Branch names only — single source of truth for dropdowns. */
+    public String[] namesArray() {
+        List<Branch> list = branches();
+        String[] out = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) out[i] = list.get(i).name;
+        return out;
+    }
+
+    /** {"All Branches", ...names} for filter spinners. */
+    public String[] namesArrayWithAll() {
+        List<Branch> list = branches();
+        String[] out = new String[list.size() + 1];
+        out[0] = "All Branches";
+        for (int i = 0; i < list.size(); i++) out[i + 1] = list.get(i).name;
+        return out;
+    }
+
+    public String firstName() {
+        List<Branch> list = branches();
+        return list.isEmpty() ? "Colombo branch" : list.get(0).name;
+    }
+
     /** Picks the nearest branch that has a technician with the right skill and (if needed) the spare part in stock. */
     public String nearestFor(String device, String service, double latitude, double longitude) {
         String skill = device.contains("Laptop") ? "Laptop / computer" : "Mobile phone";

@@ -6,6 +6,8 @@ import android.os.Handler;
 import android.os.Looper;
 import androidx.appcompat.app.AppCompatActivity;
 import com.techfix.app.databinding.ActivitySplashBinding;
+import com.techfix.app.models.UserRole;
+import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
 public class SplashActivity extends AppCompatActivity {
@@ -17,7 +19,15 @@ public class SplashActivity extends AppCompatActivity {
         WindowInsetsHelper.apply(binding.splashRoot, binding.splashRoot);
 
         new Handler(Looper.getMainLooper()).postDelayed(() -> {
-            startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+            SessionManager session = new SessionManager(SplashActivity.this);
+            Intent intent;
+            if (session.isLoggedIn()) {
+                Class<?> target = (session.getRole() == UserRole.STAFF) ? StaffActivity.class : CustomerActivity.class;
+                intent = new Intent(SplashActivity.this, target);
+            } else {
+                intent = new Intent(SplashActivity.this, HomeActivity.class);
+            }
+            startActivity(intent);
             finish();
         }, 900);
     }

@@ -6,6 +6,7 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Toast;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -74,6 +75,7 @@ public class LoginActivity extends AppCompatActivity {
         // 5. Setup click listeners
         binding.loginButton.setOnClickListener(this::submitAuthForm);
         binding.switchAuthButton.setOnClickListener(v -> switchMode(mode == Mode.SIGN_UP ? Mode.SIGN_IN : Mode.SIGN_UP));
+        binding.forgotPasswordText.setOnClickListener(this::showForgotPasswordDialog);
 
         // 6. Password strength watcher
         binding.passwordInput.addTextChangedListener(new TextWatcher() {
@@ -171,6 +173,7 @@ public class LoginActivity extends AppCompatActivity {
 
             session.start(userId, role);
             Toast.makeText(this, "Signed in successfully", Toast.LENGTH_SHORT).show();
+            com.techfix.app.util.Analytics.log(this, "login");
             openDashboard(role);
             return;
         }
@@ -195,6 +198,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             session.start(userId, role);
                             Toast.makeText(this, "Signed in successfully", Toast.LENGTH_SHORT).show();
+                            com.techfix.app.util.Analytics.log(this, "login");
                             openDashboard(role);
 
                         } else {
@@ -272,6 +276,7 @@ public class LoginActivity extends AppCompatActivity {
 
                             session.start(userId, UserRole.CUSTOMER);
                             Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+                            com.techfix.app.util.Analytics.log(this, "sign_up");
                             openDashboard(UserRole.CUSTOMER);
 
                         } else {
@@ -280,6 +285,7 @@ public class LoginActivity extends AppCompatActivity {
                                     .addOnSuccessListener(authResult -> {
                                         session.start(userId, UserRole.CUSTOMER);
                                         Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
+                                        com.techfix.app.util.Analytics.log(this, "login");
                                         openDashboard(UserRole.CUSTOMER);
                                     })
                                     .addOnFailureListener(e -> {
@@ -293,8 +299,48 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             session.start(userId, UserRole.CUSTOMER);
             Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+            com.techfix.app.util.Analytics.log(this, "sign_up");
             openDashboard(UserRole.CUSTOMER);
         }
+    }
+
+    /**
+     * Sends a Firebase password-reset email for the given (or pre-filled) address.
+     */
+    private void showForgotPasswordDialog(View v) {
+        android.widget.EditText emailField = new android.widget.EditText(this);
+        emailField.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        emailField.setHint("Email address");
+        String current = binding.emailInput.getText() != null ? binding.emailInput.getText().toString().trim() : "";
+        emailField.setText(current);
+
+        new AlertDialog.Builder(this)
+                .setTitle("Reset password")
+                .setMessage("We'll email you a link to reset your password.")
+                .setView(emailField)
+                .setPositiveButton("Send link", (dialog, which) -> {
+                    String email = emailField.getText().toString().trim();
+                    if (email.isEmpty()) {
+                        Snackbar.make(v, "Enter your email address first", Snackbar.LENGTH_LONG).show();
+                        return;
+                    }
+                    if (firebaseAuth == null) {
+                        Snackbar.make(v, "Password reset is unavailable offline", Snackbar.LENGTH_LONG).show();
+                        return;
+                    }
+                    firebaseAuth.sendPasswordResetEmail(email)
+                            .addOnCompleteListener(task -> {
+                                if (task.isSuccessful()) {
+                                    com.techfix.app.util.Analytics.log(this, "password_reset_sent");
+                                    Snackbar.make(v, "Reset link sent to " + email + " — check your inbox", Snackbar.LENGTH_LONG).show();
+                                } else {
+                                    String error = (task.getException() != null) ? task.getException().getMessage() : "Could not send reset email";
+                                    Snackbar.make(v, error, Snackbar.LENGTH_LONG).show();
+                                }
+                            });
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void openDashboard(UserRole role) {

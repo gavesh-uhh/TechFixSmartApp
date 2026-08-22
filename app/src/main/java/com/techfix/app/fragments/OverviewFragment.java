@@ -75,7 +75,7 @@ public class OverviewFragment extends Fragment {
 
         selectedBranch = host().getSelectedBranch();
 
-        String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
+        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).namesArrayWithAll();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.overviewBranchSpinner.setAdapter(branchAdapter);
@@ -156,7 +156,7 @@ public class OverviewFragment extends Fragment {
 
         final Spinner spinnerBranch = new Spinner(requireContext());
         spinnerBranch.setBackgroundResource(R.drawable.bg_spinner);
-        String[] branchOptions = {"Colombo branch", "Galle branch"};
+        String[] branchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).namesArray();
         ArrayAdapter<String> dialogBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
         dialogBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         spinnerBranch.setAdapter(dialogBranchAdapter);

@@ -87,7 +87,7 @@ public class CatalogFragment extends Fragment {
     private String selectedCatalogBranch = "All Branches";
 
     private void setupServices() {
-        String[] branchFilters = {"All Branches", "Colombo branch", "Galle branch"};
+        String[] branchFilters = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).namesArrayWithAll();
         ArrayAdapter<String> filterAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchFilters);
         filterAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.catalogBranchSpinner.setAdapter(filterAdapter);
@@ -100,7 +100,10 @@ public class CatalogFragment extends Fragment {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        String[] branchOptions = {"Colombo branch", "Galle branch", "All Branches"};
+        String[] branchNames = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).namesArray();
+        String[] branchOptions = new String[branchNames.length + 1];
+        System.arraycopy(branchNames, 0, branchOptions, 0, branchNames.length);
+        branchOptions[branchNames.length] = "All Branches";
         ArrayAdapter<String> newServiceBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
         newServiceBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.newServiceBranchSpinner.setAdapter(newServiceBranchAdapter);
