@@ -273,9 +273,10 @@ public class HomeActivity extends AppCompatActivity {
     private void selectBranchAndOpenBooking(String branch) {
         showBookAppointmentPanel();
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
+        String display = com.techfix.app.database.BranchDAO.toDisplayName(branch);
         int count = binding.bookingBranchSpinner.getAdapter() != null ? binding.bookingBranchSpinner.getAdapter().getCount() : 0;
         for (int i = 0; i < count; i++) {
-            if (branch.equalsIgnoreCase(String.valueOf(binding.bookingBranchSpinner.getItemAtPosition(i)))) {
+            if (display.equalsIgnoreCase(String.valueOf(binding.bookingBranchSpinner.getItemAtPosition(i)))) {
                 binding.bookingBranchSpinner.setSelection(i);
                 break;
             }
@@ -328,12 +329,13 @@ public class HomeActivity extends AppCompatActivity {
         if (com.techfix.app.util.NearestBranch.hasPermission(this)) {
             com.techfix.app.util.NearestBranch.resolve(this, dbHelper, (branchName, km) -> runOnUiThread(() -> {
                 if (branchName == null) return;
+                String display = com.techfix.app.database.BranchDAO.toDisplayName(branchName);
                 ArrayAdapter adapter = (ArrayAdapter) binding.bookingBranchSpinner.getAdapter();
                 if (adapter == null) return;
-                int pos = adapter.getPosition(branchName);
+                int pos = adapter.getPosition(display);
                 if (pos >= 0 && binding.bookingBranchSpinner.getSelectedItemPosition() != pos) {
                     binding.bookingBranchSpinner.setSelection(pos, false);
-                    Toast.makeText(this, String.format("Nearest branch: %s (%.1f km away)", branchName, km), Toast.LENGTH_LONG).show();
+                    Toast.makeText(this, String.format("Nearest branch: %s (%.1f km away)", display, km), Toast.LENGTH_LONG).show();
                 }
             }));
         } else if (!locationPermissionRequested) {
@@ -375,17 +377,17 @@ public class HomeActivity extends AppCompatActivity {
         binding.bookingDeviceSpinner.setAdapter(deviceAdapter);
 
         // 3. Setup Branch Dropdown & Dynamic Service Loading (from BranchDAO — single source of truth)
-        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).namesArray();
+        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).displayNamesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.bookingBranchSpinner.setAdapter(branchAdapter);
 
-        updateBookingServicesForBranch(branches[0]);
+        updateBookingServicesForBranch(com.techfix.app.database.BranchDAO.toDbName(branches[0]));
 
         binding.bookingBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                updateBookingServicesForBranch(branches[position]);
+                updateBookingServicesForBranch(com.techfix.app.database.BranchDAO.toDbName(branches[position]));
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
@@ -440,7 +442,8 @@ public class HomeActivity extends AppCompatActivity {
         String deviceCategory = (String) binding.bookingDeviceSpinner.getSelectedItem();
         String deviceModel = binding.bookingModelInput.getText().toString().trim();
         String problemDescription = binding.bookingProblemInput.getText().toString().trim();
-        String branch = (String) binding.bookingBranchSpinner.getSelectedItem();
+        String branchDisplay = (String) binding.bookingBranchSpinner.getSelectedItem();
+        String branch = com.techfix.app.database.BranchDAO.toDbName(branchDisplay);
 
         // 2. Validate input fields
         if (deviceModel.isEmpty()) {
@@ -470,7 +473,7 @@ public class HomeActivity extends AppCompatActivity {
         String requiredPart = serviceDAO.requiredPart(serviceName);
         if (requiredPart != null && !requiredPart.isEmpty()) {
             if (sparePartDAO.quantity(requiredPart, branch) <= 0) {
-                Toast.makeText(this, "Required part '" + requiredPart + "' is out of stock at " + branch + ". Please choose another branch or contact the counter.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "Required part '" + requiredPart + "' is out of stock at " + branchDisplay + ". Please choose another branch or contact the counter.", Toast.LENGTH_LONG).show();
                 return;
             }
         }
@@ -571,31 +574,31 @@ public class HomeActivity extends AppCompatActivity {
     private void resetCategoryStyles() {
         int unselectedBg = R.drawable.bg_circle_category;
         int mutedColor = getResources().getColor(R.color.muted_text, null);
-        int navyColor = getResources().getColor(R.color.navy_700, null);
+        int primaryColor = getResources().getColor(R.color.primary, null);
 
         // Category: All
         binding.circleCatAll.setBackgroundResource(unselectedBg);
-        binding.iconCatAll.setColorFilter(navyColor);
+        binding.iconCatAll.setColorFilter(primaryColor);
         binding.labelCatAll.setTextColor(mutedColor);
 
         // Category: Phones
         binding.circleCatPhones.setBackgroundResource(unselectedBg);
-        binding.iconCatPhones.setColorFilter(navyColor);
+        binding.iconCatPhones.setColorFilter(primaryColor);
         binding.labelCatPhones.setTextColor(mutedColor);
 
         // Category: Computers
         binding.circleCatComputers.setBackgroundResource(unselectedBg);
-        binding.iconCatComputers.setColorFilter(navyColor);
+        binding.iconCatComputers.setColorFilter(primaryColor);
         binding.labelCatComputers.setTextColor(mutedColor);
 
         // Category: Screens
         binding.circleCatScreens.setBackgroundResource(unselectedBg);
-        binding.iconCatScreens.setColorFilter(navyColor);
+        binding.iconCatScreens.setColorFilter(primaryColor);
         binding.labelCatScreens.setTextColor(mutedColor);
 
         // Category: Batteries
         binding.circleCatBatteries.setBackgroundResource(unselectedBg);
-        binding.iconCatBatteries.setColorFilter(navyColor);
+        binding.iconCatBatteries.setColorFilter(primaryColor);
         binding.labelCatBatteries.setTextColor(mutedColor);
     }
 
@@ -605,7 +608,7 @@ public class HomeActivity extends AppCompatActivity {
     private void highlightCategory(View circleView, ImageView iconView, TextView labelView) {
         circleView.setBackgroundResource(R.drawable.bg_circle_category_selected);
         iconView.setColorFilter(getResources().getColor(R.color.white, null));
-        labelView.setTextColor(getResources().getColor(R.color.navy_900, null));
+        labelView.setTextColor(getResources().getColor(R.color.ink, null));
     }
 
     /**
@@ -646,8 +649,9 @@ public class HomeActivity extends AppCompatActivity {
                 partText.setVisibility(View.VISIBLE);
             }
 
-            // Click service -> open Book Appointment in bottom nav
+            // Click service -> open Book Appointment in bottom nav and pre-fill
             itemView.setOnClickListener(v -> {
+                binding.bookingProblemInput.setText(service.name + " - " + (service.requiredPart != null && !service.requiredPart.isEmpty() ? service.requiredPart : "Diagnostic & Repair"));
                 binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
             });
 
@@ -710,7 +714,7 @@ public class HomeActivity extends AppCompatActivity {
      * Setup the Spare Parts panel: branch filter dropdown & real-time search input.
      */
     private void setupPartsPanel() {
-        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).namesArrayWithAll();
+        String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).filterNamesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.homePartsBranchSpinner.setAdapter(branchAdapter);
@@ -718,7 +722,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.homePartsBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                currentPartsBranch = branches[position];
+                currentPartsBranch = com.techfix.app.database.BranchDAO.toDbName(branches[position]);
                 loadAvailableParts();
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
@@ -758,7 +762,7 @@ public class HomeActivity extends AppCompatActivity {
             TextView qtyText = itemView.findViewById(R.id.partQuantityText);
             TextView badgeText = itemView.findViewById(R.id.partStatusBadge);
 
-            branchText.setText(part.branch);
+            branchText.setText(com.techfix.app.database.BranchDAO.toDisplayName(part.branch));
             nameText.setText(part.name);
             qtyText.setText(part.quantity + " units available in store");
 

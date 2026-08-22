@@ -165,7 +165,7 @@ public class QueueFragment extends Fragment {
 
     private void resetChipStyle(TextView chip) {
         chip.setBackgroundResource(R.drawable.bg_filter_pill);
-        chip.setTextColor(requireContext().getColor(R.color.navy_700));
+        chip.setTextColor(requireContext().getColor(R.color.ink));
     }
 
     private void showDocketActionMenu(Appointment a) {
