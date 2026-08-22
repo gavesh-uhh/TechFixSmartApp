@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_customer_repairs"
+        android:icon="@drawable/ic_nav_store"
+        android:title="My Repairs" />
+    <item
+        android:id="@+id/nav_customer_book"
+        android:icon="@drawable/ic_nav_book"
+        android:title="Book Repair" />
+    <item
+        android:id="@+id/nav_customer_profile"
+        android:icon="@drawable/ic_nav_account"
+        android:title="Profile" />
+</menu>

@@ -2,6 +2,7 @@ package com.techfix.app.database;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import com.techfix.app.models.Service;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,17 @@ public class ServiceDAO {
     private final DatabaseHelper helper;
 
     public ServiceDAO(DatabaseHelper helper) { this.helper = helper; }
+
+    public List<Service> list() {
+        List<Service> out = new ArrayList<>();
+        Cursor c = helper.getReadableDatabase().rawQuery(
+                "SELECT id, name, category, price, requiredPart FROM services ORDER BY category, name", null);
+        while (c.moveToNext()) {
+            out.add(new Service(c.getLong(0), c.getString(1), c.getString(2), c.getDouble(3), c.getString(4)));
+        }
+        c.close();
+        return out;
+    }
 
     public List<String> search(String query) {
         List<String> out = new ArrayList<>();
@@ -45,9 +57,25 @@ public class ServiceDAO {
     }
 
     public boolean add(String name, String category, double price) {
-        if (name.trim().isEmpty() || price <= 0) return false;
-        ContentValues v = new ContentValues(); v.put("name", name.trim()); v.put("category", category); v.put("price", price); v.put("requiredPart", "");
+        return add(name, category, price, "");
+    }
+
+    public boolean add(String name, String category, double price, String requiredPart) {
+        if (name == null || name.trim().isEmpty() || price <= 0) return false;
+        ContentValues v = new ContentValues();
+        v.put("name", name.trim());
+        v.put("category", (category != null && !category.trim().isEmpty()) ? category.trim() : "Mobile phone");
+        v.put("price", price);
+        v.put("requiredPart", requiredPart != null ? requiredPart.trim() : "");
         return helper.getWritableDatabase().insertWithOnConflict("services", null, v, android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE) > 0;
+    }
+
+    public boolean delete(long id) {
+        return helper.getWritableDatabase().delete("services", "id=?", new String[]{String.valueOf(id)}) > 0;
+    }
+
+    public boolean deleteByName(String name) {
+        return helper.getWritableDatabase().delete("services", "name=?", new String[]{name}) > 0;
     }
 
     public String catalog() {

@@ -1,7 +1,5 @@
 package com.techfix.app.activities;
 
-import com.techfix.app.R;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,7 +15,10 @@ public class SplashActivity extends AppCompatActivity {
         ActivitySplashBinding binding = ActivitySplashBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         WindowInsetsHelper.apply(binding.splashRoot, binding.splashRoot);
-        new Handler(Looper.getMainLooper()).postDelayed(() ->
-                startActivity(new Intent(this, HomeActivity.class)), 900);
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+            finish();
+        }, 900);
     }
 }

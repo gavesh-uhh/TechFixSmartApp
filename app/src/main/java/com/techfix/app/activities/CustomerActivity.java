@@ -6,209 +6,374 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.techfix.app.R;
 import com.techfix.app.adapters.AppointmentAdapter;
 import com.techfix.app.adapters.BranchAdapter;
-
-
-import com.techfix.app.adapters.SampleImageAdapter;
 import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.BranchDAO;
 import com.techfix.app.database.DatabaseHelper;
-import com.techfix.app.database.SampleRepairDAO;
 import com.techfix.app.database.ServiceDAO;
-import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
+import com.techfix.app.database.UserDAO;
 import com.techfix.app.databinding.ActivityCustomerBinding;
 import com.techfix.app.models.Appointment;
-import com.techfix.app.database.SampleRepairDAO;
+import com.techfix.app.models.PaymentStatus;
+import com.techfix.app.models.User;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.Feedback;
 import com.techfix.app.util.WindowInsetsHelper;
+
 import java.util.List;
 
+/**
+ * CustomerActivity - Complete Customer Workspace Dashboard with Bottom Navigation.
+ * Features:
+ * - Customer greeting & profile info
+ * - Bottom Navigation: My Repairs, Book Repair, Profile & Branches
+ * - My Repairs tab: view all repairs, status badges, and open live timeline
+ * - Book Repair tab: service picker, device model, photo attach, branch selector
+ * - Profile & Branches tab: user account details, store branch locations & helpline
+ * - Guaranteed secure logout with activity stack reset
+ */
 public class CustomerActivity extends AppCompatActivity {
+
     private ActivityCustomerBinding binding;
     private SessionManager session;
-    private AppointmentAdapter adapter;
-    private SampleImageAdapter sampleAdapter;
+    private DatabaseHelper dbHelper;
+
+    // DAOs
+    private AppointmentDAO appointmentDAO;
+    private ServiceDAO serviceDAO;
+    private BranchDAO branchDAO;
+    private UserDAO userDAO;
+
+    // Adapters
+    private AppointmentAdapter appointmentAdapter;
     private BranchAdapter branchAdapter;
 
-    private String pendingDevice, pendingService;
-    private Uri capturedPhotoUri;
+    // Photo capture / selection
+    private Uri selectedPhotoUri = null;
 
-    /** Camera capture with a FileProvider-backed URI so the photo is saved (Camera & Image Integrations deliverable). */
-    private final ActivityResultLauncher<Uri> cameraLauncher =
-            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.TakePicture(), ok -> {
-                if (ok) Feedback.success(binding.getRoot(), "Photo attached — it will be saved with your booking");
+    // Photo picker launcher
+    private final ActivityResultLauncher<String> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
+                if (uri != null) {
+                    selectedPhotoUri = uri;
+                    binding.customerPhotoPreview.setImageURI(uri);
+                    binding.customerPhotoPreviewContainer.setVisibility(View.VISIBLE);
+                    binding.customerPhotoStatus.setText("Photo attached");
+                    binding.customerPhotoStatus.setTextColor(getResources().getColor(R.color.success, null));
+                }
             });
-
-    /** Runtime GPS permission (Locations / Map GPS deliverable). */
-    private final ActivityResultLauncher<String> locationPermission =
-            registerForActivityResult(new androidx.activity.result.contract.ActivityResultContracts.RequestPermission(), granted -> {
-                if (granted) fetchLocationAndBook(); else bookAt(6.9271, 79.8612, "Location denied — using Colombo as reference");
-            });
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // 1. Verify user session
         session = new SessionManager(this);
-        if (!session.isLoggedIn()) { goHome(); return; }
+        if (!session.isLoggedIn()) {
+            goHome();
+            return;
+        }
+
+        // 2. Inflate layout
         binding = ActivityCustomerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         WindowInsetsHelper.apply(binding.customerHeader, binding.dashboardContent);
 
-        binding.deviceSpinner.setAdapter(new ArrayAdapter<>(this, R.layout.item_dropdown,
-                new String[]{"Mobile phone", "Laptop / computer", "Tablet"}));
-        ServiceDAO services = new ServiceDAO(DatabaseHelper.getInstance(this));
-        binding.catalogText.setText(services.catalog());
+        // 3. Initialize Database DAOs
+        dbHelper = DatabaseHelper.getInstance(this);
+        appointmentDAO = new AppointmentDAO(dbHelper);
+        serviceDAO = new ServiceDAO(dbHelper);
+        branchDAO = new BranchDAO(dbHelper);
+        userDAO = new UserDAO(dbHelper);
 
-        ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, services.all());
-        binding.serviceSpinner.setAdapter(serviceAdapter);
+        // 4. Setup User Header & Profile
+        setupUserProfile();
 
-        AppointmentDAO appointments = new AppointmentDAO(DatabaseHelper.getInstance(this));
-        List<Appointment> initial = appointments.forUser(session.getUserId());
-        render(initial);
-        binding.activeCount.setText(initial.size() + " active");
-        binding.lastUpdated.setText("Updated now");
+        // 5. Setup Bottom Navigation
+        setupBottomNavigation();
+
+        // 6. Setup Form & Repair List
+        setupBookingForm();
+        setupRepairsList();
+        setupBranchesList();
+
+        // 7. Initial load of repairs
+        refreshRepairs();
         showPanel(0);
+    }
 
-        binding.dashboardTabs.addTab(binding.dashboardTabs.newTab().setText("Book"));
-        binding.dashboardTabs.addTab(binding.dashboardTabs.newTab().setText("Repairs"));
-        binding.dashboardTabs.addTab(binding.dashboardTabs.newTab().setText("Explore"));
-        binding.dashboardTabs.addOnTabSelectedListener(new com.google.android.material.tabs.TabLayout.OnTabSelectedListener() {
-            @Override public void onTabSelected(com.google.android.material.tabs.TabLayout.Tab tab) { showPanel(tab.getPosition()); }
-            @Override public void onTabUnselected(com.google.android.material.tabs.TabLayout.Tab tab) { }
-            @Override public void onTabReselected(com.google.android.material.tabs.TabLayout.Tab tab) { }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!session.isLoggedIn()) {
+            goHome();
+        }
+    }
+
+    /**
+     * Loads logged-in user profile details into the header and profile card.
+     */
+    private void setupUserProfile() {
+        User user = userDAO.get(session.getUserId());
+        if (user != null) {
+            binding.welcomeUserText.setText("Hello, " + user.name + " 👋");
+            binding.userEmailText.setText(user.email);
+
+            binding.profileNameText.setText(user.name);
+            binding.profileEmailText.setText(user.email);
+            binding.profilePhoneText.setText(user.phone.isEmpty() ? "Phone: Not provided" : "Phone: " + user.phone);
+        }
+
+        // Home / Store button
+        binding.homeStoreButton.setOnClickListener(v -> {
+            startActivity(new Intent(CustomerActivity.this, HomeActivity.class));
         });
 
-        binding.bookButton.setOnClickListener(v -> {
-            String problem = binding.problemInput.getText().toString().trim();
-            if (problem.isEmpty()) { binding.problemInput.setError("Add a short description"); return; }
-            pendingDevice = (String) binding.deviceSpinner.getSelectedItem();
-            pendingService = (String) binding.serviceSpinner.getSelectedItem();
-            if (pendingService == null) { Feedback.error(v, "No matching service available"); return; }
-            if (checkSelfPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
-                fetchLocationAndBook();
-            } else {
-                locationPermission.launch(android.Manifest.permission.ACCESS_FINE_LOCATION);
-            }
-        });
+        // Top bar Log Out button
+        binding.logoutButton.setOnClickListener(v -> performLogout());
 
-        binding.cameraButton.setOnClickListener(v -> {
-            try {
-                java.io.File dir = new java.io.File(getCacheDir(), "images");
-                if (!dir.exists()) dir.mkdirs();
-                java.io.File photo = new java.io.File(dir, "damage_" + System.currentTimeMillis() + ".jpg");
-                capturedPhotoUri = androidx.core.content.FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photo);
-                cameraLauncher.launch(capturedPhotoUri);
-            } catch (Exception e) { Feedback.error(v, "Camera not available"); }
-        });
-
-        binding.payButton.setOnClickListener(this::payFirstPending);
-
-        branchAdapter = new BranchAdapter();
-        binding.branchList.setLayoutManager(new LinearLayoutManager(this));
-        binding.branchList.setAdapter(branchAdapter);
-        branchAdapter.submit(new BranchDAO(DatabaseHelper.getInstance(this)).branches());
-
-
-        sampleAdapter = new SampleImageAdapter();
-        binding.sampleList.setLayoutManager(new androidx.recyclerview.widget.GridLayoutManager(this, 2));
-        binding.sampleList.setAdapter(sampleAdapter);
-        sampleAdapter.submit(new SampleRepairDAO(DatabaseHelper.getInstance(this)).all());
-
-        binding.logoutButton.setOnClickListener(v -> new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Log out").setMessage("End this session?")
-                .setPositiveButton("Log out", (d, w) -> { session.logout(); goHome(); })
-                .setNegativeButton("Cancel", null).show());
-
-        binding.connectionStatus.setText("Offline · all data stored on this device");
+        // Profile tab Log Out button
+        binding.profileLogoutButton.setOnClickListener(v -> performLogout());
     }
 
-    private void showPanel(int position) {
-        binding.bookPanel.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
-        binding.repairsPanel.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
-        binding.explorePanel.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
-    }
-
-    private void render(List<Appointment> repairs) {
-        binding.emptyText.setVisibility(repairs.isEmpty() ? View.VISIBLE : View.GONE);
-        if (adapter == null) {
-            adapter = new AppointmentAdapter(a -> startActivity(
-                    new Intent(this, AppointmentDetailActivity.class).putExtra("appointmentId", a.id)));
-            binding.repairList.setLayoutManager(new LinearLayoutManager(this));
-            binding.repairList.setAdapter(adapter);
-        }
-        adapter.submitList(repairs);
-    }
-
-    private void fetchLocationAndBook() {
-        com.google.android.gms.location.FusedLocationProviderClient client =
-                com.google.android.gms.location.LocationServices.getFusedLocationProviderClient(this);
-        client.getLastLocation().addOnSuccessListener(this, location -> {
-            if (location != null) bookAt(location.getLatitude(), location.getLongitude(), null);
-            else bookAt(6.9271, 79.8612, "Could not read GPS — using Colombo as reference");
-        }).addOnFailureListener(e -> bookAt(6.9271, 79.8612, "GPS unavailable — using Colombo as reference"));
-    }
-
-    private void bookAt(double latitude, double longitude, String notice) {
-        String problem = binding.problemInput.getText().toString().trim();
-        if (problem.isEmpty() || pendingDevice == null || pendingService == null) {
-            Feedback.error(binding.getRoot(), "Fill the booking form first");
-            return;
-        }
-        DatabaseHelper helper = DatabaseHelper.getInstance(this);
-        ServiceDAO services = new ServiceDAO(helper);
-        AppointmentDAO appointments = new AppointmentDAO(helper);
-
-        String service = services.serviceName(pendingService);
-        String branch = new BranchDAO(helper).nearestFor(pendingDevice, service, latitude, longitude);
-        long id = appointments.add(session.getUserId(), pendingDevice, problem, branch, service,
-                services.price(pendingService), new TechnicianDAO(helper).availableFor(branch, pendingDevice), "");
-        if (capturedPhotoUri != null) appointments.setPhoto(id, capturedPhotoUri.toString());
-
-        final View root = binding.getRoot();
-        final String part = services.requiredPart(service);
-        if (!part.isEmpty()) {
-            SparePartDAO parts = new SparePartDAO(helper);
-            new Thread(() -> {
-                boolean consumed = parts.consume(part, branch);
-                runOnUiThread(() -> { if (!consumed && !isFinishing()) Feedback.error(root, "Note: required part out of stock at " + branch); });
-            }).start();
-        }
-
-        binding.problemInput.setText("");
-        List<Appointment> updated = appointments.forUser(session.getUserId());
-        render(updated);
-        binding.activeCount.setText(updated.size() + " active");
-        Feedback.success(root, (notice == null ? "" : notice + " · ") + "Booked at " + branch + " · technician assigned");
-    }
-
-    /** Pays the oldest unpaid repair; asks for a payment method first. */
-    private void payFirstPending(View v) {
-        AppointmentDAO appointments = new AppointmentDAO(DatabaseHelper.getInstance(this));
-        Appointment target = null;
-        for (Appointment a : appointments.forUser(session.getUserId())) {
-            if ("Pending".equals(a.payment)) { target = a; break; }
-        }
-        final Appointment appointment = target;
-        if (appointment == null) { Feedback.error(v, "No unpaid repairs"); return; }
-        String[] methods = {"Cash at counter", "Card", "Bank transfer"};
-        new androidx.appcompat.app.AlertDialog.Builder(this)
-                .setTitle("Pay Rs " + (long) appointment.price + " · " + appointment.service)
-                .setItems(methods, (d, w) -> {
-                    boolean ok = appointments.pay(appointment.id, appointment.price, methods[w]);
-                    render(appointments.forUser(session.getUserId()));
-                    if (ok) Feedback.success(v, "Payment recorded · " + methods[w]); else Feedback.error(v, "Payment failed");
-                }).setNegativeButton("Cancel", null).show();
+    private void performLogout() {
+        session.logout();
+        android.widget.Toast.makeText(this, "Logged out successfully", android.widget.Toast.LENGTH_SHORT).show();
+        goHome();
     }
 
     private void goHome() {
-        startActivity(new Intent(this, HomeActivity.class));
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        startActivity(intent);
         finish();
+    }
+
+    /**
+     * Setup bottom navigation bar (My Repairs, Book Repair, Profile).
+     */
+    private void setupBottomNavigation() {
+        binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_repairs);
+
+        binding.customerBottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_customer_repairs) {
+                showPanel(0);
+                return true;
+            } else if (itemId == R.id.nav_customer_book) {
+                showPanel(1);
+                return true;
+            } else if (itemId == R.id.nav_customer_profile) {
+                showPanel(2);
+                return true;
+            }
+
+            return false;
+        });
+
+        binding.emptyBookButton.setOnClickListener(v -> {
+            binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_book);
+        });
+
+        // Pay pending repairs button
+        binding.payButton.setOnClickListener(this::payFirstPending);
+    }
+
+    /**
+     * Shows the active tab panel.
+     */
+    private void showPanel(int position) {
+        binding.repairsPanel.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
+        binding.bookPanel.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
+        binding.explorePanel.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
+
+        if (position == 0) {
+            refreshRepairs();
+        }
+    }
+
+    /**
+     * Setup RecyclerView for user repairs.
+     */
+    private void setupRepairsList() {
+        appointmentAdapter = new AppointmentAdapter(appointment -> {
+            Intent intent = new Intent(CustomerActivity.this, AppointmentDetailActivity.class);
+            intent.putExtra("appointmentId", appointment.id);
+            startActivity(intent);
+        });
+
+        binding.repairList.setLayoutManager(new LinearLayoutManager(this));
+        binding.repairList.setAdapter(appointmentAdapter);
+    }
+
+    /**
+     * Refreshes the list of repairs for the logged-in customer.
+     */
+    private void refreshRepairs() {
+        List<Appointment> repairs = appointmentDAO.forUser(session.getUserId());
+        appointmentAdapter.submitList(repairs);
+
+        boolean hasRepairs = !repairs.isEmpty();
+        binding.repairList.setVisibility(hasRepairs ? View.VISIBLE : View.GONE);
+        binding.emptyStateContainer.setVisibility(hasRepairs ? View.GONE : View.VISIBLE);
+
+        // Check if there are any pending payments
+        boolean hasPendingPayment = false;
+        for (Appointment a : repairs) {
+            if (PaymentStatus.PENDING.label.equalsIgnoreCase(a.payment)) {
+                hasPendingPayment = true;
+                break;
+            }
+        }
+        binding.paymentCard.setVisibility(hasPendingPayment ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Setup Book Repair Form with service dropdown, device info, and photo attachment.
+     */
+    private void setupBookingForm() {
+        // 1. Service Type Dropdown
+        List<String> serviceOptions = serviceDAO.all();
+        if (serviceOptions.isEmpty()) {
+            serviceOptions.add("Screen replacement · Rs 8500");
+            serviceOptions.add("Battery replacement · Rs 4500");
+            serviceOptions.add("Laptop diagnostics · Rs 3000");
+            serviceOptions.add("Operating system repair · Rs 6500");
+        }
+        ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
+        binding.serviceSpinner.setAdapter(serviceAdapter);
+
+        // 2. Device Category Dropdown
+        String[] deviceCategories = {"Mobile phone", "Laptop / computer", "Tablet", "Other smart device"};
+        ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, deviceCategories);
+        binding.deviceSpinner.setAdapter(deviceAdapter);
+
+        // 3. Branch Dropdown
+        String[] branches = {"Colombo branch", "Galle branch"};
+        ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
+        binding.branchSpinner.setAdapter(branchAdapter);
+
+        // 4. Attach Photo Button
+        binding.cameraButton.setOnClickListener(v -> photoPickerLauncher.launch("image/*"));
+
+        // 5. Remove Photo Button
+        binding.customerRemovePhotoButton.setOnClickListener(v -> {
+            selectedPhotoUri = null;
+            binding.customerPhotoPreview.setImageURI(null);
+            binding.customerPhotoPreviewContainer.setVisibility(View.GONE);
+            binding.customerPhotoStatus.setText("No photo attached");
+            binding.customerPhotoStatus.setTextColor(getResources().getColor(R.color.muted_text, null));
+        });
+
+        // 6. Submit Booking Button
+        binding.bookButton.setOnClickListener(v -> submitBooking());
+    }
+
+    /**
+     * Validates and submits a new repair booking for the customer.
+     */
+    private void submitBooking() {
+        String serviceSelection = (String) binding.serviceSpinner.getSelectedItem();
+        String deviceCategory = (String) binding.deviceSpinner.getSelectedItem();
+        String deviceModel = binding.deviceModelInput.getText().toString().trim();
+        String problem = binding.problemInput.getText().toString().trim();
+        String branch = (String) binding.branchSpinner.getSelectedItem();
+
+        if (deviceModel.isEmpty()) {
+            binding.deviceModelInput.setError("Please enter your device model / brand");
+            binding.deviceModelInput.requestFocus();
+            return;
+        }
+
+        if (problem.isEmpty()) {
+            binding.problemInput.setError("Please describe the problem or damage");
+            binding.problemInput.requestFocus();
+            return;
+        }
+
+        String serviceName = serviceDAO.serviceName(serviceSelection != null ? serviceSelection : "Repair Service");
+        double price = serviceDAO.price(serviceSelection != null ? serviceSelection : "0");
+        String fullDeviceInfo = deviceCategory + " (" + deviceModel + ")";
+
+        // Auto-assign available technician for branch
+        String technician = new TechnicianDAO(dbHelper).availableFor(branch, deviceCategory);
+
+        // Save appointment to SQLite database
+        long appointmentId = appointmentDAO.add(session.getUserId(), fullDeviceInfo, problem, branch, serviceName, price, technician, "");
+
+        if (selectedPhotoUri != null && appointmentId > 0) {
+            appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
+        }
+
+        // Show confirmation dialog
+        new AlertDialog.Builder(this)
+                .setTitle("Repair Booked!")
+                .setMessage("Appointment #" + appointmentId + " booked at " + branch + ".\nTechnician: " + technician + "\nEstimated Price: Rs " + (long) price)
+                .setPositiveButton("View Repairs", (dialog, which) -> {
+                    // Reset form
+                    binding.deviceModelInput.setText("");
+                    binding.problemInput.setText("");
+                    selectedPhotoUri = null;
+                    binding.customerPhotoPreviewContainer.setVisibility(View.GONE);
+                    binding.customerPhotoStatus.setText("No photo attached");
+
+                    // Switch to My Repairs bottom nav item
+                    binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_repairs);
+                })
+                .show();
+    }
+
+    /**
+     * Setup Branch list in the Profile & Branches tab.
+     */
+    private void setupBranchesList() {
+        branchAdapter = new BranchAdapter();
+        binding.branchList.setLayoutManager(new LinearLayoutManager(this));
+        binding.branchList.setAdapter(branchAdapter);
+        branchAdapter.submit(branchDAO.branches());
+    }
+
+    /**
+     * Pays the oldest pending unpaid repair.
+     */
+    private void payFirstPending(View v) {
+        List<Appointment> userRepairs = appointmentDAO.forUser(session.getUserId());
+        Appointment target = null;
+        for (Appointment a : userRepairs) {
+            if (PaymentStatus.PENDING.label.equalsIgnoreCase(a.payment)) {
+                target = a;
+                break;
+            }
+        }
+
+        final Appointment appointment = target;
+        if (appointment == null) {
+            Feedback.error(v, "No unpaid repairs pending");
+            return;
+        }
+
+        String[] methods = {"Cash at counter", "Card", "Bank transfer"};
+        new AlertDialog.Builder(this)
+                .setTitle("Pay Rs " + (long) appointment.price + " · " + appointment.service)
+                .setItems(methods, (d, which) -> {
+                    boolean ok = appointmentDAO.pay(appointment.id, appointment.price, methods[which]);
+                    refreshRepairs();
+                    if (ok) {
+                        Feedback.success(v, "Payment recorded (" + methods[which] + ")");
+                    } else {
+                        Feedback.error(v, "Payment failed");
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 }

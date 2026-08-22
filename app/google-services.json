@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "940461852032",
+    "project_id": "techfix-1554c",
+    "storage_bucket": "techfix-1554c.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:940461852032:android:7a6be483a7670ab7e16d65",
+        "android_client_info": {
+          "package_name": "com.techfix.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCf8Bvq75KauIw-06Ne0hH0457tZkhVAJU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

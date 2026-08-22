@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="@dimen/space_12"
+    app:cardBackgroundColor="@color/white"
+    app:cardCornerRadius="14dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/line"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="12dp"
+        android:gravity="center_vertical">
+
+        <!-- Store Image Box for Service -->
+        <FrameLayout
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:background="@drawable/bg_field"
+            android:padding="12dp">
+
+            <ImageView
+                android:id="@+id/serviceImageView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:contentDescription="Service Image"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_store_phone_screen" />
+        </FrameLayout>
+
+        <!-- Service Information -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="12dp"
+            android:orientation="vertical">
+
+            <!-- Category / Tag -->
+            <TextView
+                android:id="@+id/serviceCategoryText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mobile phone"
+                android:textColor="@color/techfix_blue"
+                android:textSize="11sp"
+                android:textStyle="bold" />
+
+            <!-- Service Name -->
+            <TextView
+                android:id="@+id/serviceNameText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Screen replacement"
+                android:textColor="@color/navy_900"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <!-- Part required or description -->
+            <TextView
+                android:id="@+id/servicePartText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Includes genuine display"
+                android:textColor="@color/muted_text"
+                android:textSize="11sp" />
+
+            <!-- Price -->
+            <TextView
+                android:id="@+id/servicePriceText"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Rs 8,500"
+                android:textColor="@color/navy_700"
+                android:textSize="14sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Store Service Badge -->
+        <TextView
+            android:id="@+id/serviceBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_field"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            android:text="Available"
+            android:textColor="@color/success"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>
