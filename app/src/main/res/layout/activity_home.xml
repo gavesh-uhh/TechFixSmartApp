@@ -74,198 +74,207 @@
                     android:text="Categories"
                     style="@style/Widget.TechFix.SectionTitle" />
 
-                <!-- Horizontal Scrollable Round Categories -->
-                <HorizontalScrollView
+                <!-- Evenly Spaced Round Categories Row -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:clipToPadding="false"
-                    android:paddingHorizontal="@dimen/space_16">
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="@dimen/space_12"
+                    android:paddingVertical="@dimen/space_4"
+                    android:weightSum="5">
 
+                    <!-- Category 1: All -->
                     <LinearLayout
-                        android:layout_width="wrap_content"
+                        android:id="@+id/catAll"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingVertical="@dimen/space_4">
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:clickable="true"
+                        android:focusable="true">
 
-                        <!-- Category 1: All -->
-                        <LinearLayout
-                            android:id="@+id/catAll"
+                        <FrameLayout
+                            android:id="@+id/circleCatAll"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_circle_category_selected"
+                            android:padding="13dp">
+
+                            <ImageView
+                                android:id="@+id/iconCatAll"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_cat_all" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/labelCatAll"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:layout_marginEnd="@dimen/space_16">
-
-                            <FrameLayout
-                                android:id="@+id/circleCatAll"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:background="@drawable/bg_circle_category_selected"
-                                android:padding="15dp">
-
-                                <ImageView
-                                    android:id="@+id/iconCatAll"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_cat_all" />
-                            </FrameLayout>
-
-                            <TextView
-                                android:id="@+id/labelCatAll"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="All"
-                                android:textColor="@color/navy_900"
-                                android:textSize="12sp"
-                                android:textStyle="bold" />
-                        </LinearLayout>
-
-                        <!-- Category 2: Phones -->
-                        <LinearLayout
-                            android:id="@+id/catPhones"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:layout_marginEnd="@dimen/space_16">
-
-                            <FrameLayout
-                                android:id="@+id/circleCatPhones"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:background="@drawable/bg_circle_category"
-                                android:padding="14dp">
-
-                                <ImageView
-                                    android:id="@+id/iconCatPhones"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_store_phone_screen" />
-                            </FrameLayout>
-
-                            <TextView
-                                android:id="@+id/labelCatPhones"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="Phones"
-                                android:textColor="@color/muted_text"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <!-- Category 3: Computers & Laptops -->
-                        <LinearLayout
-                            android:id="@+id/catComputers"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:layout_marginEnd="@dimen/space_16">
-
-                            <FrameLayout
-                                android:id="@+id/circleCatComputers"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:background="@drawable/bg_circle_category"
-                                android:padding="14dp">
-
-                                <ImageView
-                                    android:id="@+id/iconCatComputers"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_store_laptop_diagnostics" />
-                            </FrameLayout>
-
-                            <TextView
-                                android:id="@+id/labelCatComputers"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="Computers"
-                                android:textColor="@color/muted_text"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <!-- Category 4: Screens -->
-                        <LinearLayout
-                            android:id="@+id/catScreens"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:layout_marginEnd="@dimen/space_16">
-
-                            <FrameLayout
-                                android:id="@+id/circleCatScreens"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:background="@drawable/bg_circle_category"
-                                android:padding="14dp">
-
-                                <ImageView
-                                    android:id="@+id/iconCatScreens"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_store_phone_screen" />
-                            </FrameLayout>
-
-                            <TextView
-                                android:id="@+id/labelCatScreens"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="Screens"
-                                android:textColor="@color/muted_text"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
-                        <!-- Category 5: Batteries -->
-                        <LinearLayout
-                            android:id="@+id/catBatteries"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:orientation="vertical"
-                            android:gravity="center_horizontal"
-                            android:clickable="true"
-                            android:focusable="true"
-                            android:layout_marginEnd="@dimen/space_8">
-
-                            <FrameLayout
-                                android:id="@+id/circleCatBatteries"
-                                android:layout_width="56dp"
-                                android:layout_height="56dp"
-                                android:background="@drawable/bg_circle_category"
-                                android:padding="14dp">
-
-                                <ImageView
-                                    android:id="@+id/iconCatBatteries"
-                                    android:layout_width="match_parent"
-                                    android:layout_height="match_parent"
-                                    android:src="@drawable/ic_store_battery" />
-                            </FrameLayout>
-
-                            <TextView
-                                android:id="@+id/labelCatBatteries"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginTop="6dp"
-                                android:text="Batteries"
-                                android:textColor="@color/muted_text"
-                                android:textSize="12sp" />
-                        </LinearLayout>
-
+                            android:layout_marginTop="6dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:text="All"
+                            android:textColor="@color/navy_900"
+                            android:textSize="11sp"
+                            android:textStyle="bold" />
                     </LinearLayout>
-                </HorizontalScrollView>
+
+                    <!-- Category 2: Phones -->
+                    <LinearLayout
+                        android:id="@+id/catPhones"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <FrameLayout
+                            android:id="@+id/circleCatPhones"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_circle_category"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:id="@+id/iconCatPhones"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_store_phone_screen" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/labelCatPhones"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:text="Phones"
+                            android:textColor="@color/muted_text"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Category 3: Computers & Laptops -->
+                    <LinearLayout
+                        android:id="@+id/catComputers"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <FrameLayout
+                            android:id="@+id/circleCatComputers"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_circle_category"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:id="@+id/iconCatComputers"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_store_laptop_diagnostics" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/labelCatComputers"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:text="Computers"
+                            android:textColor="@color/muted_text"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Category 4: Screens -->
+                    <LinearLayout
+                        android:id="@+id/catScreens"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <FrameLayout
+                            android:id="@+id/circleCatScreens"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_circle_category"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:id="@+id/iconCatScreens"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_store_phone_screen" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/labelCatScreens"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:text="Screens"
+                            android:textColor="@color/muted_text"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                    <!-- Category 5: Batteries -->
+                    <LinearLayout
+                        android:id="@+id/catBatteries"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:gravity="center_horizontal"
+                        android:clickable="true"
+                        android:focusable="true">
+
+                        <FrameLayout
+                            android:id="@+id/circleCatBatteries"
+                            android:layout_width="50dp"
+                            android:layout_height="50dp"
+                            android:background="@drawable/bg_circle_category"
+                            android:padding="12dp">
+
+                            <ImageView
+                                android:id="@+id/iconCatBatteries"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:src="@drawable/ic_store_battery" />
+                        </FrameLayout>
+
+                        <TextView
+                            android:id="@+id/labelCatBatteries"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:gravity="center"
+                            android:maxLines="1"
+                            android:ellipsize="end"
+                            android:text="Batteries"
+                            android:textColor="@color/muted_text"
+                            android:textSize="11sp" />
+                    </LinearLayout>
+
+                </LinearLayout>
 
                 <!-- Main Body Container -->
                 <LinearLayout
@@ -631,7 +640,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
-                            android:hint="e.g. iPhone 13 Pro, Dell Inspiron 15"
                             android:inputType="text"
                             android:maxLines="1" />
 
@@ -651,7 +659,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
-                            android:hint="Describe the damage, screen issue, battery life or symptoms..."
                             android:inputType="textMultiLine"
                             android:minLines="3"
                             android:gravity="top" />

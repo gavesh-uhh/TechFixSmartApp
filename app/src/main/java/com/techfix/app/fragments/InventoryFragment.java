@@ -6,6 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -87,29 +90,56 @@ public class InventoryFragment extends Fragment {
         binding.partsList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.partsList.setAdapter(sparePartAdapter);
 
-        // Add part button
-        binding.btnAddPartButton.setOnClickListener(v -> {
-            String name = binding.newPartNameInput.getText().toString().trim();
-            String branch = binding.newPartBranchInput.getText().toString().trim();
-            String qtyStr = binding.newPartQtyInput.getText().toString().trim();
-
-            if (name.isEmpty()) {
-                binding.newPartNameInput.setError("Enter part name");
-                return;
-            }
-            int qty = 1;
-            try { if (!qtyStr.isEmpty()) qty = Integer.parseInt(qtyStr); } catch (Exception ignored) {}
-
-            sparePartDAO.add(name, branch.isEmpty() ? "Colombo branch" : branch, qty);
-            binding.newPartNameInput.setText("");
-            binding.newPartBranchInput.setText("");
-            binding.newPartQtyInput.setText("");
-
-            refresh();
-            Snackbar.make(v, "Saved " + name + " to inventory", Snackbar.LENGTH_LONG).show();
-        });
+        // Add part button opens popup dialog
+        binding.btnAddPartButton.setOnClickListener(v -> showAddPartDialog());
 
         refresh();
+    }
+
+    /**
+     * Opens the popup dialog for adding/restocking a workshop part.
+     */
+    private void showAddPartDialog() {
+        View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_part, null);
+        EditText inputName = dialogView.findViewById(R.id.dialogPartNameInput);
+        Spinner spinnerBranch = dialogView.findViewById(R.id.dialogPartBranchSpinner);
+        EditText inputQty = dialogView.findViewById(R.id.dialogPartQtyInput);
+
+        String[] branchOptions = {"Colombo branch", "Galle branch"};
+        ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
+        spinnerBranch.setAdapter(branchAdapter);
+
+        // Pre-select branch based on current active branch filter if applicable
+        String currentFilter = (String) binding.inventoryBranchSpinner.getSelectedItem();
+        if ("Galle branch".equalsIgnoreCase(currentFilter)) {
+            spinnerBranch.setSelection(1);
+        } else {
+            spinnerBranch.setSelection(0);
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setPositiveButton("Save Part to Inventory", (dialog, which) -> {
+                    String name = inputName.getText().toString().trim();
+                    String branch = (String) spinnerBranch.getSelectedItem();
+                    String qtyStr = inputQty.getText().toString().trim();
+
+                    if (name.isEmpty()) {
+                        Toast.makeText(requireContext(), "Please enter a part name", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    int qty = 1;
+                    try {
+                        if (!qtyStr.isEmpty()) qty = Integer.parseInt(qtyStr);
+                    } catch (Exception ignored) {}
+
+                    sparePartDAO.add(name, branch != null ? branch : "Colombo branch", qty);
+                    refresh();
+                    Snackbar.make(binding.getRoot(), "Saved " + name + " to " + branch + " inventory", Snackbar.LENGTH_LONG).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void refresh() {

@@ -285,7 +285,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
-                            android:hint="e.g. iPhone 13 Pro, Dell XPS 15"
                             android:inputType="text"
                             android:maxLines="1" />
 
@@ -337,7 +336,6 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="@dimen/space_4"
-                            android:hint="Describe the damage, symptoms, screen issues..."
                             android:inputType="textMultiLine"
                             android:minLines="3"
                             android:gravity="top" />

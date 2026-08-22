@@ -25,33 +25,13 @@
             android:layout_weight="1"
             android:orientation="vertical">
 
-            <LinearLayout
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center_vertical"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="TechFix Admin"
-                    android:textColor="@color/navy_900"
-                    android:textSize="20sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/headerBranchBadge"
-                    style="@style/Widget.TechFix.Stamp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
-                    android:background="@drawable/bg_field"
-                    android:paddingHorizontal="8dp"
-                    android:paddingVertical="2dp"
-                    android:text="ALL BRANCHES"
-                    android:textColor="@color/techfix_blue"
-                    android:textSize="11sp" />
-            </LinearLayout>
+                android:text="TechFix Admin"
+                android:textColor="@color/navy_900"
+                android:textSize="20sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/staffEmailText"
@@ -76,7 +56,19 @@
             android:textSize="14sp"
             android:textStyle="bold" />
 
-        <!-- Log Out Button (removed from header: logout lives only in the Admin panel card) -->
+        <!-- Log Out Button -->
+        <Button
+            android:id="@+id/staffLogoutButton"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:minWidth="0dp"
+            android:minHeight="@dimen/touch_target"
+            android:text="Log Out"
+            android:textColor="@color/error"
+            android:textSize="14sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
     <!-- Divider Line -->
