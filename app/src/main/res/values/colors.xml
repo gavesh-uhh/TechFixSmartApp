@@ -1,47 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ===== TechFix "Navy on Cloud" palette — single source of truth ===== -->
+    <!-- ===== TechFix "Deep Royal Lilac & White" Palette — Single Source of Truth ===== -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Navy ramp -->
-    <color name="navy_900">#0B1D33</color>
-    <color name="navy_700">#1B3A5C</color>
-    <color name="navy_500">#2E5E8C</color>
+    <!-- Deep Royal Lilac Core Ramp -->
+    <color name="lilac_900">#1C122C</color>
+    <color name="lilac_800">#382064</color>
+    <color name="lilac_700">#4A2E80</color>
+    <color name="lilac_600">#5E3B8D</color>
+    <color name="lilac_500">#6F42C1</color>
+    <color name="lilac_300">#B79FE4</color>
+    <color name="lilac_200">#D8CEEE</color>
+    <color name="lilac_100">#ECE5F8</color>
+    <color name="lilac_50">#F8F6FC</color>
 
-    <!-- Light neutrals -->
-    <color name="sky_200">#D7E4F2</color>
-    <color name="cloud">#F6F8FA</color>
-    <color name="paper">#F6F8FA</color>
-    <color name="line">#E3EAF2</color>
-    <color name="steel">#5B7A9D</color>
-    <color name="ink">#0B1D33</color>
-    <color name="techfix_line">#E3EAF2</color>
-    <color name="muted_text">#64748B</color>
+    <!-- Light Neutrals & Canvas Surfaces -->
+    <color name="cloud">#F8F6FC</color>
+    <color name="paper">#F8F6FC</color>
+    <color name="surface">#FFFFFFFF</color>
+    <color name="surface_variant">#F3EFFC</color>
+    <color name="line">#E8E2F2</color>
+    <color name="techfix_line">#E8E2F2</color>
+    <color name="outline">#D8CEEE</color>
+    <color name="sky_200">#ECE5F8</color>
+    <color name="steel">#6F42C1</color>
+    <color name="ink">#1C122C</color>
+    <color name="muted_text">#6C627E</color>
 
-    <!-- Semantic -->
-    <color name="success">#15803D</color>
-    <color name="success_container">#DCF3E4</color>
-    <color name="error">#B91C1C</color>
-    <color name="error_container">#FBE3E3</color>
-    <color name="warning">#B45309</color>
-    <color name="warning_container">#FCEFDC</color>
-    <color name="info_container">#E1ECF8</color>
+    <!-- Semantic Alerts & Status Tints -->
+    <color name="success">#16A34A</color>
+    <color name="success_container">#EAF8EE</color>
+    <color name="error">#DC2626</color>
+    <color name="error_container">#FEECEC</color>
+    <color name="warning">#D97706</color>
+    <color name="warning_container">#FEF4E6</color>
+    <color name="info_container">#ECE5F8</color>
 
-    <!-- ===== Legacy aliases (kept so existing layouts keep compiling; values now navy-themed) ===== -->
-    <color name="primary">#1B3A5C</color>
+    <!-- ===== Compatibility Aliases (Navy/Blue names mapped to Deep Lilac) ===== -->
+    <color name="primary">#4A2E80</color>
     <color name="on_primary">#FFFFFF</color>
-    <color name="primary_container">#D7E4F2</color>
-    <color name="on_primary_container">#0B1D33</color>
-    <color name="surface">#FFFFFF</color>
-    <color name="surface_variant">#EDF2F8</color>
-    <color name="outline">#C3D2E3</color>
-    <color name="techfix_ink">#0B1D33</color>
-    <color name="techfix_blue">#2E5E8C</color>
-    <color name="techfix_blue_dark">#1B3A5C</color>
-    <color name="techfix_sky">#BFD4EA</color>
-    <color name="techfix_mist">#EFF4FA</color>
-    <color name="techfix_cloud">#F5F8FB</color>
-    <color name="techfix_muted">#64748B</color>
-    <color name="ripple">#332E5E8C</color>
+    <color name="primary_container">#ECE5F8</color>
+    <color name="on_primary_container">#382064</color>
+    <color name="chip_bg">#ECE5F8</color>
+    <color name="accent_subtle">#ECE5F8</color>
+    <color name="navy_900">#1C122C</color>
+    <color name="navy_700">#4A2E80</color>
+    <color name="navy_500">#6F42C1</color>
+    <color name="techfix_ink">#1C122C</color>
+    <color name="techfix_blue">#6F42C1</color>
+    <color name="techfix_blue_dark">#4A2E80</color>
+    <color name="techfix_sky">#D8CEEE</color>
+    <color name="techfix_mist">#F3EFFC</color>
+    <color name="techfix_cloud">#F8F6FC</color>
+    <color name="techfix_muted">#6C627E</color>
+    <color name="ripple">#254A2E80</color>
 </resources>

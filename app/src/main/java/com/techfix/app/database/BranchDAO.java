@@ -1,6 +1,5 @@
 package com.techfix.app.database;
 
-import android.content.ContentValues;
 import android.database.Cursor;
 import com.techfix.app.models.Branch;
 import java.util.ArrayList;
@@ -19,7 +18,7 @@ public class BranchDAO {
         return out;
     }
 
-    /** Branch names only — single source of truth for dropdowns. */
+    /** Branch database names. */
     public String[] namesArray() {
         List<Branch> list = branches();
         String[] out = new String[list.size()];
@@ -27,13 +26,58 @@ public class BranchDAO {
         return out;
     }
 
-    /** {"All Branches", ...names} for filter spinners. */
-    public String[] namesArrayWithAll() {
+    /** Descriptive formatted labels for booking dropdowns. */
+    public String[] displayNamesArray() {
+        List<Branch> list = branches();
+        String[] out = new String[list.size()];
+        for (int i = 0; i < list.size(); i++) {
+            out[i] = toDisplayName(list.get(i).name);
+        }
+        return out;
+    }
+
+    /** {"All Branches", ...displayNames} for filter spinners. */
+    public String[] filterNamesArray() {
         List<Branch> list = branches();
         String[] out = new String[list.size() + 1];
         out[0] = "All Branches";
-        for (int i = 0; i < list.size(); i++) out[i + 1] = list.get(i).name;
+        for (int i = 0; i < list.size(); i++) {
+            out[i + 1] = toDisplayName(list.get(i).name);
+        }
         return out;
+    }
+
+    /** {"All Branches", ...names} for backward-compatible filters. */
+    public String[] namesArrayWithAll() {
+        return filterNamesArray();
+    }
+
+    public static String toDbName(String displayName) {
+        if (displayName == null || displayName.trim().isEmpty() || displayName.equalsIgnoreCase("All Branches")) {
+            return "All Branches";
+        }
+        String lower = displayName.toLowerCase();
+        if (lower.contains("colombo")) {
+            return "Colombo branch";
+        }
+        if (lower.contains("galle")) {
+            return "Galle branch";
+        }
+        return displayName;
+    }
+
+    public static String toDisplayName(String dbName) {
+        if (dbName == null || dbName.trim().isEmpty() || dbName.equalsIgnoreCase("All Branches")) {
+            return "All Branches";
+        }
+        String lower = dbName.toLowerCase();
+        if (lower.contains("colombo")) {
+            return "Colombo Flagship (Colombo 04)";
+        }
+        if (lower.contains("galle")) {
+            return "Galle Service Center (Galle Fort)";
+        }
+        return dbName;
     }
 
     public String firstName() {

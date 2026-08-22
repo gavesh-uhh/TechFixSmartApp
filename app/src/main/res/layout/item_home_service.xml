@@ -1,101 +1,167 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.TechFix.ShadowCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/space_12"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/line"
-    app:strokeWidth="1dp">
+    android:layout_marginBottom="14dp"
+    android:clickable="true"
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="18dp">
 
-        <!-- Store Image Box for Service -->
-        <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@drawable/bg_field"
-            android:padding="12dp">
-
-            <ImageView
-                android:id="@+id/serviceImageView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="Service Image"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_store_phone_screen" />
-        </FrameLayout>
-
-        <!-- Service Information -->
+        <!-- Top Row: Clean Category Text & Star Rating -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <!-- Category / Tag -->
             <TextView
                 android:id="@+id/serviceCategoryText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Mobile phone"
-                android:textColor="@color/techfix_blue"
-                android:textSize="11sp"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
-            <!-- Service Name -->
             <TextView
-                android:id="@+id/serviceNameText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Screen replacement"
-                android:textColor="@color/navy_900"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <!-- Part required or description -->
-            <TextView
-                android:id="@+id/servicePartText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Includes genuine display"
+                android:layout_marginStart="8dp"
+                android:text="•"
                 android:textColor="@color/muted_text"
-                android:textSize="11sp" />
+                android:textSize="12sp" />
 
-            <!-- Price -->
             <TextView
-                android:id="@+id/servicePriceText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="Rs 8,500"
-                android:textColor="@color/navy_700"
-                android:textSize="14sp"
+                android:layout_marginStart="8dp"
+                android:text="★ 4.9"
+                android:textColor="@color/warning"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="1dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="90-Day Warranty"
+                android:textColor="@color/success"
+                android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Store Service Badge -->
-        <TextView
-            android:id="@+id/serviceBadge"
-            android:layout_width="wrap_content"
+        <!-- Middle Row: Image Thumbnail & Title / Part Info -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_field"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:text="Available"
-            android:textColor="@color/success"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_kpi_icon_purple">
+
+                <ImageView
+                    android:id="@+id/serviceImageView"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Service Image"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_store_phone_screen" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/serviceNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Screen replacement"
+                    android:textColor="@color/ink"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/servicePartText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="Includes genuine OEM display"
+                    android:textColor="@color/muted_text"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Divider Line -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="14dp"
+            android:layout_marginBottom="12dp"
+            android:background="@color/line" />
+
+        <!-- Bottom Row: Price Callout & Clean Book Button -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Workshop Price"
+                    android:textColor="@color/muted_text"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/servicePriceText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Rs 8,500"
+                    android:textColor="@color/primary"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/serviceBadge"
+                style="@style/Widget.TechFix.Stamp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_filter_pill_selected"
+                android:paddingHorizontal="16dp"
+                android:paddingVertical="9dp"
+                android:text="Book Repair"
+                android:textColor="@color/white"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

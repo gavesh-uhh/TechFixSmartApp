@@ -1,18 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.TechFix.ShadowCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="@dimen/card_gap"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="3dp">
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="6dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="14dp">
+        android:padding="18dp">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -25,22 +24,25 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:textColor="@color/techfix_ink"
-                android:textSize="16sp"
+                android:textColor="@color/ink"
+                android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/branchCity"
-                style="@style/Widget.TechFix.StatusChip"
+                style="@style/Widget.TechFix.Stamp"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_card_pill"
+                android:textColor="@color/primary" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/branchCoords"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
+            android:layout_marginTop="6dp"
+            android:lineSpacingExtra="2dp"
             android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
         <Button
@@ -48,7 +50,7 @@
             style="@style/Widget.TechFix.Button.Secondary"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Open in Maps" />
+            android:layout_marginTop="14dp"
+            android:text="🗺️ Open in Google Maps" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

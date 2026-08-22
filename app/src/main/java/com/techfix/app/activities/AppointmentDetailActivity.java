@@ -62,7 +62,7 @@ public class AppointmentDetailActivity extends AppCompatActivity {
             TextView empty = new TextView(this);
             empty.setText("No status updates yet — the workshop will update this docket once work begins.");
             empty.setTextSize(13);
-            empty.setTextColor(getColor(R.color.techfix_muted));
+            empty.setTextColor(getColor(R.color.muted_text));
             empty.setBackgroundResource(R.drawable.bg_field);
             empty.setPadding(18, 14, 18, 14);
             binding.timelineList.addView(empty);
@@ -74,7 +74,7 @@ public class AppointmentDetailActivity extends AppCompatActivity {
             String bullet = i == history.size() - 1 ? "\u25CF  " : "\u25CB  ";
             row.setText(bullet + step.status + "\n     " + step.updatedAt + (step.note.isEmpty() ? "" : " \u2014 " + step.note));
             row.setTextSize(14);
-            row.setTextColor(getColor(i == history.size() - 1 ? R.color.techfix_blue_dark : R.color.techfix_muted));
+            row.setTextColor(getColor(i == history.size() - 1 ? R.color.primary : R.color.muted_text));
             row.setBackgroundResource(R.drawable.bg_field);
             row.setPadding(18, 14, 18, 14);
             LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);

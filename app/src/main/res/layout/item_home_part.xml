@@ -1,90 +1,109 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.TechFix.ShadowCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="@dimen/space_12"
-    app:cardBackgroundColor="@color/white"
-    app:cardCornerRadius="14dp"
-    app:cardElevation="2dp"
-    app:strokeColor="@color/line"
-    app:strokeWidth="1dp">
+    android:layout_marginBottom="14dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="12dp"
-        android:gravity="center_vertical">
+        android:orientation="vertical"
+        android:padding="18dp">
 
-        <!-- Store Image Box for Part -->
-        <FrameLayout
-            android:layout_width="80dp"
-            android:layout_height="80dp"
-            android:background="@drawable/bg_field"
-            android:padding="12dp">
-
-            <ImageView
-                android:id="@+id/partImageView"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:contentDescription="Part Image"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_store_hardware_part" />
-        </FrameLayout>
-
-        <!-- Part Details -->
+        <!-- Top Row: Clean Branch & OEM Label -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <!-- Branch location tag -->
             <TextView
                 android:id="@+id/partBranchText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Colombo branch"
-                android:textColor="@color/techfix_blue"
-                android:textSize="11sp"
+                android:textColor="@color/primary"
+                android:textSize="12sp"
                 android:textStyle="bold" />
 
-            <!-- Part name -->
             <TextView
-                android:id="@+id/partNameText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:text="Phone display"
-                android:textColor="@color/navy_900"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-
-            <!-- In Stock Quantity -->
-            <TextView
-                android:id="@+id/partQuantityText"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="8 units available in store"
+                android:layout_marginStart="8dp"
+                android:text="•"
                 android:textColor="@color/muted_text"
                 android:textSize="12sp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Genuine OEM"
+                android:textColor="@color/success"
+                android:textSize="12sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Stock Status Badge -->
-        <TextView
-            android:id="@+id/partStatusBadge"
-            android:layout_width="wrap_content"
+        <!-- Middle Row: Image Thumbnail & Part Name / Count -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@drawable/bg_field"
-            android:paddingHorizontal="8dp"
-            android:paddingVertical="4dp"
-            android:text="In Stock"
-            android:textColor="@color/success"
-            android:textSize="11sp"
-            android:textStyle="bold" />
+            android:layout_marginTop="12dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="52dp"
+                android:layout_height="52dp"
+                android:background="@drawable/bg_kpi_icon_amber">
+
+                <ImageView
+                    android:id="@+id/partImageView"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Part Image"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/ic_store_hardware_part" />
+            </FrameLayout>
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="14dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/partNameText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Phone display"
+                    android:textColor="@color/ink"
+                    android:textSize="17sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/partQuantityText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="3dp"
+                    android:text="8 units available in workshop stock"
+                    android:textColor="@color/muted_text"
+                    android:textSize="13sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/partStatusBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="In Stock"
+                android:textColor="@color/success"
+                android:textSize="13sp"
+                android:textStyle="bold" />
+        </LinearLayout>
 
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
