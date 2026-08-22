@@ -7,34 +7,66 @@
     android:orientation="vertical"
     android:background="@color/cloud">
 
-    <!-- Clean Top App Bar -->
+    <!-- Top App Header -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingHorizontal="@dimen/space_16"
         android:paddingTop="16dp"
-        android:paddingBottom="12dp"
+        android:paddingBottom="8dp"
         android:background="@color/white">
 
-        <TextView
-            android:id="@+id/topBarTitle"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="TechFix Store"
-            android:textColor="@color/navy_900"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/topBarSubtitle"
+            <TextView
+                android:id="@+id/topBarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TechFix"
+                android:textColor="@color/navy_900"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/topBarSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Computer &amp; Mobile Phone Repairs"
+                android:textColor="@color/muted_text"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <!-- Account / Sign In Button -->
+        <Button
+            android:id="@+id/accountButton"
+            style="@style/Widget.Material3.Button.TextButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Computer &amp; Mobile Phone Repairs"
-            android:textColor="@color/muted_text"
-            android:textSize="12sp" />
+            android:minWidth="0dp"
+            android:text="Sign In"
+            android:textColor="@color/techfix_blue"
+            android:textSize="13sp"
+            android:textStyle="bold" />
     </LinearLayout>
+
+    <!-- Top Navigation Tabs (Store & Book Appointment) -->
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/topTabs"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/white"
+        app:tabIndicatorColor="@color/techfix_blue"
+        app:tabSelectedTextColor="@color/navy_900"
+        app:tabTextColor="@color/muted_text"
+        app:tabMode="fixed"
+        app:tabGravity="fill" />
 
     <!-- Divider Line -->
     <View
@@ -45,8 +77,7 @@
     <!-- Content Area: Panels Container -->
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
+        android:layout_height="match_parent">
 
         <!-- ================= PANEL 1: STORE CATALOG ================= -->
         <ScrollView
@@ -689,16 +720,5 @@
         </ScrollView>
 
     </FrameLayout>
-
-    <!-- Bottom Navigation Bar -->
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottomNavigation"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/white"
-        app:elevation="8dp"
-        app:itemIconTint="@color/techfix_blue"
-        app:itemTextColor="@color/navy_900"
-        app:menu="@menu/bottom_nav_home" />
 
 </LinearLayout>
