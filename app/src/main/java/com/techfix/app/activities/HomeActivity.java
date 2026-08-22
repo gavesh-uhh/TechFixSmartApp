@@ -31,6 +31,7 @@ import com.techfix.app.models.Service;
 import com.techfix.app.models.SparePart;
 import com.techfix.app.models.UserRole;
 import com.techfix.app.session.SessionManager;
+import com.techfix.app.sync.FirebaseSyncManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
 import java.io.File;
@@ -157,14 +158,25 @@ public class HomeActivity extends AppCompatActivity {
         appointmentDAO = new AppointmentDAO(dbHelper);
         session = new SessionManager(this);
 
-        // 3. Setup UI components
+        // 3. Initialize Firebase Cloud Sync (Offline-First auto-sync when online)
+        FirebaseSyncManager.getInstance().init(this);
+        FirebaseSyncManager.getInstance().addListener((isSyncing, success) -> {
+            if (!isSyncing && success) {
+                runOnUiThread(() -> {
+                    loadAvailableServices(currentCategory);
+                    loadAvailableParts();
+                });
+            }
+        });
+
+        // 4. Setup UI components
         setupBranchButtons();
         setupBottomNavigation();
         setupRoundCategories();
         setupPartsPanel();
         setupBookingForm();
 
-        // 4. Initial load of all available repair services
+        // 5. Initial load of all available repair services
         selectCategory("ALL");
     }
 
@@ -361,6 +373,9 @@ public class HomeActivity extends AppCompatActivity {
         if (selectedPhotoUri != null && appointmentId > 0) {
             appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
         }
+
+        // Trigger instant cloud sync to Firebase if online
+        FirebaseSyncManager.getInstance().sync(this, null);
 
         // 9. Show Success Confirmation Dialog
         new AlertDialog.Builder(this)

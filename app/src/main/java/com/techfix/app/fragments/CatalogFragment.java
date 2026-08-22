@@ -29,6 +29,7 @@ import com.techfix.app.databinding.FragmentCatalogBinding;
 import java.util.List;
 import com.techfix.app.models.Service;
 import com.techfix.app.models.Technician;
+import com.techfix.app.sync.FirebaseSyncManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
 /**
@@ -40,6 +41,12 @@ public class CatalogFragment extends Fragment {
     private ServiceDAO serviceDAO;
     private TechnicianDAO technicianDAO;
     private SampleRepairDAO sampleRepairDAO;
+
+    private final FirebaseSyncManager.SyncListener syncListener = (isSyncing, success) -> {
+        if (!isSyncing && success && isAdded() && binding != null) {
+            requireActivity().runOnUiThread(this::refresh);
+        }
+    };
 
     private Uri pendingSampleUri;
     private final ActivityResultLauncher<Uri> cameraLauncher =
@@ -66,6 +73,8 @@ public class CatalogFragment extends Fragment {
         // Bottom inset so content clears the gesture nav bar / keyboard
         WindowInsetsHelper.applyBottomInset(binding.tabCatalog);
 
+        FirebaseSyncManager.getInstance().addListener(syncListener);
+
         setupServices();
         setupTechnicians();
         setupShowcase();
@@ -87,6 +96,7 @@ public class CatalogFragment extends Fragment {
                         .setMessage("Remove \"" + service.name + "\" from service catalog?")
                         .setPositiveButton("Remove", (dialog, which) -> {
                             serviceDAO.delete(service.id);
+                            FirebaseSyncManager.getInstance().sync(requireContext(), null);
                             refresh();
                             Snackbar.make(binding.getRoot(), "Service removed", Snackbar.LENGTH_SHORT).show();
                         })
@@ -116,6 +126,7 @@ public class CatalogFragment extends Fragment {
             try {
                 double price = Double.parseDouble(priceStr);
                 serviceDAO.add(name, category.isEmpty() ? "Mobile phone" : category, price, part);
+                FirebaseSyncManager.getInstance().sync(requireContext(), null);
                 binding.newServiceName.setText("");
                 binding.newServiceCategory.setText("");
                 binding.newServiceRequiredPart.setText("");
@@ -134,6 +145,7 @@ public class CatalogFragment extends Fragment {
             @Override
             public void onToggleDuty(Technician technician) {
                 technicianDAO.setAvailability(technician.name, !technician.available);
+                FirebaseSyncManager.getInstance().sync(requireContext(), null);
                 refresh();
                 Snackbar.make(binding.getRoot(), technician.name + " duty status updated", Snackbar.LENGTH_SHORT).show();
             }
@@ -145,6 +157,7 @@ public class CatalogFragment extends Fragment {
                         .setMessage("Remove " + technician.name + " from technician roster?")
                         .setPositiveButton("Remove", (dialog, which) -> {
                             technicianDAO.delete(technician.id);
+                            FirebaseSyncManager.getInstance().sync(requireContext(), null);
                             refresh();
                             Snackbar.make(binding.getRoot(), "Technician removed", Snackbar.LENGTH_SHORT).show();
                         })
@@ -168,6 +181,7 @@ public class CatalogFragment extends Fragment {
             }
 
             technicianDAO.add(name, branch.isEmpty() ? "Colombo branch" : branch, skill.isEmpty() ? "Mobile phone" : skill);
+            FirebaseSyncManager.getInstance().sync(requireContext(), null);
             binding.newTechName.setText("");
             binding.newTechBranch.setText("");
             binding.newTechSkill.setText("");
@@ -222,6 +236,7 @@ public class CatalogFragment extends Fragment {
                     try {
                         double price = Double.parseDouble(pStr);
                         serviceDAO.updatePrice(service.name, price);
+                        FirebaseSyncManager.getInstance().sync(requireContext(), null);
                         refresh();
                         Snackbar.make(binding.getRoot(), "Price updated for " + service.name, Snackbar.LENGTH_LONG).show();
                     } catch (Exception e) {
@@ -247,6 +262,7 @@ public class CatalogFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        FirebaseSyncManager.getInstance().removeListener(syncListener);
         binding = null;
     }
 }

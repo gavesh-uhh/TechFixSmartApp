@@ -23,6 +23,7 @@ import com.techfix.app.database.DatabaseHelper;
 import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.databinding.FragmentInventoryBinding;
 import com.techfix.app.models.SparePart;
+import com.techfix.app.sync.FirebaseSyncManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
 import java.util.List;
@@ -35,6 +36,11 @@ public class InventoryFragment extends Fragment {
     private FragmentInventoryBinding binding;
     private SparePartDAO sparePartDAO;
     private SparePartAdapter sparePartAdapter;
+    private final FirebaseSyncManager.SyncListener syncListener = (isSyncing, success) -> {
+        if (!isSyncing && success && isAdded() && binding != null) {
+            requireActivity().runOnUiThread(this::refresh);
+        }
+    };
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -53,6 +59,8 @@ public class InventoryFragment extends Fragment {
         // Bottom inset so content clears the gesture nav bar / keyboard
         WindowInsetsHelper.applyBottomInset(binding.tabInventory);
 
+        FirebaseSyncManager.getInstance().addListener(syncListener);
+
         String[] branches = {"All Branches", "Colombo branch", "Galle branch"};
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branches);
         binding.inventoryBranchSpinner.setAdapter(branchAdapter);
@@ -69,6 +77,7 @@ public class InventoryFragment extends Fragment {
             @Override
             public void onAdjustQuantity(SparePart part, int delta) {
                 sparePartDAO.adjustStock(part.id, delta);
+                FirebaseSyncManager.getInstance().sync(requireContext(), null);
                 refresh();
             }
 
@@ -79,6 +88,7 @@ public class InventoryFragment extends Fragment {
                         .setMessage("Remove this spare part item from " + part.branch + " inventory?")
                         .setPositiveButton("Delete", (dialog, which) -> {
                             sparePartDAO.delete(part.id);
+                            FirebaseSyncManager.getInstance().sync(requireContext(), null);
                             refresh();
                             Snackbar.make(binding.getRoot(), "Part deleted", Snackbar.LENGTH_SHORT).show();
                         })
@@ -135,6 +145,7 @@ public class InventoryFragment extends Fragment {
                     } catch (Exception ignored) {}
 
                     sparePartDAO.add(name, branch != null ? branch : "Colombo branch", qty);
+                    FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();
                     Snackbar.make(binding.getRoot(), "Saved " + name + " to " + branch + " inventory", Snackbar.LENGTH_LONG).show();
                 })

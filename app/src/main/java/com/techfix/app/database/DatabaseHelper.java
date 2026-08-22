@@ -33,11 +33,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     }
 
     private void seed(SQLiteDatabase db) {
-        db.execSQL("INSERT INTO branches VALUES(1,'Colombo branch','Colombo',6.9271,79.8612),(2,'Galle branch','Galle',6.0329,80.2168)");
-        db.execSQL("INSERT INTO services VALUES(1,'Screen replacement','Mobile phone',8500,'Phone display'),(2,'Battery replacement','Mobile phone',4500,'Phone battery'),(3,'Laptop diagnostics','Laptop / computer',3000,''),(4,'Operating system repair','Laptop / computer',6500,'Laptop battery')");
-        db.execSQL("INSERT INTO technicians VALUES(1,'Nimal Perera','Colombo branch','Mobile phone',1),(2,'Sahan Silva','Colombo branch','Laptop / computer',1),(3,'Kasun Fernando','Galle branch','Mobile phone',1)");
-        db.execSQL("INSERT INTO parts VALUES(1,'Phone display',8,'Colombo branch'),(2,'Laptop battery',4,'Colombo branch'),(3,'Phone battery',5,'Galle branch')");
-        db.execSQL("INSERT INTO samples VALUES(1,'iPhone screen restoration','Screen replacement',''),(2,'Laptop performance recovery','Operating system repair','')");
+        db.execSQL("INSERT OR IGNORE INTO branches VALUES(1,'Colombo branch','Colombo',6.9271,79.8612),(2,'Galle branch','Galle',6.0329,80.2168)");
+        db.execSQL("INSERT OR IGNORE INTO services VALUES(1,'Screen replacement','Mobile phone',8500,'Phone display'),(2,'Battery replacement','Mobile phone',4500,'Phone battery'),(3,'Laptop diagnostics','Laptop / computer',3000,''),(4,'Operating system repair','Laptop / computer',6500,'Laptop battery')");
+        db.execSQL("INSERT OR IGNORE INTO technicians VALUES(1,'Nimal Perera','Colombo branch','Mobile phone',1),(2,'Sahan Silva','Colombo branch','Laptop / computer',1),(3,'Kasun Fernando','Galle branch','Mobile phone',1)");
         android.content.ContentValues staff = new android.content.ContentValues();
         staff.put("name", "TechFix Staff"); staff.put("email", "staff@techfix.lk");
         staff.put("phone", "0112345678");

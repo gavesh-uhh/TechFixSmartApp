@@ -53,6 +53,9 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
         // own navigationBars inset via Material, so we don't pad it again (avoids double inset).
         WindowInsetsHelper.apply(binding.staffHeader, binding.staffContent);
 
+        // Initialize Firebase Sync Manager
+        com.techfix.app.sync.FirebaseSyncManager.getInstance().init(this);
+
         // 3. Header & Navigation
         binding.staffHomeStoreButton.setOnClickListener(v ->
                 startActivity(new Intent(StaffActivity.this, HomeActivity.class)));

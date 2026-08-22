@@ -24,6 +24,7 @@ import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.databinding.FragmentOverviewBinding;
 import com.techfix.app.models.Technician;
+import com.techfix.app.sync.FirebaseSyncManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
 import java.util.List;
@@ -39,6 +40,12 @@ public class OverviewFragment extends Fragment {
     private TechnicianDAO technicianDAO;
     private ServiceDAO serviceDAO;
     private String selectedBranch = "All Branches";
+
+    private final FirebaseSyncManager.SyncListener syncListener = (isSyncing, success) -> {
+        if (!isSyncing && success && isAdded() && binding != null) {
+            requireActivity().runOnUiThread(this::refresh);
+        }
+    };
 
     private StaffTabHost host() {
         return (StaffTabHost) requireActivity();
@@ -63,6 +70,8 @@ public class OverviewFragment extends Fragment {
 
         // Bottom inset so content clears the gesture nav bar / keyboard
         WindowInsetsHelper.applyBottomInset(binding.tabOverview);
+
+        FirebaseSyncManager.getInstance().addListener(syncListener);
 
         selectedBranch = host().getSelectedBranch();
 
@@ -174,6 +183,7 @@ public class OverviewFragment extends Fragment {
                     String tech = technicianDAO.availableFor(branch, device);
 
                     long newId = appointmentDAO.add(0, device, problem + (customer.isEmpty() ? "" : " (Walk-in: " + customer + ")"), branch, sName, sPrice, tech, "Walk-in Counter");
+                    FirebaseSyncManager.getInstance().sync(requireContext(), null);
                     refresh();
                     Snackbar.make(binding.getRoot(), "Walk-in Docket #" + newId + " created successfully!", Snackbar.LENGTH_LONG).show();
                 })
@@ -184,6 +194,7 @@ public class OverviewFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+        FirebaseSyncManager.getInstance().removeListener(syncListener);
         binding = null;
     }
 }
