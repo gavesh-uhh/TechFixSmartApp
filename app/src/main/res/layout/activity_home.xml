@@ -22,30 +22,69 @@
             android:orientation="vertical"
             android:paddingBottom="@dimen/space_24">
 
-            <!-- Top Header Band -->
+            <!-- Top Header Band with Modern Gradient & Logo -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/bg_service_band"
-                android:orientation="vertical"
+                android:background="@drawable/bg_header_gradient"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
                 android:paddingHorizontal="@dimen/space_16"
-                android:paddingVertical="@dimen/space_16">
+                android:paddingTop="20dp"
+                android:paddingBottom="20dp">
 
+                <!-- Logo Icon Box -->
+                <FrameLayout
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@drawable/bg_header_badge"
+                    android:padding="8dp">
+
+                    <ImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:contentDescription="TechFix Logo"
+                        android:src="@drawable/ic_techfix_logo" />
+                </FrameLayout>
+
+                <!-- Brand Title and Subtitle -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TechFix"
+                        android:textColor="@color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.02" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Computer &amp; Phone Repair Shop"
+                        android:textColor="@color/sky_200"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <!-- Status Pill Badge -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="TechFix"
+                    android:background="@drawable/bg_header_badge"
+                    android:paddingHorizontal="10dp"
+                    android:paddingVertical="6dp"
+                    android:text="Open Daily"
                     android:textColor="@color/white"
-                    android:textSize="22sp"
+                    android:textSize="11sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="Computer &amp; Mobile Phone Repair Shop"
-                    android:textColor="@color/sky_200"
-                    android:textSize="13sp" />
             </LinearLayout>
 
             <!-- Main Body Container -->
