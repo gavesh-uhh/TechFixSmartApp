@@ -16,11 +16,9 @@ import com.techfix.app.R;
 import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.DatabaseHelper;
 import com.techfix.app.database.ServiceDAO;
-import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.databinding.ActivityHomeBinding;
 import com.techfix.app.models.Service;
-import com.techfix.app.models.SparePart;
 import com.techfix.app.models.UserRole;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.WindowInsetsHelper;
@@ -29,11 +27,10 @@ import java.util.List;
 
 /**
  * HomeActivity - Landing Page & Booking for TechFix Repair Shop.
- * TechFix is a newly established computer and mobile phone repair shop.
+ * TechFix is a dedicated computer and mobile phone repair shop.
  * Features:
- * - Round category quick-filters (All, Phones, Computers, Screens, Batteries, Parts)
+ * - Round category quick-filters (All, Phones, Computers, Screens, Batteries)
  * - Available repair services catalog with pricing in LKR
- * - In-stock replacement spare parts & components
  * - Bottom navigation: Store, Book Appointment, Branches, Account
  * - Mandatory login/account check before placing repair appointments
  */
@@ -45,11 +42,10 @@ public class HomeActivity extends AppCompatActivity {
     // Database access objects
     private DatabaseHelper dbHelper;
     private ServiceDAO serviceDAO;
-    private SparePartDAO sparePartDAO;
     private AppointmentDAO appointmentDAO;
     private SessionManager session;
 
-    // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES", "PARTS"
+    // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES"
     private String currentCategory = "ALL";
 
     // Attached device photo URI
@@ -79,7 +75,6 @@ public class HomeActivity extends AppCompatActivity {
         // 2. Initialize Database DAOs and Session
         dbHelper = DatabaseHelper.getInstance(this);
         serviceDAO = new ServiceDAO(dbHelper);
-        sparePartDAO = new SparePartDAO(dbHelper);
         appointmentDAO = new AppointmentDAO(dbHelper);
         session = new SessionManager(this);
 
@@ -89,7 +84,7 @@ public class HomeActivity extends AppCompatActivity {
         setupRoundCategories();
         setupBookingForm();
 
-        // 4. Initial load of all available repair services and spare parts
+        // 4. Initial load of all available repair services
         selectCategory("ALL");
     }
 
@@ -287,7 +282,6 @@ public class HomeActivity extends AppCompatActivity {
         binding.catComputers.setOnClickListener(v -> selectCategory("COMPUTERS"));
         binding.catScreens.setOnClickListener(v -> selectCategory("SCREENS"));
         binding.catBatteries.setOnClickListener(v -> selectCategory("BATTERIES"));
-        binding.catParts.setOnClickListener(v -> selectCategory("PARTS"));
     }
 
     /**
@@ -310,12 +304,10 @@ public class HomeActivity extends AppCompatActivity {
             highlightCategory(binding.circleCatScreens, binding.iconCatScreens, binding.labelCatScreens);
         } else if ("BATTERIES".equals(categoryKey)) {
             highlightCategory(binding.circleCatBatteries, binding.iconCatBatteries, binding.labelCatBatteries);
-        } else if ("PARTS".equals(categoryKey)) {
-            highlightCategory(binding.circleCatParts, binding.iconCatParts, binding.labelCatParts);
         }
 
-        // Reload repair services and spare parts according to the selected filter
-        loadItemsForCategory(categoryKey);
+        // Reload repair services according to the selected filter
+        loadAvailableServices(categoryKey);
     }
 
     /**
@@ -351,11 +343,6 @@ public class HomeActivity extends AppCompatActivity {
         binding.circleCatBatteries.setBackgroundResource(unselectedBg);
         binding.iconCatBatteries.setColorFilter(navyColor);
         binding.labelCatBatteries.setTextColor(mutedColor);
-
-        // Category: Parts
-        binding.circleCatParts.setBackgroundResource(unselectedBg);
-        binding.iconCatParts.setColorFilter(navyColor);
-        binding.labelCatParts.setTextColor(mutedColor);
     }
 
     /**
@@ -368,25 +355,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Loads and filters repair services and spare parts for the given category.
-     */
-    private void loadItemsForCategory(String filter) {
-        loadAvailableServices(filter);
-        loadAvailableSpareParts(filter);
-    }
-
-    /**
      * Load computer and mobile phone repair services from the SQLite database with category filtering.
      */
     private void loadAvailableServices(String filter) {
         binding.servicesContainer.removeAllViews();
-
-        if ("PARTS".equals(filter)) {
-            binding.servicesHeaderTitle.setVisibility(View.GONE);
-            binding.servicesHeaderSubtitle.setVisibility(View.GONE);
-            binding.servicesContainer.setVisibility(View.GONE);
-            return;
-        }
 
         List<Service> services = serviceDAO.list();
         int count = 0;
@@ -434,55 +406,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     /**
-     * Load in-stock replacement spare parts from the SQLite database with category filtering.
-     */
-    private void loadAvailableSpareParts(String filter) {
-        binding.partsContainer.removeAllViews();
-
-        List<SparePart> parts = sparePartDAO.all();
-        int count = 0;
-
-        for (SparePart part : parts) {
-            if (!matchesFilter(part.name, part.branch, filter)) {
-                continue;
-            }
-
-            count++;
-            View itemView = getLayoutInflater().inflate(R.layout.item_home_part, binding.partsContainer, false);
-
-            ImageView imageView = itemView.findViewById(R.id.partImageView);
-            TextView nameText = itemView.findViewById(R.id.partNameText);
-            TextView statusBadge = itemView.findViewById(R.id.partStatusBadge);
-            TextView quantityText = itemView.findViewById(R.id.partQuantityText);
-            TextView branchText = itemView.findViewById(R.id.partBranchText);
-
-            imageView.setImageResource(getPartImageResource(part.name));
-            nameText.setText(part.name);
-            quantityText.setText("Stock: " + part.quantity + " units available");
-            branchText.setText(part.branch);
-
-            if (part.quantity > 0) {
-                statusBadge.setText("In Stock");
-                statusBadge.setTextColor(getResources().getColor(R.color.success, null));
-            } else {
-                statusBadge.setText("Out of Stock");
-                statusBadge.setTextColor(getResources().getColor(R.color.error, null));
-            }
-
-            // Click part -> open Book Appointment in bottom nav
-            itemView.setOnClickListener(v -> {
-                binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
-            });
-
-            binding.partsContainer.addView(itemView);
-        }
-
-        binding.partsHeaderTitle.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
-        binding.partsHeaderSubtitle.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
-        binding.partsContainer.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
-    }
-
-    /**
      * Checks if an item matches the current active category filter.
      */
     private boolean matchesFilter(String name, String extra, String filter) {
@@ -498,8 +421,6 @@ public class HomeActivity extends AppCompatActivity {
                 return combined.contains("screen") || combined.contains("display");
             case "BATTERIES":
                 return combined.contains("battery");
-            case "PARTS":
-                return true;
             default:
                 return true;
         }
@@ -527,23 +448,7 @@ public class HomeActivity extends AppCompatActivity {
         } else if (query.contains("system") || query.contains("os") || query.contains("software")) {
             return R.drawable.ic_store_os_repair;
         } else {
-            return R.drawable.ic_store_hardware_part;
-        }
-    }
-
-    /**
-     * Helper method to choose an image for a spare part item.
-     */
-    private int getPartImageResource(String partName) {
-        String query = partName.toLowerCase();
-        if (query.contains("display") || query.contains("screen")) {
             return R.drawable.ic_store_phone_screen;
-        } else if (query.contains("laptop") && query.contains("battery")) {
-            return R.drawable.ic_store_laptop_battery;
-        } else if (query.contains("battery")) {
-            return R.drawable.ic_store_battery;
-        } else {
-            return R.drawable.ic_store_hardware_part;
         }
     }
 
