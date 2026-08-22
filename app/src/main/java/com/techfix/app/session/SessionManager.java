@@ -14,26 +14,39 @@ public class SessionManager {
     private final SharedPreferences prefs;
 
     public SessionManager(Context context) {
-        prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
+        prefs = context.getApplicationContext().getSharedPreferences(PREFS, Context.MODE_PRIVATE);
     }
 
     public void start(long userId, UserRole role) {
-        prefs.edit().putLong(KEY_USER_ID, userId).putString(KEY_ROLE, role.name()).apply();
+        prefs.edit()
+                .putLong(KEY_USER_ID, userId)
+                .putString(KEY_ROLE, role.name())
+                .commit();
     }
 
-    public boolean isLoggedIn() { return prefs.contains(KEY_USER_ID); }
+    public boolean isLoggedIn() {
+        return prefs.contains(KEY_USER_ID) && prefs.getLong(KEY_USER_ID, -1) != -1;
+    }
 
-    public long getUserId() { return prefs.getLong(KEY_USER_ID, -1); }
+    public long getUserId() {
+        return prefs.getLong(KEY_USER_ID, -1);
+    }
 
     public UserRole getRole() {
-        try { return UserRole.valueOf(prefs.getString(KEY_ROLE, UserRole.CUSTOMER.name())); }
-        catch (Exception e) { return UserRole.CUSTOMER; }
+        try {
+            return UserRole.valueOf(prefs.getString(KEY_ROLE, UserRole.CUSTOMER.name()));
+        } catch (Exception e) {
+            return UserRole.CUSTOMER;
+        }
     }
 
     public void logout() {
         try {
-            FirebaseAuth.getInstance().signOut();
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            if (auth != null) {
+                auth.signOut();
+            }
         } catch (Exception ignored) {}
-        prefs.edit().clear().apply();
+        prefs.edit().clear().commit();
     }
 }

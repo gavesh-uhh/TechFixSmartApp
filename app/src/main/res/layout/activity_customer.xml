@@ -471,6 +471,15 @@
                             android:textColor="@color/techfix_blue"
                             android:textSize="12sp"
                             android:textStyle="bold" />
+
+                        <Button
+                            android:id="@+id/profileLogoutButton"
+                            style="@style/Widget.TechFix.Secondary"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="@dimen/space_12"
+                            android:text="Log Out of Account"
+                            android:textColor="@color/error" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 

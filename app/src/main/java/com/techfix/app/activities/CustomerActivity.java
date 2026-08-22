@@ -38,7 +38,7 @@ import java.util.List;
  * - My Repairs tab: view all repairs, status badges, and open live timeline
  * - Book Repair tab: service picker, device model, photo attach, branch selector
  * - Profile & Branches tab: user account details, store branch locations & helpline
- * - Secure logout with confirmation
+ * - Guaranteed secure logout with activity stack reset
  */
 public class CustomerActivity extends AppCompatActivity {
 
@@ -110,6 +110,14 @@ public class CustomerActivity extends AppCompatActivity {
         showPanel(0);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (!session.isLoggedIn()) {
+            goHome();
+        }
+    }
+
     /**
      * Loads logged-in user profile details into the header and profile card.
      */
@@ -129,18 +137,29 @@ public class CustomerActivity extends AppCompatActivity {
             startActivity(new Intent(CustomerActivity.this, HomeActivity.class));
         });
 
-        // Log out button
-        binding.logoutButton.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Log Out")
-                    .setMessage("Are you sure you want to end this session?")
-                    .setPositiveButton("Log Out", (dialog, which) -> {
-                        session.logout();
-                        goHome();
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
-        });
+        // Top bar Log Out button
+        binding.logoutButton.setOnClickListener(v -> performLogout());
+
+        // Profile tab Log Out button
+        binding.profileLogoutButton.setOnClickListener(v -> performLogout());
+    }
+
+    /**
+     * Confirms and performs complete account logout, clearing sessions and navigating back to Home.
+     */
+    private void performLogout() {
+        new AlertDialog.Builder(this)
+                .setTitle("Log Out")
+                .setMessage("Are you sure you want to log out of your TechFix account?")
+                .setPositiveButton("Log Out", (dialog, which) -> {
+                    session.logout();
+                    Intent intent = new Intent(CustomerActivity.this, HomeActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     /**
@@ -165,8 +184,6 @@ public class CustomerActivity extends AppCompatActivity {
 
             return false;
         });
-
-
 
         binding.emptyBookButton.setOnClickListener(v -> {
             binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_book);
@@ -213,8 +230,6 @@ public class CustomerActivity extends AppCompatActivity {
         boolean hasRepairs = !repairs.isEmpty();
         binding.repairList.setVisibility(hasRepairs ? View.VISIBLE : View.GONE);
         binding.emptyStateContainer.setVisibility(hasRepairs ? View.GONE : View.VISIBLE);
-
-
 
         // Check if there are any pending payments
         boolean hasPendingPayment = false;
@@ -368,7 +383,9 @@ public class CustomerActivity extends AppCompatActivity {
     }
 
     private void goHome() {
-        startActivity(new Intent(this, HomeActivity.class));
+        Intent intent = new Intent(this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
         finish();
     }
 }

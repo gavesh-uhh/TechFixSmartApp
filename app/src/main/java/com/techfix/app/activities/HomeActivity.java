@@ -88,6 +88,12 @@ public class HomeActivity extends AppCompatActivity {
         selectCategory("ALL");
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        session = new SessionManager(this);
+    }
+
     /**
      * Setup bottom navigation bar (Store, Book, Branches, Account).
      */
@@ -119,8 +125,9 @@ public class HomeActivity extends AppCompatActivity {
 
             } else if (itemId == R.id.nav_home_account) {
                 // Open Customer / Staff dashboard if logged in, or Login screen if not
-                if (session.isLoggedIn()) {
-                    Class<?> target = session.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
+                SessionManager currentSession = new SessionManager(HomeActivity.this);
+                if (currentSession.isLoggedIn()) {
+                    Class<?> target = currentSession.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
                     startActivity(new Intent(HomeActivity.this, target));
                 } else {
                     Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
