@@ -5,7 +5,9 @@ import android.content.SharedPreferences;
 import com.google.firebase.auth.FirebaseAuth;
 import com.techfix.app.models.UserRole;
 
-/** Persists the logged-in user across app restarts and manages Firebase Auth session. */
+/**
+ * Persists the logged-in user across app restarts and manages Firebase Auth session.
+ */
 public class SessionManager {
     private static final String PREFS = "techfix_session";
     private static final String KEY_USER_ID = "userId";
@@ -25,7 +27,7 @@ public class SessionManager {
     }
 
     public boolean isLoggedIn() {
-        return prefs.contains(KEY_USER_ID) && prefs.getLong(KEY_USER_ID, -1) != -1;
+        return prefs.contains(KEY_USER_ID) && prefs.getLong(KEY_USER_ID, -1) > 0;
     }
 
     public long getUserId() {

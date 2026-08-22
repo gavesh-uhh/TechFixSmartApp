@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
+import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -24,25 +25,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * LoginActivity - Firebase Authentication for TechFix Repair App.
- * Features:
- * - Sign In: Authenticates with FirebaseAuth (with offline SQLite fallback)
- * - Sign Up: Registers account in FirebaseAuth and stores customer profile in Firestore & SQLite
- * - Auto-detects user role (Customer vs Staff) and redirects to the appropriate dashboard
+ * LoginActivity - Unified Authentication for TechFix Repair App.
+ * Supports:
+ * 1. Seamless login for accounts created before or after Firebase setup.
+ * 2. Real-time Firebase Authentication with local SQLite offline sync.
+ * 3. Automatic routing to CustomerActivity or StaffActivity based on user role.
  */
 public class LoginActivity extends AppCompatActivity {
 
-    // Auth screen mode: Sign In vs Create Account
     private enum Mode { SIGN_IN, SIGN_UP }
 
     private ActivityLoginBinding binding;
     private Mode mode = Mode.SIGN_IN;
 
-    // Firebase instances
     private FirebaseAuth firebaseAuth;
     private FirebaseFirestore firestore;
 
-    // Local SQLite DAO & Session
     private UserDAO userDAO;
     private SessionManager session;
 
@@ -54,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
         session = new SessionManager(this);
         userDAO = new UserDAO(DatabaseHelper.getInstance(this));
 
-        // 2. Check if user is already logged in
+        // 2. Check if already logged in
         if (session.isLoggedIn()) {
             resumeSession(session);
             return;
@@ -75,38 +73,27 @@ public class LoginActivity extends AppCompatActivity {
         binding.loginButton.setOnClickListener(this::submitAuthForm);
         binding.switchAuthButton.setOnClickListener(v -> switchMode(mode == Mode.SIGN_UP ? Mode.SIGN_IN : Mode.SIGN_UP));
 
-        // 6. Password strength watcher (for sign up)
+        // 6. Password strength watcher
         binding.passwordInput.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
                 int score = Math.min(4, s.length() / 3);
                 binding.passwordStrength.setProgressCompat(score, true);
                 binding.strengthLabel.setText(score < 2 ? "Weak password" : score < 4 ? "Good password" : "Strong password");
             }
-
-            @Override
-            public void afterTextChanged(Editable s) {}
+            @Override public void afterTextChanged(Editable s) {}
         });
 
         // 7. Initial view state
         switchMode(Mode.SIGN_IN);
     }
 
-    /**
-     * Resumes existing active session based on user role.
-     */
     private void resumeSession(SessionManager session) {
         Class<?> targetActivity = (session.getRole() == UserRole.STAFF) ? StaffActivity.class : CustomerActivity.class;
         startActivity(new Intent(this, targetActivity));
         finish();
     }
 
-    /**
-     * Switch between Sign In and Create Account views.
-     */
     private void switchMode(Mode nextMode) {
         mode = nextMode;
         boolean isSignUp = (mode == Mode.SIGN_UP);
@@ -122,12 +109,9 @@ public class LoginActivity extends AppCompatActivity {
         binding.switchAuthButton.setText(isSignUp ? "Already have an account? Sign in" : "Don't have an account? Sign up");
     }
 
-    /**
-     * Handles login / sign up submission using Firebase Authentication.
-     */
     private void submitAuthForm(View view) {
         String email = binding.emailInput.getText().toString().trim();
-        String password = binding.passwordInput.getText().toString();
+        String password = binding.passwordInput.getText().toString().trim();
 
         if (email.isEmpty()) {
             binding.emailInput.setError("Please enter your email address");
@@ -142,16 +126,95 @@ public class LoginActivity extends AppCompatActivity {
         }
 
         if (mode == Mode.SIGN_UP) {
-            handleSignUpWithFirebase(view, email, password);
+            handleSignUp(view, email, password);
         } else {
-            handleSignInWithFirebase(view, email, password);
+            handleSignIn(view, email, password);
         }
     }
 
     /**
-     * Registers a new customer account using Firebase Authentication.
+     * Handles User Sign In:
+     * 1. Checks local SQLite credentials (supports accounts created before Firebase).
+     * 2. Checks Firebase Authentication.
+     * 3. Syncs between both platforms automatically.
      */
-    private void handleSignUpWithFirebase(View view, String email, String password) {
+    private void handleSignIn(View view, String email, String password) {
+        binding.loginButton.setEnabled(false);
+        binding.loginButton.setText("Signing in...");
+
+        boolean isStaff = email.equalsIgnoreCase("staff@techfix.lk");
+
+        // Step 1: Check if credentials exist locally in SQLite (created previously)
+        if (userDAO.authenticate(email, password)) {
+            User localUser = userDAO.findByEmail(email);
+            UserRole role = (isStaff || (localUser != null && localUser.role == UserRole.STAFF)) ? UserRole.STAFF : UserRole.CUSTOMER;
+            long userId = (localUser != null) ? localUser.id : 1;
+
+            // In background, register into Firebase Auth if not already there
+            if (firebaseAuth != null) {
+                final String uName = (localUser != null) ? localUser.name : "User";
+                firebaseAuth.signInWithEmailAndPassword(email, password)
+                        .addOnFailureListener(e -> {
+                            // User doesn't exist in Firebase yet; create them in Firebase Auth
+                            firebaseAuth.createUserWithEmailAndPassword(email, password)
+                                    .addOnSuccessListener(authResult -> {
+                                        if (firebaseAuth.getCurrentUser() != null) {
+                                            UserProfileChangeRequest updates = new UserProfileChangeRequest.Builder()
+                                                    .setDisplayName(uName).build();
+                                            firebaseAuth.getCurrentUser().updateProfile(updates);
+                                        }
+                                    });
+                        });
+            }
+
+            session.start(userId, role);
+            Toast.makeText(this, "Signed in successfully", Toast.LENGTH_SHORT).show();
+            openDashboard(role);
+            return;
+        }
+
+        // Step 2: Try Firebase Authentication
+        if (firebaseAuth != null) {
+            firebaseAuth.signInWithEmailAndPassword(email, password)
+                    .addOnCompleteListener(this, task -> {
+                        if (task.isSuccessful()) {
+                            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
+                            String name = (firebaseUser != null && firebaseUser.getDisplayName() != null) ? firebaseUser.getDisplayName() : "Customer";
+
+                            // Ensure local user exists in SQLite
+                            User localUser = userDAO.findByEmail(email);
+                            if (localUser == null) {
+                                userDAO.create(name, email, "", password);
+                                localUser = userDAO.findByEmail(email);
+                            }
+
+                            UserRole role = (isStaff || (localUser != null && localUser.role == UserRole.STAFF)) ? UserRole.STAFF : UserRole.CUSTOMER;
+                            long userId = (localUser != null) ? localUser.id : 1;
+
+                            session.start(userId, role);
+                            Toast.makeText(this, "Signed in successfully", Toast.LENGTH_SHORT).show();
+                            openDashboard(role);
+
+                        } else {
+                            binding.loginButton.setEnabled(true);
+                            binding.loginButton.setText("Sign in");
+                            String error = (task.getException() != null) ? task.getException().getMessage() : "Invalid email or password";
+                            Snackbar.make(view, error, Snackbar.LENGTH_LONG).show();
+                        }
+                    });
+        } else {
+            binding.loginButton.setEnabled(true);
+            binding.loginButton.setText("Sign in");
+            Snackbar.make(view, "Invalid email or password", Snackbar.LENGTH_LONG).show();
+        }
+    }
+
+    /**
+     * Handles User Sign Up:
+     * 1. Creates account in Firebase Auth + Firestore.
+     * 2. Saves profile in SQLite for offline and local appointment mapping.
+     */
+    private void handleSignUp(View view, String email, String password) {
         String fullName = binding.nameInput.getText().toString().trim();
         String phone = binding.phoneInput.getText().toString().trim();
 
@@ -176,20 +239,22 @@ public class LoginActivity extends AppCompatActivity {
         binding.loginButton.setEnabled(false);
         binding.loginButton.setText("Creating account...");
 
+        // Save to SQLite
+        userDAO.create(fullName, email, phone, password);
+        User localUser = userDAO.findByEmail(email);
+        long userId = (localUser != null) ? localUser.id : 1;
+
         if (firebaseAuth != null) {
             firebaseAuth.createUserWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
                         if (task.isSuccessful()) {
                             FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-
-                            // Update Display Name in Firebase
                             if (firebaseUser != null) {
                                 UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                         .setDisplayName(fullName)
                                         .build();
                                 firebaseUser.updateProfile(profileUpdates);
 
-                                // Save user profile to Firestore
                                 if (firestore != null) {
                                     Map<String, Object> userMap = new HashMap<>();
                                     userMap.put("uid", firebaseUser.getUid());
@@ -203,106 +268,33 @@ public class LoginActivity extends AppCompatActivity {
                                 }
                             }
 
-                            // Also save to local SQLite for offline access
-                            userDAO.create(fullName, email, phone, password);
-                            User localUser = userDAO.findByEmail(email);
-                            long userId = (localUser != null) ? localUser.id : 1;
-
                             session.start(userId, UserRole.CUSTOMER);
+                            Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
                             openDashboard(UserRole.CUSTOMER);
 
                         } else {
-                            binding.loginButton.setEnabled(true);
-                            binding.loginButton.setText("Create account");
-                            String error = (task.getException() != null) ? task.getException().getMessage() : "Sign up failed";
-                            Snackbar.make(view, error, Snackbar.LENGTH_LONG).show();
+                            // If user already existed in Firebase, try sign in with same password
+                            firebaseAuth.signInWithEmailAndPassword(email, password)
+                                    .addOnSuccessListener(authResult -> {
+                                        session.start(userId, UserRole.CUSTOMER);
+                                        Toast.makeText(this, "Welcome back!", Toast.LENGTH_SHORT).show();
+                                        openDashboard(UserRole.CUSTOMER);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        binding.loginButton.setEnabled(true);
+                                        binding.loginButton.setText("Create account");
+                                        String error = (task.getException() != null) ? task.getException().getMessage() : "Sign up failed";
+                                        Snackbar.make(view, error, Snackbar.LENGTH_LONG).show();
+                                    });
                         }
                     });
         } else {
-            // Local fallback if Firebase is uninitialized
-            boolean created = userDAO.create(fullName, email, phone, password);
-            if (created) {
-                User localUser = userDAO.findByEmail(email);
-                long userId = (localUser != null) ? localUser.id : 1;
-                session.start(userId, UserRole.CUSTOMER);
-                openDashboard(UserRole.CUSTOMER);
-            } else {
-                binding.loginButton.setEnabled(true);
-                binding.loginButton.setText("Create account");
-                Snackbar.make(view, "Email is already registered", Snackbar.LENGTH_LONG).show();
-            }
+            session.start(userId, UserRole.CUSTOMER);
+            Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
+            openDashboard(UserRole.CUSTOMER);
         }
     }
 
-    /**
-     * Signs in an existing customer or staff member using Firebase Authentication.
-     */
-    private void handleSignInWithFirebase(View view, String email, String password) {
-        binding.loginButton.setEnabled(false);
-        binding.loginButton.setText("Signing in...");
-
-        // Check if this is the staff account
-        boolean isStaffEmail = email.equalsIgnoreCase("staff@techfix.lk");
-
-        if (firebaseAuth != null) {
-            firebaseAuth.signInWithEmailAndPassword(email, password)
-                    .addOnCompleteListener(this, task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
-                            String name = (firebaseUser != null && firebaseUser.getDisplayName() != null) ? firebaseUser.getDisplayName() : "Customer";
-
-                            // Ensure local user exists in SQLite
-                            User localUser = userDAO.findByEmail(email);
-                            if (localUser == null) {
-                                userDAO.create(name, email, "", password);
-                                localUser = userDAO.findByEmail(email);
-                            }
-
-                            UserRole role = (isStaffEmail || (localUser != null && localUser.role == UserRole.STAFF)) ? UserRole.STAFF : UserRole.CUSTOMER;
-                            long userId = (localUser != null) ? localUser.id : 1;
-
-                            session.start(userId, role);
-                            openDashboard(role);
-
-                        } else {
-                            // Check local SQLite credentials as fallback (e.g. for offline usage or seeded staff)
-                            if (userDAO.authenticate(email, password)) {
-                                User localUser = userDAO.findByEmail(email);
-                                UserRole role = (localUser != null && localUser.role != null) ? localUser.role : (isStaffEmail ? UserRole.STAFF : UserRole.CUSTOMER);
-                                long userId = (localUser != null) ? localUser.id : 1;
-
-                                session.start(userId, role);
-                                openDashboard(role);
-                            } else {
-                                binding.loginButton.setEnabled(true);
-                                binding.loginButton.setText("Sign in");
-                                String error = (task.getException() != null) ? task.getException().getMessage() : "Invalid email or password";
-                                Snackbar.make(view, error, Snackbar.LENGTH_LONG).show();
-                            }
-                        }
-                    });
-        } else {
-            // Local fallback
-            if (userDAO.authenticate(email, password)) {
-                User localUser = userDAO.findByEmail(email);
-                UserRole role = (localUser != null && localUser.role != null) ? localUser.role : (isStaffEmail ? UserRole.STAFF : UserRole.CUSTOMER);
-                long userId = (localUser != null) ? localUser.id : 1;
-
-                session.start(userId, role);
-                openDashboard(role);
-            } else {
-                binding.loginButton.setEnabled(true);
-                binding.loginButton.setText("Sign in");
-                Snackbar.make(view, "Invalid email or password", Snackbar.LENGTH_LONG).show();
-            }
-        }
-    }
-
-    /**
-     * Opens the appropriate dashboard based on user role:
-     * - STAFF -> StaffActivity
-     * - CUSTOMER -> CustomerActivity
-     */
     private void openDashboard(UserRole role) {
         Class<?> target = (role == UserRole.STAFF) ? StaffActivity.class : CustomerActivity.class;
         startActivity(new Intent(this, target));

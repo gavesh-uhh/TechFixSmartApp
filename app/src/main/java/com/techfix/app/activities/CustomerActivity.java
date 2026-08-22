@@ -144,22 +144,13 @@ public class CustomerActivity extends AppCompatActivity {
         binding.profileLogoutButton.setOnClickListener(v -> performLogout());
     }
 
-    /**
-     * Confirms and performs complete account logout, clearing sessions and navigating back to Home.
-     */
     private void performLogout() {
-        new AlertDialog.Builder(this)
-                .setTitle("Log Out")
-                .setMessage("Are you sure you want to log out of your TechFix account?")
-                .setPositiveButton("Log Out", (dialog, which) -> {
-                    session.logout();
-                    Intent intent = new Intent(CustomerActivity.this, HomeActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        session.logout();
+        android.widget.Toast.makeText(this, "Logged out successfully", android.widget.Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(CustomerActivity.this, HomeActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     /**
