@@ -23,7 +23,7 @@ import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.databinding.ActivityCustomerBinding;
 import com.techfix.app.models.Appointment;
-import com.techfix.app.network.CatalogSync;
+import com.techfix.app.database.SampleRepairDAO;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.Feedback;
 import com.techfix.app.util.WindowInsetsHelper;
@@ -126,14 +126,7 @@ public class CustomerActivity extends AppCompatActivity {
                 .setPositiveButton("Log out", (d, w) -> { session.logout(); goHome(); })
                 .setNegativeButton("Cancel", null).show());
 
-        CatalogSync.sync(this, services, (online, count) -> {
-            if (isDestroyed() || isFinishing()) return;
-            binding.connectionStatus.setText(online ? "Online · synced " + count + " services" : "Available offline");
-            if (online) {
-                serviceAdapter.clear(); serviceAdapter.addAll(services.all()); serviceAdapter.notifyDataSetChanged();
-                binding.catalogText.setText(services.catalog());
-            }
-        });
+        binding.connectionStatus.setText("Offline · all data stored on this device");
     }
 
     private void showPanel(int position) {
