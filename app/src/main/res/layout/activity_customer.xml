@@ -68,18 +68,6 @@
             android:textSize="13sp" />
     </LinearLayout>
 
-    <!-- Top Dashboard Tabs -->
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/dashboardTabs"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:background="@color/white"
-        app:tabIndicatorColor="@color/techfix_blue"
-        app:tabSelectedTextColor="@color/navy_900"
-        app:tabTextColor="@color/muted_text"
-        app:tabMode="fixed"
-        app:tabGravity="fill" />
-
     <!-- Divider Line -->
     <View
         android:layout_width="match_parent"
@@ -590,4 +578,16 @@
         </ScrollView>
 
     </FrameLayout>
+
+    <!-- Bottom Navigation Bar for Customer Dashboard -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/customerBottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        app:elevation="8dp"
+        app:itemIconTint="@color/techfix_blue"
+        app:itemTextColor="@color/navy_900"
+        app:menu="@menu/bottom_nav_customer" />
+
 </LinearLayout>

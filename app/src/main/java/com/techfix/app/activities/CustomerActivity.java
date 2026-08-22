@@ -11,7 +11,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
-import com.google.android.material.tabs.TabLayout;
 import com.techfix.app.R;
 import com.techfix.app.adapters.AppointmentAdapter;
 import com.techfix.app.adapters.BranchAdapter;
@@ -32,9 +31,10 @@ import com.techfix.app.util.WindowInsetsHelper;
 import java.util.List;
 
 /**
- * CustomerActivity - Complete Customer Workspace Dashboard.
+ * CustomerActivity - Complete Customer Workspace Dashboard with Bottom Navigation.
  * Features:
  * - Customer greeting & profile info
+ * - Bottom Navigation: My Repairs, Book Repair, Profile & Branches
  * - My Repairs tab: view all repairs, status badges, and open live timeline
  * - Book Repair tab: service picker, device model, photo attach, branch selector
  * - Profile & Branches tab: user account details, store branch locations & helpline
@@ -97,8 +97,8 @@ public class CustomerActivity extends AppCompatActivity {
         // 4. Setup User Header & Profile
         setupUserProfile();
 
-        // 5. Setup Navigation Tabs
-        setupDashboardTabs();
+        // 5. Setup Bottom Navigation
+        setupBottomNavigation();
 
         // 6. Setup Form & Repair List
         setupBookingForm();
@@ -144,35 +144,35 @@ public class CustomerActivity extends AppCompatActivity {
     }
 
     /**
-     * Setup dashboard top tabs (My Repairs, Book Repair, Profile & Branches).
+     * Setup bottom navigation bar (My Repairs, Book Repair, Profile).
      */
-    private void setupDashboardTabs() {
-        binding.dashboardTabs.addTab(binding.dashboardTabs.newTab().setText("My Repairs"));
-        binding.dashboardTabs.addTab(binding.dashboardTabs.newTab().setText("Book Repair"));
-        binding.dashboardTabs.addTab(binding.dashboardTabs.newTab().setText("Profile & Branches"));
+    private void setupBottomNavigation() {
+        binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_repairs);
 
-        binding.dashboardTabs.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                showPanel(tab.getPosition());
+        binding.customerBottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+
+            if (itemId == R.id.nav_customer_repairs) {
+                showPanel(0);
+                return true;
+            } else if (itemId == R.id.nav_customer_book) {
+                showPanel(1);
+                return true;
+            } else if (itemId == R.id.nav_customer_profile) {
+                showPanel(2);
+                return true;
             }
 
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {}
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {}
+            return false;
         });
 
         // Quick book buttons
         binding.quickBookButton.setOnClickListener(v -> {
-            TabLayout.Tab bookTab = binding.dashboardTabs.getTabAt(1);
-            if (bookTab != null) bookTab.select();
+            binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_book);
         });
 
         binding.emptyBookButton.setOnClickListener(v -> {
-            TabLayout.Tab bookTab = binding.dashboardTabs.getTabAt(1);
-            if (bookTab != null) bookTab.select();
+            binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_book);
         });
 
         // Pay pending repairs button
@@ -320,9 +320,8 @@ public class CustomerActivity extends AppCompatActivity {
                     binding.customerPhotoPreviewContainer.setVisibility(View.GONE);
                     binding.customerPhotoStatus.setText("No photo attached");
 
-                    // Switch to My Repairs tab
-                    TabLayout.Tab repairsTab = binding.dashboardTabs.getTabAt(0);
-                    if (repairsTab != null) repairsTab.select();
+                    // Switch to My Repairs bottom nav item
+                    binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_repairs);
                 })
                 .show();
     }
