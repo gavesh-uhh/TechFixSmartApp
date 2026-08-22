@@ -54,11 +54,24 @@
                         android:textSize="11sp" />
 
                     <TextView
+                        android:id="@+id/serviceBranchBadge"
+                        style="@style/Widget.TechFix.Stamp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_field"
+                        android:paddingHorizontal="8dp"
+                        android:paddingVertical="2dp"
+                        android:text="Colombo branch"
+                        android:textColor="@color/navy_700"
+                        android:textSize="11sp" />
+
+                    <TextView
                         android:id="@+id/serviceRequiredPart"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="â€¢ Requires: Phone display"
+                        android:text="• Requires: Phone display"
                         android:textColor="@color/muted_text"
                         android:textSize="12sp" />
                 </LinearLayout>

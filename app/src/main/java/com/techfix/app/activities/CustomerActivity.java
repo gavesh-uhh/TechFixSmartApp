@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
@@ -327,17 +328,30 @@ public class CustomerActivity extends AppCompatActivity {
             serviceOptions.add("Operating system repair · Rs 6500");
         }
         ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
+        serviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.serviceSpinner.setAdapter(serviceAdapter);
 
         // 2. Device Category Dropdown
         String[] deviceCategories = {"Mobile phone", "Laptop / computer", "Tablet", "Other smart device"};
         ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, deviceCategories);
+        deviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.deviceSpinner.setAdapter(deviceAdapter);
 
-        // 3. Branch Dropdown
+        // 3. Branch Dropdown & Dynamic Service Loading
         String[] branches = {"Colombo branch", "Galle branch"};
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
+        branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.branchSpinner.setAdapter(branchAdapter);
+
+        updateCustomerBookingServicesForBranch(branches[0]);
+
+        binding.branchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                updateCustomerBookingServicesForBranch(branches[position]);
+            }
+            @Override public void onNothingSelected(AdapterView<?> parent) {}
+        });
 
         // 4. Attach Photo Button
         binding.cameraButton.setOnClickListener(v -> showPhotoOptionsDialog());
@@ -354,6 +368,16 @@ public class CustomerActivity extends AppCompatActivity {
 
         // 6. Submit Booking Button
         binding.bookButton.setOnClickListener(v -> submitBooking());
+    }
+
+    private void updateCustomerBookingServicesForBranch(String branch) {
+        List<String> serviceOptions = serviceDAO.allByBranch(branch);
+        if (serviceOptions.isEmpty()) {
+            serviceOptions = serviceDAO.all();
+        }
+        ArrayAdapter<String> serviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, serviceOptions);
+        serviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.serviceSpinner.setAdapter(serviceAdapter);
     }
 
     /**

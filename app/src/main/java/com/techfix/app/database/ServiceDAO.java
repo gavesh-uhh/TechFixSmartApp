@@ -12,27 +12,58 @@ public class ServiceDAO {
     public ServiceDAO(DatabaseHelper helper) { this.helper = helper; }
 
     public List<Service> list() {
+        return listByBranch("All Branches");
+    }
+
+    public List<Service> listByBranch(String branch) {
         List<Service> out = new ArrayList<>();
-        Cursor c = helper.getReadableDatabase().rawQuery(
-                "SELECT id, name, category, price, requiredPart FROM services ORDER BY category, name", null);
+        String sql;
+        String[] args;
+
+        if (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) {
+            sql = "SELECT id, name, category, price, requiredPart, branch FROM services WHERE branch=? OR branch='All Branches' ORDER BY category, name";
+            args = new String[]{branch};
+        } else {
+            sql = "SELECT id, name, category, price, requiredPart, branch FROM services ORDER BY branch, category, name";
+            args = null;
+        }
+
+        Cursor c = helper.getReadableDatabase().rawQuery(sql, args);
         while (c.moveToNext()) {
-            out.add(new Service(c.getLong(0), c.getString(1), c.getString(2), c.getDouble(3), c.getString(4)));
+            out.add(new Service(c.getLong(0), c.getString(1), c.getString(2), c.getDouble(3), c.getString(4), c.getString(5)));
         }
         c.close();
         return out;
     }
 
     public List<String> search(String query) {
+        return searchByBranch(query, "All Branches");
+    }
+
+    public List<String> searchByBranch(String query, String branch) {
         List<String> out = new ArrayList<>();
-        Cursor c = helper.getReadableDatabase().rawQuery(
-                "SELECT name||' · Rs '||price FROM services WHERE name LIKE ? OR category LIKE ?",
-                new String[]{"%" + query + "%", "%" + query + "%"});
+        String sql;
+        String[] args;
+
+        if (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) {
+            sql = "SELECT name||' · Rs '||price FROM services WHERE (name LIKE ? OR category LIKE ?) AND (branch=? OR branch='All Branches') ORDER BY name";
+            args = new String[]{"%" + query + "%", "%" + query + "%", branch};
+        } else {
+            sql = "SELECT name||' · Rs '||price FROM services WHERE name LIKE ? OR category LIKE ? ORDER BY name";
+            args = new String[]{"%" + query + "%", "%" + query + "%"};
+        }
+
+        Cursor c = helper.getReadableDatabase().rawQuery(sql, args);
         while (c.moveToNext()) out.add(c.getString(0));
         c.close();
         return out;
     }
 
-    public List<String> all() { return search(""); }
+    public List<String> all() { return allByBranch("All Branches"); }
+
+    public List<String> allByBranch(String branch) {
+        return searchByBranch("", branch);
+    }
 
     public String serviceName(String item) { return item.split(" · Rs ")[0]; }
 
@@ -50,23 +81,33 @@ public class ServiceDAO {
         helper.getWritableDatabase().update("services", v, "name=?", new String[]{service});
     }
 
-    public void upsert(String name, String category, double price, String requiredPart) {
-        ContentValues v = new ContentValues(); v.put("name", name); v.put("category", category); v.put("price", price); v.put("requiredPart", requiredPart);
+    public void upsert(String name, String category, double price, String requiredPart, String branch) {
+        ContentValues v = new ContentValues();
+        v.put("name", name);
+        v.put("category", category);
+        v.put("price", price);
+        v.put("requiredPart", requiredPart);
+        v.put("branch", (branch != null && !branch.trim().isEmpty()) ? branch.trim() : "Colombo branch");
         long id = helper.getWritableDatabase().insertWithOnConflict("services", null, v, android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE);
         if (id < 0) helper.getWritableDatabase().update("services", v, "name=?", new String[]{name});
     }
 
     public boolean add(String name, String category, double price) {
-        return add(name, category, price, "");
+        return add(name, category, price, "", "All Branches");
     }
 
     public boolean add(String name, String category, double price, String requiredPart) {
+        return add(name, category, price, requiredPart, "All Branches");
+    }
+
+    public boolean add(String name, String category, double price, String requiredPart, String branch) {
         if (name == null || name.trim().isEmpty() || price <= 0) return false;
         ContentValues v = new ContentValues();
         v.put("name", name.trim());
         v.put("category", (category != null && !category.trim().isEmpty()) ? category.trim() : "Mobile phone");
         v.put("price", price);
         v.put("requiredPart", requiredPart != null ? requiredPart.trim() : "");
+        v.put("branch", (branch != null && !branch.trim().isEmpty()) ? branch.trim() : "All Branches");
         return helper.getWritableDatabase().insertWithOnConflict("services", null, v, android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE) > 0;
     }
 

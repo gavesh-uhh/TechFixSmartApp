@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Outer Rounded Box -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/techfix_mist" />
+            <corners android:radius="14dp" />
+            <stroke android:width="1dp" android:color="@color/techfix_sky" />
+        </shape>
+    </item>
+    <!-- Dropdown Chevron Arrow on right -->
+    <item
+        android:drawable="@drawable/ic_arrow_drop_down"
+        android:gravity="end|center_vertical"
+        android:width="20dp"
+        android:height="20dp"
+        android:right="12dp" />
+</layer-list>

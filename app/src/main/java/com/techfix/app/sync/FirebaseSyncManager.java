@@ -221,7 +221,7 @@ public class FirebaseSyncManager {
         cp.close();
 
         // Push Services
-        Cursor cs = db.rawQuery("SELECT id, name, category, price, requiredPart FROM services", null);
+        Cursor cs = db.rawQuery("SELECT id, name, category, price, requiredPart, branch FROM services", null);
         while (cs.moveToNext()) {
             long id = cs.getLong(0);
             Map<String, Object> map = new HashMap<>();
@@ -230,6 +230,7 @@ public class FirebaseSyncManager {
             map.put("category", cs.getString(2));
             map.put("price", cs.getDouble(3));
             map.put("requiredPart", cs.getString(4));
+            map.put("branch", cs.getString(5));
             firestore.collection("services").document("srv_" + id).set(map, SetOptions.merge());
         }
         cs.close();
@@ -340,6 +341,7 @@ public class FirebaseSyncManager {
                 v.put("category", doc.getString("category") != null ? doc.getString("category") : "Mobile phone");
                 v.put("price", doc.getDouble("price") != null ? doc.getDouble("price") : 0.0);
                 v.put("requiredPart", doc.getString("requiredPart") != null ? doc.getString("requiredPart") : "");
+                v.put("branch", doc.getString("branch") != null ? doc.getString("branch") : "All Branches");
                 db.insertWithOnConflict("services", null, v, SQLiteDatabase.CONFLICT_REPLACE);
             }
         } catch (Exception e) {
