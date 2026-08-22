@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/nav_customer_repairs"
+        android:id="@+id/nav_customer_store"
         android:icon="@drawable/ic_nav_store"
+        android:title="Store" />
+    <item
+        android:id="@+id/nav_customer_repairs"
+        android:icon="@drawable/ic_nav_queue"
         android:title="My Repairs" />
     <item
         android:id="@+id/nav_customer_book"

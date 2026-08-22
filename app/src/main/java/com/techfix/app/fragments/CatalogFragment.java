@@ -87,23 +87,20 @@ public class CatalogFragment extends Fragment {
     private String selectedCatalogBranch = "All Branches";
 
     private void setupServices() {
-        String[] branchFilters = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).namesArrayWithAll();
+        String[] branchFilters = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).filterNamesArray();
         ArrayAdapter<String> filterAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchFilters);
         filterAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.catalogBranchSpinner.setAdapter(filterAdapter);
         binding.catalogBranchSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedCatalogBranch = branchFilters[position];
+                selectedCatalogBranch = com.techfix.app.database.BranchDAO.toDbName(branchFilters[position]);
                 refresh();
             }
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        String[] branchNames = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).namesArray();
-        String[] branchOptions = new String[branchNames.length + 1];
-        System.arraycopy(branchNames, 0, branchOptions, 0, branchNames.length);
-        branchOptions[branchNames.length] = "All Branches";
+        String[] branchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).filterNamesArray();
         ArrayAdapter<String> newServiceBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, branchOptions);
         newServiceBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.newServiceBranchSpinner.setAdapter(newServiceBranchAdapter);
@@ -117,9 +114,9 @@ public class CatalogFragment extends Fragment {
             @Override
             public void onDelete(Service service) {
                 new AlertDialog.Builder(requireContext())
-                        .setTitle("Remove Service?")
-                        .setMessage("Remove \"" + service.name + "\" (" + service.branch + ") from service catalog?")
-                        .setPositiveButton("Remove", (dialog, which) -> {
+                        .setTitle("Delete " + service.name + "?")
+                        .setMessage("Remove this repair service from the customer store catalog?")
+                        .setPositiveButton("Delete", (dialog, which) -> {
                             serviceDAO.delete(service.id);
                             FirebaseSyncManager.getInstance().sync(requireContext(), null);
                             refresh();
@@ -138,7 +135,7 @@ public class CatalogFragment extends Fragment {
             String category = binding.newServiceCategory.getText().toString().trim();
             String part = binding.newServiceRequiredPart.getText().toString().trim();
             String priceStr = binding.newServicePrice.getText().toString().trim();
-            String branch = (String) binding.newServiceBranchSpinner.getSelectedItem();
+            String branch = com.techfix.app.database.BranchDAO.toDbName((String) binding.newServiceBranchSpinner.getSelectedItem());
 
             if (name.isEmpty()) {
                 binding.newServiceName.setError("Enter service name");

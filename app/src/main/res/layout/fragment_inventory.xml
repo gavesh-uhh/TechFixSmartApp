@@ -1,112 +1,178 @@
 <?xml version="1.0" encoding="utf-8"?>
-        <ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/tabInventory"
+    android:id="@+id/tabInventory"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cloud"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="@dimen/screen_padding"
+        android:paddingVertical="@dimen/space_16">
+
+        <!-- Inventory Header Card -->
+        <com.google.android.material.card.MaterialCardView
+            style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:fillViewport="true">
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/screen_padding">
+                android:padding="18dp">
 
-                <!-- Inventory Header: Branch Filter & Add Part Button -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
+                    <FrameLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/bg_kpi_icon_purple">
+
+                        <ImageView
+                            android:layout_width="22dp"
+                            android:layout_height="22dp"
+                            android:layout_gravity="center"
+                            android:contentDescription="@null"
+                            android:src="@drawable/ic_nav_inventory"
+                            app:tint="@color/primary" />
+                    </FrameLayout>
+
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
                         android:layout_weight="1"
-                        android:gravity="center_vertical"
-                        android:orientation="horizontal">
-
-                        <ImageView
-                            android:layout_width="18dp"
-                            android:layout_height="18dp"
-                            android:contentDescription="@null"
-                            android:src="@drawable/ic_nav_location"
-                            app:tint="@color/muted_text" />
+                        android:orientation="vertical">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="4dp"
-                            android:text="Branch:"
-                            android:textColor="@color/muted_text"
-                            android:textSize="12sp"
+                            android:text="Parts &amp; Inventory"
+                            android:textColor="@color/ink"
+                            android:textSize="18sp"
                             android:textStyle="bold" />
 
-                        <Spinner
-                            android:id="@+id/inventoryBranchSpinner"
-                            style="@style/Widget.TechFix.Spinner"
-                            android:layout_width="0dp"
-                            android:layout_height="44dp"
-                            android:layout_marginStart="@dimen/space_8"
-                            android:layout_weight="1" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:text="Live workshop spare components"
+                            android:textColor="@color/muted_text"
+                            android:textSize="12sp" />
                     </LinearLayout>
 
                     <Button
                         android:id="@+id/btnAddPartButton"
                         style="@style/Widget.TechFix.Button.Filled"
                         android:layout_width="wrap_content"
-                        android:layout_height="44dp"
-                        android:layout_marginStart="@dimen/space_12"
+                        android:layout_height="42dp"
+                        android:insetTop="0dp"
+                        android:insetBottom="0dp"
                         android:minWidth="0dp"
                         android:paddingHorizontal="14dp"
                         android:text="+ Add Part"
                         android:textSize="13sp" />
                 </LinearLayout>
 
-                <!-- Inventory Items Section -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/space_16"
-                    android:layout_marginBottom="6dp"
-                    android:text="Spare Parts Stock"
-                    style="@style/Widget.TechFix.SectionTitle" />
-
-                <!-- Empty Parts Container -->
+                <!-- Branch Filter Row -->
                 <LinearLayout
-                    android:id="@+id/emptyPartsContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:orientation="vertical"
-                    android:padding="@dimen/space_24" android:visibility="gone">
+                    android:layout_marginTop="16dp"
+                    android:background="@drawable/bg_field"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="4dp">
 
                     <ImageView
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
+                        android:layout_width="18dp"
+                        android:layout_height="18dp"
                         android:contentDescription="@null"
-                        android:src="@drawable/ic_nav_inventory"
-                        app:tint="@color/muted_text" />
+                        android:src="@drawable/ic_nav_location"
+                        app:tint="@color/primary" />
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/space_8"
-                        android:text="No spare parts registered yet"
-                        android:textColor="@color/navy_900"
-                        android:textSize="16sp"
+                        android:layout_marginStart="6dp"
+                        android:text="Branch Filter:"
+                        android:textColor="@color/ink"
+                        android:textSize="13sp"
                         android:textStyle="bold" />
+
+                    <Spinner
+                        android:id="@+id/inventoryBranchSpinner"
+                        style="@style/Widget.TechFix.Spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_marginStart="8dp"
+                        android:layout_weight="1" />
                 </LinearLayout>
-
-                <!-- Parts RecyclerView -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/partsList"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:clipToPadding="false"
-                    android:paddingBottom="@dimen/space_8"
-                    android:nestedScrollingEnabled="false" />
-
             </LinearLayout>
-        </ScrollView>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Inventory Items Title -->
+        <TextView
+            style="@style/Widget.TechFix.SectionTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="12dp"
+            android:text="Registered Components" />
+
+        <!-- Empty Parts Container -->
+        <LinearLayout
+            android:id="@+id/emptyPartsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_nav_inventory"
+                app:tint="@color/muted_text" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="No spare parts registered yet"
+                android:textColor="@color/ink"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Tap '+ Add Part' above to record stock items."
+                android:textColor="@color/muted_text"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Parts RecyclerView -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/partsList"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clipToPadding="false"
+            android:nestedScrollingEnabled="false"
+            android:paddingBottom="24dp" />
+
+    </LinearLayout>
+</ScrollView>

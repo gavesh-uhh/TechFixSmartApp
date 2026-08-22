@@ -56,11 +56,11 @@ public class StaffAppointmentAdapter extends RecyclerView.Adapter<StaffAppointme
         if (AppointmentStatus.COMPLETED.label.equalsIgnoreCase(a.status)) {
             holder.stamp.setTextColor(holder.itemView.getContext().getColor(R.color.success));
         } else if (AppointmentStatus.READY_FOR_COLLECTION.label.equalsIgnoreCase(a.status)) {
-            holder.stamp.setTextColor(holder.itemView.getContext().getColor(R.color.techfix_blue_dark));
+            holder.stamp.setTextColor(holder.itemView.getContext().getColor(R.color.primary));
         } else if (AppointmentStatus.REPAIRING.label.equalsIgnoreCase(a.status) || AppointmentStatus.DIAGNOSING.label.equalsIgnoreCase(a.status)) {
             holder.stamp.setTextColor(holder.itemView.getContext().getColor(R.color.warning));
         } else {
-            holder.stamp.setTextColor(holder.itemView.getContext().getColor(R.color.navy_700));
+            holder.stamp.setTextColor(holder.itemView.getContext().getColor(R.color.ink));
         }
 
         holder.itemView.setOnClickListener(v -> listener.onClick(a));

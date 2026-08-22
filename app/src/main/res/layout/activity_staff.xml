@@ -15,9 +15,9 @@
         android:background="@color/white"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="@dimen/space_16"
-        android:paddingTop="16dp"
-        android:paddingBottom="12dp">
+        android:paddingHorizontal="20dp"
+        android:paddingTop="18dp"
+        android:paddingBottom="14dp">
 
         <LinearLayout
             android:layout_width="0dp"
@@ -28,9 +28,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="TechFix Admin"
-                android:textColor="@color/navy_900"
-                android:textSize="20sp"
+                android:text="Admin"
+                android:textColor="@color/ink"
+                android:textSize="22sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
-                android:text="staff@techfix.lk Â· Workshop Control Center"
+                android:text="staff@techfix.lk • Workshop Control Center"
                 android:textColor="@color/muted_text"
                 android:textSize="12sp" />
         </LinearLayout>
@@ -46,29 +46,37 @@
         <!-- Customer Store Mode Button -->
         <Button
             android:id="@+id/staffHomeStoreButton"
-            style="@style/Widget.Material3.Button.TextButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="38dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:minWidth="0dp"
-            android:minHeight="@dimen/touch_target"
+            android:paddingHorizontal="12dp"
             android:text="Store"
-            android:textColor="@color/techfix_blue"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textColor="@color/primary"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/primary_container"
+            app:cornerRadius="12dp" />
 
         <!-- Log Out Button -->
         <Button
             android:id="@+id/staffLogoutButton"
-            style="@style/Widget.Material3.Button.TextButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
+            android:layout_height="38dp"
+            android:layout_marginStart="8dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:minWidth="0dp"
-            android:minHeight="@dimen/touch_target"
+            android:paddingHorizontal="12dp"
             android:text="Log Out"
             android:textColor="@color/error"
-            android:textSize="14sp"
-            android:textStyle="bold" />
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/error_container"
+            app:cornerRadius="12dp" />
     </LinearLayout>
 
     <!-- Divider Line -->
@@ -91,8 +99,9 @@
         android:layout_height="wrap_content"
         android:background="@color/white"
         app:elevation="8dp"
-        app:itemIconTint="@color/techfix_blue"
-        app:itemTextColor="@color/navy_900"
+        app:itemIconTint="@color/nav_item_color"
+        app:itemTextColor="@color/nav_item_color"
+        app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_nav_staff" />
 
 </LinearLayout>
