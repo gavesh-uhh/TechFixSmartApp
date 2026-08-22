@@ -67,7 +67,9 @@ public class LoginActivity extends AppCompatActivity {
         // 4. Inflate layout
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        WindowInsetsHelper.apply(binding.loginContent, binding.loginContent);
+        // Single listener pads top by statusBars/cutout and bottom by navigationBars + ime(),
+        // so the scroll content clears system bars and rises above the keyboard (adjustResize).
+        WindowInsetsHelper.applyScrollContent(binding.loginContent);
 
         // 5. Setup click listeners
         binding.loginButton.setOnClickListener(this::submitAuthForm);

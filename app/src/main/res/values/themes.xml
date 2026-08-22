@@ -34,6 +34,7 @@
     </style>
 
     <style name="Widget.TechFix.TextInput" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:textSize">16sp</item>
         <item name="boxCornerRadiusTopStart">16dp</item><item name="boxCornerRadiusTopEnd">16dp</item><item name="boxCornerRadiusBottomStart">16dp</item><item name="boxCornerRadiusBottomEnd">16dp</item><item name="boxStrokeColor">@color/primary</item><item name="errorTextColor">@color/error</item><item name="hintTextColor">@color/techfix_muted</item>
     </style>
 
@@ -52,13 +53,7 @@
     <style name="TextAppearance.TechFix.Label" parent="TextAppearance.Material3.LabelLarge"><item name="android:fontFamily">@font/plex_sans</item></style>
     <style name="TextAppearance.TechFix.Mono" parent="TextAppearance.Material3.BodyMedium"><item name="android:fontFamily">@font/plex_mono</item><item name="android:textColor">@color/navy_700</item><item name="android:textSize">12sp</item></style>
 
-    <!-- Status stamp: uppercase, letterspaced, tinted -->
-    <style name="Widget.TechFix.Stamp" parent="Widget.TechFix.StatusChip">
-        <item name="android:textSize">11sp</item>
-        <item name="android:letterSpacing">0.08</item>
-        <item name="android:textStyle">bold</item>
-        <item name="android:textAllCaps">true</item>
-    </style>
+    <!-- Status stamp: uppercase, letterspaced, tinted — delegates to StatusChip (single source) -->
 
     <!-- Modern soft shadow card (E1): 3dp elevation, 16dp radius, hairline stroke -->
     <style name="Widget.TechFix.ShadowCard" parent="Widget.Material3.CardView.Elevated">
@@ -107,7 +102,8 @@
         <item name="android:textStyle">bold</item>
     </style>
 
-    <!-- Small pill showing appointment/payment state -->
+    <!-- Single visual language for status pills: uppercase, letterspaced pill.
+         StatusChip is the base look; Stamp is an alias so both names render identically. -->
     <style name="Widget.TechFix.StatusChip" parent="">
         <item name="android:background">@drawable/bg_field</item>
         <item name="android:paddingLeft">10dp</item>
@@ -115,8 +111,13 @@
         <item name="android:paddingTop">3dp</item>
         <item name="android:paddingBottom">3dp</item>
         <item name="android:textColor">@color/techfix_blue_dark</item>
-        <item name="android:textSize">12sp</item>
+        <item name="android:textSize">11sp</item>
+        <item name="android:letterSpacing">0.08</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textAllCaps">true</item>
     </style>
+
+    <style name="Widget.TechFix.Stamp" parent="Widget.TechFix.StatusChip" />
 
     <!-- Vertical padding wrapper for scrollable body content -->
     <style name="Widget.TechFix.ScreenBody" parent="">

@@ -15,8 +15,8 @@
         android:orientation="horizontal"
         android:gravity="center_vertical"
         android:paddingHorizontal="@dimen/space_16"
-        android:paddingTop="16dp"
-        android:paddingBottom="12dp"
+        android:paddingTop="@dimen/space_16"
+        android:paddingBottom="@dimen/space_12"
         android:background="@color/white">
 
         <LinearLayout
@@ -51,21 +51,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:minWidth="0dp"
+            android:minHeight="@dimen/touch_target"
             android:text="Store"
             android:textColor="@color/techfix_blue"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold" />
-
-        <!-- Log Out Button -->
-        <Button
-            android:id="@+id/logoutButton"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:text="Log out"
-            android:textColor="@color/error"
-            android:textSize="13sp" />
     </LinearLayout>
 
     <!-- Divider Line -->
@@ -115,12 +105,12 @@
                     android:gravity="center"
                     android:padding="@dimen/space_24"
                     android:visibility="gone">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="📱"
-                        android:textSize="48sp" />
+<ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@drawable/ic_nav_book"
+                        app:tint="@color/muted_text"
+                        android:contentDescription="@null" />
 
                     <TextView
                         android:id="@+id/emptyText"
@@ -138,7 +128,7 @@
                         android:layout_marginTop="@dimen/space_4"
                         android:text="Book an appointment to get your phone or computer repaired."
                         android:textColor="@color/muted_text"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:gravity="center" />
 
                     <Button
@@ -237,13 +227,22 @@
                             android:text="Select your repair service and provide device information."
                             android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="@dimen/space_8"
+                            android:text="Step 1 Â· Device &amp; Service"
+                            android:textColor="@color/techfix_blue"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
                         <!-- 1. Service Type -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Service Type"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -260,7 +259,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Device Type"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -277,7 +276,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Device Model / Brand"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -290,6 +289,38 @@
                             android:inputType="text"
                             android:maxLines="1" />
 
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- STEP 2 CARD: Details & Photo -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Step 2 Â· Details &amp; Photo"
+                            android:textColor="@color/techfix_blue"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="@dimen/space_8"
+                            android:text="Describe the issue and attach a photo if possible."
+                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
                         <!-- 4. Problem Description -->
                         <TextView
                             android:layout_width="wrap_content"
@@ -297,7 +328,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Problem Description"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -318,7 +349,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Device Photo"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <LinearLayout
@@ -339,7 +370,7 @@
                                 android:id="@+id/customerPhotoStatus"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="12dp"
+                                android:layout_marginStart="@dimen/space_12"
                                 android:text="No photo attached"
                                 android:textColor="@color/muted_text"
                                 android:textSize="12sp" />
@@ -367,9 +398,41 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top|end"
-                                android:text="✕ Remove"
+                                android:text="âœ• Remove"
                                 android:textColor="@color/error" />
                         </FrameLayout>
+
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- STEP 3 CARD: Branch & Confirm -->
+                <com.google.android.material.card.MaterialCardView
+                    style="@style/Widget.TechFix.ShadowCard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/space_12">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="@dimen/card_padding">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Step 3 Â· Branch &amp; Confirm"
+                            android:textColor="@color/techfix_blue"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="2dp"
+                            android:layout_marginBottom="@dimen/space_8"
+                            android:text="Choose a branch and submit your appointment."
+                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                         <!-- 6. Preferred Branch -->
                         <TextView
@@ -378,7 +441,7 @@
                             android:layout_marginTop="@dimen/space_12"
                             android:text="Preferred Branch"
                             android:textColor="@color/navy_900"
-                            android:textSize="13sp"
+                            android:textSize="12sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -452,7 +515,7 @@
                             android:layout_marginTop="2dp"
                             android:text="email@example.com"
                             android:textColor="@color/muted_text"
-                            android:textSize="13sp" />
+                            android:textSize="12sp" />
 
                         <TextView
                             android:id="@+id/profilePhoneText"
@@ -461,7 +524,7 @@
                             android:layout_marginTop="2dp"
                             android:text="Phone: Not provided"
                             android:textColor="@color/muted_text"
-                            android:textSize="13sp" />
+                            android:textSize="12sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -523,13 +586,13 @@
                             android:layout_height="wrap_content"
                             android:text="Need Help?"
                             android:textColor="@color/navy_900"
-                            android:textSize="15sp"
+                            android:textSize="16sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
+                            android:layout_marginTop="@dimen/space_4"
                             android:text="Call our helpline: 011 234 5678\nEmail support: support@techfix.lk\nOpen Daily: 9:00 AM - 7:00 PM"
                             android:textColor="@color/muted_text"
                             android:textSize="12sp" />

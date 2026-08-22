@@ -61,7 +61,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:textColor="@color/muted_text"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
         <!-- Technician, Branch & Price Meta -->
         <TextView
@@ -71,17 +71,6 @@
             android:layout_marginTop="8dp"
             android:textColor="@color/techfix_blue_dark"
             android:textSize="12sp"
-            android:textStyle="bold" />
-
-        <!-- Tap indicator / Action hint -->
-        <TextView
-            android:id="@+id/docketActionHint"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:text="Tap to update stage or assign technician →"
-            android:textColor="@color/techfix_blue"
-            android:textSize="11sp"
             android:textStyle="bold" />
 
         <FrameLayout

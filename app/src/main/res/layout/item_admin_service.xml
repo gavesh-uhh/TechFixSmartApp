@@ -51,14 +51,14 @@
                         android:paddingVertical="2dp"
                         android:text="Mobile phone"
                         android:textColor="@color/techfix_blue"
-                        android:textSize="10sp" />
+                        android:textSize="11sp" />
 
                     <TextView
                         android:id="@+id/serviceRequiredPart"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="8dp"
-                        android:text="• Requires: Phone display"
+                        android:text="â€¢ Requires: Phone display"
                         android:textColor="@color/muted_text"
                         android:textSize="12sp" />
                 </LinearLayout>
@@ -71,7 +71,7 @@
                 android:layout_height="wrap_content"
                 android:text="Rs 8,500"
                 android:textColor="@color/navy_900"
-                android:textSize="17sp" />
+                android:textSize="16sp" />
         </LinearLayout>
 
         <!-- Divider Line -->
@@ -96,7 +96,11 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:paddingHorizontal="14dp"
-                android:text="✏️ Edit Price"
+                android:text="Edit Price"
+                app:icon="@drawable/ic_edit"
+                app:iconGravity="textStart"
+                app:iconSize="14dp"
+                app:iconTint="@color/navy_700" />
                 android:textColor="@color/navy_700"
                 android:textSize="12sp"
                 app:cornerRadius="8dp" />

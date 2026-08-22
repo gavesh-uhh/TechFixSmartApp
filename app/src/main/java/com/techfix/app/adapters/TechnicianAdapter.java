@@ -53,20 +53,20 @@ public class TechnicianAdapter extends RecyclerView.Adapter<TechnicianAdapter.Ho
         Technician tech = items.get(position);
 
         holder.techName.setText(tech.name);
-        holder.techDetails.setText("📍 " + tech.branch + " · 🛠️ " + tech.skill);
+        holder.techDetails.setText(tech.branch + " · " + tech.skill);
 
         if (tech.available) {
-            holder.techStatusBadge.setText("🟢 ON DUTY");
+            holder.techStatusBadge.setText("ON DUTY");
             holder.techStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.success));
             holder.btnToggleDuty.setText("Set Off-Duty / Busy");
         } else {
-            holder.techStatusBadge.setText("🔴 BUSY / OFF-DUTY");
+            holder.techStatusBadge.setText("BUSY / OFF-DUTY");
             holder.techStatusBadge.setTextColor(holder.itemView.getContext().getColor(R.color.error));
             holder.btnToggleDuty.setText("Set Available");
         }
 
         int activeJobs = (countProvider != null) ? countProvider.getCount(tech.name) : 0;
-        holder.techActiveJobs.setText("⚡ " + activeJobs + (activeJobs == 1 ? " Active Job" : " Active Jobs"));
+        holder.techActiveJobs.setText(activeJobs + (activeJobs == 1 ? " Active Job" : " Active Jobs"));
 
         holder.btnToggleDuty.setOnClickListener(v -> {
             if (listener != null) listener.onToggleDuty(tech);

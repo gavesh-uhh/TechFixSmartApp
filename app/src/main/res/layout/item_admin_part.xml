@@ -39,7 +39,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
-                    android:text="📍 Colombo branch"
+                    android:text="Colombo branch"
                     android:textColor="@color/muted_text"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -87,9 +87,9 @@
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
                 android:padding="0dp"
-                android:text="−1"
+                android:text="âˆ’1"
                 android:textColor="@color/navy_700"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 app:cornerRadius="8dp" />
 
             <!-- Plus 1 Button -->
@@ -104,7 +104,7 @@
                 android:padding="0dp"
                 android:text="+1"
                 android:textColor="@color/navy_700"
-                android:textSize="13sp"
+                android:textSize="14sp"
                 app:cornerRadius="8dp" />
 
             <!-- Plus 5 Restock Button -->

@@ -1,0 +1,258 @@
+package com.techfix.app.fragments;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+
+import com.google.android.material.snackbar.Snackbar;
+import com.techfix.app.R;
+import com.techfix.app.activities.AppointmentDetailActivity;
+import com.techfix.app.adapters.StaffAppointmentAdapter;
+import com.techfix.app.database.AppointmentDAO;
+import com.techfix.app.database.DatabaseHelper;
+import com.techfix.app.database.TechnicianDAO;
+import com.techfix.app.databinding.FragmentQueueBinding;
+import com.techfix.app.models.Appointment;
+import com.techfix.app.models.AppointmentStatus;
+import com.techfix.app.util.WindowInsetsHelper;
+
+import java.util.List;
+
+/**
+ * TAB 2: Repair Queue & Docket Master (status chips, real-time search, workflow updates).
+ */
+public class QueueFragment extends Fragment {
+
+    private FragmentQueueBinding binding;
+    private AppointmentDAO appointmentDAO;
+    private TechnicianDAO technicianDAO;
+    private StaffAppointmentAdapter queueAdapter;
+    private String branchFilter = "All Branches";
+    private String statusFilter = "All";
+
+    private StaffTabHost host() {
+        return (StaffTabHost) requireActivity();
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+        binding = FragmentQueueBinding.inflate(inflater, container, false);
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        DatabaseHelper dbHelper = DatabaseHelper.getInstance(requireContext());
+        appointmentDAO = new AppointmentDAO(dbHelper);
+        technicianDAO = new TechnicianDAO(dbHelper);
+        branchFilter = host().getSelectedBranch();
+
+        // Bottom inset so content clears the gesture nav bar / keyboard
+        WindowInsetsHelper.applyBottomInset(binding.tabQueue);
+
+        binding.statusSpinner.setAdapter(new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, AppointmentStatus.labels()));
+
+        queueAdapter = new StaffAppointmentAdapter(this::showDocketActionMenu);
+        binding.appointmentList.setLayoutManager(new LinearLayoutManager(requireContext()));
+        binding.appointmentList.setAdapter(queueAdapter);
+
+        // Real-time search listener
+        binding.searchQueueInput.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                refresh();
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
+        setupFilterChips();
+
+        // Quick status update by ID
+        binding.updateStatusButton.setOnClickListener(this::updateStatusById);
+
+        refresh();
+    }
+
+    private void setupFilterChips() {
+        binding.chipFilterAll.setOnClickListener(v -> setFilter("All", binding.chipFilterAll));
+        binding.chipFilterActive.setOnClickListener(v -> setFilter("Active", binding.chipFilterActive));
+        binding.chipFilterReceived.setOnClickListener(v -> setFilter(AppointmentStatus.REQUEST_RECEIVED.label, binding.chipFilterReceived));
+        binding.chipFilterRepairing.setOnClickListener(v -> setFilter(AppointmentStatus.REPAIRING.label, binding.chipFilterRepairing));
+        binding.chipFilterReady.setOnClickListener(v -> setFilter(AppointmentStatus.READY_FOR_COLLECTION.label, binding.chipFilterReady));
+        binding.chipFilterCompleted.setOnClickListener(v -> setFilter(AppointmentStatus.COMPLETED.label, binding.chipFilterCompleted));
+        binding.chipFilterUnpaid.setOnClickListener(v -> setFilter("Unpaid", binding.chipFilterUnpaid));
+    }
+
+    private void refresh() {
+        String searchQuery = binding.searchQueueInput.getText().toString();
+        List<Appointment> filtered = appointmentDAO.filter(branchFilter, statusFilter, searchQuery);
+
+        queueAdapter.submit(filtered);
+        binding.appointmentList.setVisibility(filtered.isEmpty() ? View.GONE : View.VISIBLE);
+        binding.emptyQueueContainer.setVisibility(filtered.isEmpty() ? View.VISIBLE : View.GONE);
+
+        int activeCount = appointmentDAO.countActive(branchFilter);
+        int completedCount = appointmentDAO.countCompleted(branchFilter);
+        int totalCount = appointmentDAO.countAll(branchFilter);
+
+        binding.queueStatsTitle.setText(totalCount + (totalCount == 1 ? " Repair Docket" : " Repair Dockets"));
+        binding.queueStatsSubtitle.setText(activeCount + " Active Repairs · " + completedCount + " Completed");
+    }
+
+    private void setFilter(String status, View activeChip) {
+        statusFilter = status;
+
+        resetChipStyle(binding.chipFilterAll);
+        resetChipStyle(binding.chipFilterActive);
+        resetChipStyle(binding.chipFilterReceived);
+        resetChipStyle(binding.chipFilterRepairing);
+        resetChipStyle(binding.chipFilterReady);
+        resetChipStyle(binding.chipFilterCompleted);
+        resetChipStyle(binding.chipFilterUnpaid);
+
+        if (activeChip instanceof android.widget.Button) {
+            ((android.widget.Button) activeChip).setBackgroundColor(requireContext().getColor(R.color.navy_700));
+            ((android.widget.Button) activeChip).setTextColor(requireContext().getColor(R.color.white));
+        }
+
+        refresh();
+    }
+
+    private void resetChipStyle(android.widget.Button btn) {
+        btn.setBackgroundColor(requireContext().getColor(R.color.surface));
+        btn.setTextColor(requireContext().getColor(R.color.navy_700));
+    }
+
+    private void showDocketActionMenu(Appointment a) {
+        String[] actions = {
+                "Change Workflow Stage (" + a.status + ")",
+                "Re-assign Technician (" + a.technician + ")",
+                "Record Payment (Rs " + (long) a.price + ")",
+                "View Full Docket & Timeline",
+                "Delete Docket"
+        };
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Docket #" + a.id + " · " + a.device)
+                .setItems(actions, (dialog, which) -> {
+                    if (which == 0) {
+                        showStatusPicker(a);
+                    } else if (which == 1) {
+                        showTechnicianPicker(a);
+                    } else if (which == 2) {
+                        showPaymentMethodPicker(a);
+                    } else if (which == 3) {
+                        Intent intent = new Intent(requireContext(), AppointmentDetailActivity.class);
+                        intent.putExtra("appointmentId", a.id);
+                        startActivity(intent);
+                    } else if (which == 4) {
+                        showDeleteConfirmation(a);
+                    }
+                })
+                .setNegativeButton("Close", null)
+                .show();
+    }
+
+    private void showStatusPicker(Appointment a) {
+        String[] labels = AppointmentStatus.labels();
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Update Status · #" + a.id)
+                .setItems(labels, (dialog, which) -> {
+                    String newStatus = labels[which];
+                    appointmentDAO.updateStatus(a.id, newStatus);
+                    refresh();
+                    Snackbar.make(binding.getRoot(), "Docket #" + a.id + " updated to " + newStatus, Snackbar.LENGTH_LONG).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void showTechnicianPicker(Appointment a) {
+        List<com.techfix.app.models.Technician> techList = technicianDAO.all();
+        String[] techNames = new String[techList.size()];
+        for (int i = 0; i < techList.size(); i++) {
+            techNames[i] = techList.get(i).name + " (" + techList.get(i).branch + ")";
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Assign Technician · #" + a.id)
+                .setItems(techNames, (dialog, which) -> {
+                    String chosenTech = techList.get(which).name;
+                    appointmentDAO.updateTechnician(a.id, chosenTech);
+                    refresh();
+                    Snackbar.make(binding.getRoot(), "Assigned to " + chosenTech, Snackbar.LENGTH_LONG).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void showPaymentMethodPicker(Appointment a) {
+        String[] methods = {"Cash at counter", "Card", "Bank transfer"};
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Record Payment · Rs " + (long) a.price)
+                .setItems(methods, (dialog, which) -> {
+                    boolean ok = appointmentDAO.pay(a.id, a.price, methods[which]);
+                    refresh();
+                    if (ok) {
+                        Snackbar.make(binding.getRoot(), "Payment recorded (" + methods[which] + ")", Snackbar.LENGTH_LONG).show();
+                    } else {
+                        Snackbar.make(binding.getRoot(), "Already paid", Snackbar.LENGTH_SHORT).show();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void showDeleteConfirmation(Appointment a) {
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Delete Docket #" + a.id + "?")
+                .setMessage("Are you sure you want to remove this repair docket permanently?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    appointmentDAO.delete(a.id);
+                    refresh();
+                    Snackbar.make(binding.getRoot(), "Docket #" + a.id + " deleted", Snackbar.LENGTH_LONG).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void updateStatusById(View v) {
+        String idStr = binding.appointmentIdInput.getText().toString().trim();
+        if (idStr.isEmpty()) {
+            binding.appointmentIdInput.setError("Please enter a docket ID");
+            return;
+        }
+
+        try {
+            long id = Long.parseLong(idStr);
+            String status = (String) binding.statusSpinner.getSelectedItem();
+            appointmentDAO.updateStatus(id, status);
+            binding.appointmentIdInput.setText("");
+            refresh();
+            Snackbar.make(v, "Docket #" + id + " updated to " + status, Snackbar.LENGTH_LONG).show();
+        } catch (Exception e) {
+            binding.appointmentIdInput.setError("Invalid docket ID");
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
+    }
+}
