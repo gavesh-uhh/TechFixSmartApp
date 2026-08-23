@@ -4,7 +4,7 @@
     style="@style/Widget.TechFix.ShadowCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
+    android:layout_marginTop="6dp"
     android:layout_marginBottom="6dp">
 
     <LinearLayout
@@ -24,6 +24,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@color/ink"
                 android:textSize="17sp"
                 android:textStyle="bold" />
@@ -34,14 +36,19 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_card_pill"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@color/primary" />
         </LinearLayout>
 
         <TextView
             android:id="@+id/branchCoords"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
+            android:autoLink="phone"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:lineSpacingExtra="2dp"
             android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
@@ -51,6 +58,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="14dp"
-            android:text="🗺️ Open in Google Maps" />
+            android:text="Open in Google Maps"
+            app:icon="@drawable/ic_nav_location"
+            app:iconGravity="textStart" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

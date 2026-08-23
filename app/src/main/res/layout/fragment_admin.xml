@@ -59,16 +59,18 @@
                             android:layout_height="wrap_content"
                             android:text="TechFix Admin Staff"
                             android:textColor="@color/ink"
-                            android:textSize="18sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="2dp"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:text="staff@techfix.lk"
                             android:textColor="@color/muted_text"
-                            android:textSize="13sp" />
+                            android:textSize="12sp" />
                     </LinearLayout>
                 </LinearLayout>
 
@@ -95,17 +97,17 @@
                         android:layout_marginStart="8dp"
                         android:text="Head Workshop Administrator"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
                 </LinearLayout>
 
                 <Button
                     android:id="@+id/staffProfileLogoutButton"
-                    style="@style/Widget.TechFix.Secondary"
+                    style="@style/Widget.TechFix.Button.Secondary"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Log Out of Staff Workspace"
+                    android:text="Log Out"
                     android:textColor="@color/error"
                     app:strokeColor="@color/error" />
             </LinearLayout>
@@ -126,9 +128,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:hint="Search customer by name, email, or phone..."
-            android:inputType="text"
-            android:maxLines="1" />
+            android:maxLines="1"
+            android:hint="Search Name, Email, or Phone…"
+            android:inputType="text" />
 
         <!-- Empty Customers Container -->
         <LinearLayout
@@ -153,7 +155,7 @@
                 android:layout_marginTop="12dp"
                 android:text="No customers registered yet"
                 android:textColor="@color/ink"
-                android:textSize="15sp"
+                android:textSize="16sp"
                 android:textStyle="bold" />
         </LinearLayout>
 
@@ -209,13 +211,13 @@
 
                 <TextView
                     android:id="@+id/dbDiagnosticsText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:lineSpacingExtra="4dp"
-                    android:text="• Primary Branches: Colombo &amp; Galle Workshops\n• Cloud Sync: Connected &amp; active\n• Total Records: Loading summary..."
+                    android:layout_marginTop="6dp"
+                    android:lineSpacingExtra="3dp"
+                    android:text="• Primary Branches: Colombo, Galle\n• SQLite DB: v6 active (techfix.db)\n• Cloud Sync: Firebase Auth &amp; Firestore enabled"
                     android:textColor="@color/muted_text"
-                    android:textSize="13sp" />
+                    android:textSize="14sp" />
 
                 <Button
                     android:id="@+id/btnSyncFirebaseNow"
@@ -223,7 +225,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Sync Now" />
+                    android:text="Sync Firebase Now" />
 
                 <Button
                     android:id="@+id/btnReseedDemoData"

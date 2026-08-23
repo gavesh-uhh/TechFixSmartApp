@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>TechFix Smart App — CW1 Report</title>
+<style>
+body { font-family: Calibri, sans-serif; font-size: 11pt; line-height: 1.4; }
+h1 { font-size: 20pt; }
+h2 { font-size: 15pt; color: #1F3864; border-bottom: 1px solid #B4C6E7; padding-bottom: 3px; margin-top: 22px; text-transform: uppercase; letter-spacing: 0.5px; }
+h3 { font-size: 12.5pt; color: #2E5395; margin-bottom: 5px; }
+table { border-collapse: collapse; width: 100%; margin: 8px 0 14px 0; font-size: 10pt; }
+th, td { border: 1px solid #8EAADB; padding: 5px 8px; vertical-align: top; text-align: left; }
+th { background: #D9E2F3; }
+code, pre { font-family: Consolas, monospace; font-size: 9.5pt; background: #F2F2F2; }
+pre { padding: 8px; }
+.cover { text-align: center; margin-top: 90px; }
+.meta { margin-top: 50px; }
+li { margin-bottom: 4px; }
+.pagebreak { page-break-before: always; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+<h1>Higher National Diploma in Software Engineering<br>Mobile Application Development — CW1</h1>
+<h2 style="border:none; color:#1C122C; text-transform:none; letter-spacing:0;">TechFix Smart App</h2>
+<p style="font-size:13pt;"><b>An Offline-First Android Application for Computer &amp; Mobile Phone Repair Service Management</b></p>
+<div class="meta">
+<p><b>National Institute of Business Management — School of Computing and Engineering</b><br>
+Batch 25.2 &nbsp;|&nbsp; Group Coursework (CW1) &nbsp;|&nbsp; Assessment: Report &amp; Viva</p>
+<p><b>GitHub Repository:</b> https://github.com/gavesh-uhh/TechFixSmartApp</p>
+</div>
+</div>
+
+<h2 class="pagebreak">Abstract</h2>
+<p>TechFix is a newly established computer and mobile phone repair shop operating two branches in Sri Lanka, in Colombo and Galle. Because the business was recently founded, it lacked a technological platform to manage repair requests, branch operations, and customer communication. This project delivers <b>TechFix Smart App</b>, a native Android application that allows customers to register, browse repair services and spare parts, book repair appointments with photo evidence, track repair progress in real time, settle payments, and review their complete repair history — while staff manage appointments, technicians, spare-part inventory, service pricing, device showcases, payments, and customer accounts through a dedicated administrative workspace.</p>
+<p>The application is built in <b>Java</b> with Material Design 3 components and follows an <b>offline-first architecture</b>: all data is persisted locally in a nine-table SQLite database accessed through hand-written DAO classes and a Content Provider, and synchronised bidirectionally with <b>Google Firebase Firestore</b> whenever connectivity is available. Advanced Android features integrated include <b>GPS location services</b> (nearest-branch detection using FusedLocationProviderClient and the Haversine formula), <b>camera and image integration</b> (device photos attached to bookings and staff-published repair showcases), <b>complex data models with RecyclerView adapters</b> (ListAdapter with DiffUtil), and simulated payment processing. The result is a robust, user-friendly dual-role application in which every functional objective of the brief is implemented and verified.</p>
+
+<h2>Introduction</h2>
+<h3>Business Context</h3>
+<p>TechFix has rapidly become one of the popular repair service providers in Sri Lanka, yet its operations still rely on manual processes: walk-in dockets, paper-based part inventories, and no central record of customer repair history. As demand grows across its Colombo and Galle branches, this creates missed appointments, stock-outs of critical spare parts, unclear repair-status communication, and no mechanism for customers to discover services remotely.</p>
+<h3>Objectives</h3>
+<ul>
+<li>Maintain information about TechFix branches (Colombo and Galle), including locations and contact details.</li>
+<li>Enable management of repair services, device categories, repair prices, spare-part availability, technicians, and sample images of repaired devices — and display this information to customers.</li>
+<li>Allow customers to create accounts, log in, search available repair services, submit repair request appointments, and track repair status.</li>
+<li>Assign repair requests to the nearest branch where technicians and required spare parts are available, supporting repair handling and payment processing.</li>
+<li>Allow customers to view their previous repair history.</li>
+<li>Additional objectives defined by the team: offline-first operation with cloud synchronisation, GPS-assisted branch selection, photo-based fault reporting, published repair showcases for customer trust, and an executive KPI dashboard for staff.</li>
+</ul>
+<h3>Scope of this Report</h3>
+<p>This report documents the requirement analysis, system design, development approach, advanced Android technologies used, results achieved, and a critical discussion of design decisions and limitations.</p>
+
+<h2>Development</h2>
+<h3>Technology Stack</h3>
+<table>
+<tr><th>Layer</th><th>Technology</th></tr>
+<tr><td>Language / Platform</td><td>Java (100%), Android SDK 37 (minSdk 24), single-module Gradle project</td></tr>
+<tr><td>UI</td><td>Material Design 3, XML layouts with runtime ViewBinding, RecyclerView, BottomNavigationView, custom design-token system (typography ramp, 52dp controls, 20dp-radius cards)</td></tr>
+<tr><td>Persistence</td><td>SQLite (SQLiteOpenHelper v6) — 9 relational tables, 8 DAO classes; <b>ContentProvider</b> (authority <i>com.techfix.app.providers</i>) exposing appointments CRUD</td></tr>
+<tr><td>Cloud</td><td>Firebase Authentication (email/password, password reset) + Cloud Firestore bidirectional sync engine</td></tr>
+<tr><td>Location</td><td>Google Play Services FusedLocationProviderClient; Haversine distance calculation; implicit <code>geo:</code> intents into Google Maps</td></tr>
+<tr><td>Camera / Media</td><td>ActivityResultContracts.TakePicture with FileProvider URI sharing; OpenDocument gallery picker with persistable URI permissions; sampled Bitmap decoding</td></tr>
+</table>
+
+<h3>Architecture</h3>
+<p>The codebase is organised into clearly separated packages: <code>activities</code> (six screen hosts), <code>fragments</code> (five staff management tabs), <code>adapters</code> (eight RecyclerView adapters), <code>database</code> (SQLiteOpenHelper + DAOs + ContentProvider), <code>models</code> (twelve related entity classes), <code>session</code> (role-aware session manager), <code>sync</code> (FirebaseSyncManager singleton), and <code>util</code> (network monitoring, window-inset handling, analytics, nearest-branch calculator).</p>
+<p>The application follows an <b>offline-first, repository-mediated design</b>: every user action writes first to SQLite; UI screens observe the local database; and a connectivity-aware synchronisation service mirrors changes to the cloud when online. This guarantees the app remains fully functional during network outages — essential for workshop environments with unreliable Wi-Fi.</p>
+
+<h3>Database Design</h3>
+<table>
+<tr><th>Table</th><th>Purpose</th><th>Key Relationships</th></tr>
+<tr><td>branches</td><td>Colombo &amp; Galle branches with latitude/longitude</td><td>Referenced by services, parts, technicians, appointments</td></tr>
+<tr><td>services</td><td>Repair services with category, price (LKR), required part — branch-scoped</td><td>branch → branches; requiredPart → parts</td></tr>
+<tr><td>parts</td><td>Spare-part stock counts per branch</td><td>branch → branches; consumed by appointments</td></tr>
+<tr><td>technicians</td><td>Name, branch, skill ("Mobile phone" / "Laptop / computer"), duty availability</td><td>branch → branches</td></tr>
+<tr><td>users</td><td>Customer/staff accounts, SHA-256 hashed passwords, roles</td><td>appointments.user_id → users.id</td></tr>
+<tr><td>appointments</td><td>Dockets: device, problem, branch, status, price, technician, payment state, photo URI, timestamps</td><td>user_id, branch, technician</td></tr>
+<tr><td>status_history</td><td>Audit trail of each docket stage change with notes/timestamps</td><td>appointment_id → appointments.id</td></tr>
+<tr><td>payments</td><td>Amounts, method (cash/card/bank transfer), paid-at timestamps</td><td>appointment_id → appointments.id</td></tr>
+<tr><td>samples</td><td>Staff-published repair showcase images shown to customers</td><td>Displayed via SampleImageAdapter carousel</td></tr>
+</table>
+
+<h3>Functional Modules</h3>
+<p><b>Customer journey.</b> A guest lands on a public storefront showing the hero banner, five round category quick-filters (All, Phones, PC/Mac, Screens, Battery), the priced service catalogue, live spare-parts stock, and a horizontal showcase carousel of repaired devices. Registration/login supports both local SHA-256 credential verification and Firebase Authentication. The three-step booking form captures service, device category and model, problem description, optional camera/gallery photo, and preferred branch — validated against live spare-part stock at the chosen branch before submission, after which a technician with matching skill is auto-assigned. Customers track each docket through a live status timeline (Request Received → Repairing → Ready for Collection → Completed), pay outstanding invoices (cash at counter / card / bank-transfer simulation), and browse their complete Active/Completed repair history with filter chips.</p>
+<p><b>Staff workspace.</b> Five tabs: Overview (executive KPIs — active jobs, collected vs pending revenue, low-stock alerts, technicians on duty — plus walk-in docket creation and quick actions), Queue (searchable/sortable docket list with seven filter chips and one-tap stage updates), Inventory (part CRUD with ±stock adjusters and low-stock alerts), Catalog (service pricing CRUD per branch, technician roster with duty toggles and active-job load, showcase photo publishing), and Admin (customer directory with search, database diagnostics, forced cloud re-sync).</p>
+<p><b>Smart assignment.</b> Booking validates the required part is in stock at the selected branch and auto-assigns an available technician whose skill matches the device category (<code>TechnicianDAO.availableFor()</code>). GPS assistance uses FusedLocationProviderClient plus the Haversine formula to suggest and pre-select the nearest of the two branches; branch coordinates seed the database so the logic works fully offline.</p>
+<p><b>Cloud sync engine.</b> FirebaseSyncManager is a connectivity-aware singleton: it registers a ConnectivityManager NetworkCallback that triggers automatic push/pull whenever connectivity is restored, syncs immediately at startup when online, fires after every write operation, guards against concurrent runs, and notifies registered screens to refresh from local data once complete. Nine Firestore collections mirror the SQLite schema. An admin "Sync Now" control provides manual override.</p>
+
+<h3>Deliverables Coverage</h3>
+<table>
+<tr><th>Deliverable</th><th>Status</th><th>Evidence in Codebase</th></tr>
+<tr><td>Locations / Map GPS</td><td>✔ Implemented</td><td>FusedLocationProviderClient + location permissions; Haversine nearest-branch pre-selection in both booking flows; <code>geo:</code> intents opening each branch in Google Maps from Branch cards</td></tr>
+<tr><td>Complex Data Model &amp; Adapters</td><td>✔ Implemented</td><td>12 interrelated model classes; 8 RecyclerView adapters including ListAdapter&lt;Appointment&gt; with custom DiffUtil.ItemCallback; multi-panel dashboards driven by typed binders</td></tr>
+<tr><td>Camera &amp; Image Integrations</td><td>✔ Implemented</td><td>TakePicture contract + FileProvider for booking photos and staff showcase capture; OpenDocument gallery picker with persistable permission; down-sampled bitmap decoding for memory safety</td></tr>
+<tr><td>SQLite, Content Providers &amp; Offline Application</td><td>✔ Implemented</td><td>SQLiteOpenHelper v6 with migration ladder and seeding; 8 DAO classes; registered ContentProvider over appointments; full offline-first operation with cloud catch-up</td></tr>
+<tr><td>Web Services &amp; Remote Data</td><td>— Removed by group decision</td><td>Excluded from scope per team agreement; Firebase Auth/Firestore retained purely as an additional value-adding feature (not claimed as a core deliverable)</td></tr>
+</table>
+
+<h2>Results</h2>
+<h3>Feature Completeness Against Objectives</h3>
+<table>
+<tr><th>Objective</th><th>Status</th></tr>
+<tr><td>Branch information maintained and displayed</td><td>✔ Both branches seeded with coordinates, addresses, phone numbers (tappable), opening hours; dedicated Branches panel and profile-tab branch cards with map buttons</td></tr>
+<tr><td>Management of services, categories, prices, parts, technicians, showcase images — displayed to customers</td><td>✔ Full CRUD in staff Catalog/Inventory tabs; category filters, search, pricing, stock badges, and horizontal showcase carousel rendered on customer storefront</td></tr>
+<tr><td>Customer accounts, login, search, appointment submission, status tracking</td><td>✔ Dual-backend authentication with password strength meter and reset flow; keyword search + category chips; validated booking with photo; four-stage timeline tracking</td></tr>
+<tr><td>Nearest-branch assignment with technician/part availability; repair handling &amp; payment</td><td>✔ GPS nearest-branch suggestion; stock reservation and skill-matched technician auto-assignment; queue handling with stage updates; payment recording with revenue reporting</td></tr>
+<tr><td>Previous repair history</td><td>✔ My Repairs tab with All/Active/Completed filters linking to detailed docket timelines</td></tr>
+<tr><td>Additional objectives</td><td>✔ Offline-first sync engine; executive KPI dashboard; repair showcases; walk-in counter mode for unregistered customers</td></tr>
+</table>
+
+<h3>Verification Summary</h3>
+<p>All primary flows were manually verified end-to-end on device/emulator: registration → login → browse/filter/search → book (with photo) → stock decrement and technician assignment → staff stage updates → payment recording → history review; staff-side inventory/catalog CRUD reflected instantly on the customer storefront; airplane-mode testing confirmed uninterrupted local operation with automatic cloud catch-up on reconnect; content-provider CRUD verified against the appointments URI.</p>
+
+<h3>Application Metrics</h3>
+<ul>
+<li>~30 XML layouts, six activities/five fragments/eight adapters, 43 Git commits</li>
+<li>9-table relational schema with migration ladder (v1→v6)</li>
+<li>Zero known crash paths in primary flows; input validation with inline errors throughout</li>
+<li>Demo credentials — Customer: any registered account · Staff: staff@techfix.lk / techfix123</li>
+</ul>
+
+<h2>Discussion</h2>
+<h3>Key Design Decisions</h3>
+<p><b>Offline-first persistence.</b> Workshops cannot rely on constant connectivity, so SQLite is the single source of truth and the cloud is a replica. This inverted the usual mobile pattern but eliminated every loading-failure state from the UX; the cost is a custom bidirectional merge in FirebaseSyncManager rather than relying on an online-only API.</p>
+<p><b>Dual authentication backends.</b> Local hashed credentials guarantee login works offline, while Firebase Auth adds industry-standard reset emails and prepares the app for future server-side features. Session state is role-aware, routing staff and customers to separate workspaces.</p>
+<p><b>Constraint-driven data entry.</b> Technician branch/skill and service categories are Spinner-bound to canonical values rather than free text, eliminating silent typos that previously could break skill-matched auto-assignment — a bug class discovered during internal testing.</p>
+<p><b>Honest UI.</b> Fabricated social-proof elements (hardcoded star ratings, blanket "Genuine OEM" claims) were deliberately removed in favour of verifiable information: real stock counts, warranty policy, tappable contact numbers, and authentic staff-published repair showcases.</p>
+<h3>Limitations and Future Work</h3>
+<ul>
+<li>Payments are simulated (ledger recording only); integrating PayHere/Stripe LKR checkout is the highest-value next step.</li>
+<li>Branch selection suggests the nearest branch but final assignment honours the user's confirmed choice; a fully automatic routing mode using combined technician-and-stock availability queries is planned.</li>
+<li>Date/time-slot selection for appointments (schema-ready <code>time_slot</code> column) is not yet exposed in the UI.</li>
+<li>An embedded Google Maps SDK view would further enrich the branch page versus current external-map intents.</li>
+</ul>
+<h3>Challenges Encountered</h3>
+<p>Notable challenges included designing a conflict-safe two-way sync without a backend, keeping memory usage safe when displaying camera-captured bitmaps (solved via bounds-checked sampling), maintaining a consistent design language across 25+ screens (solved with shared style tokens and audits), and ensuring edge-to-edge insets behaved correctly across nested scroll containers.</p>
+
+<h2>References</h2>
+<ol>
+<li>Android Developers, "App architecture guide," developer.android.com, 2025. [Online]. Available: https://developer.android.com/topic/architecture</li>
+<li>Android Developers, "Save data in a local database using SQLite," developer.android.com, 2025.</li>
+<li>Android Developers, "Create a content provider," developer.android.com, 2025.</li>
+<li>Android Developers, "Location and context APIs (FusedLocationProviderClient)," developers.google.com, 2025.</li>
+<li>Google Firebase, "Cloud Firestore documentation," firebase.google.com, 2025.</li>
+<li>Google Firebase, "Firebase Authentication for Android," firebase.google.com, 2025.</li>
+<li>Material Design, "Material Design 3 for Android," m3.material.io, 2025.</li>
+<li>Android Developers, "Activity Result APIs and photo capture," developer.android.com, 2025.</li>
+<li>R. W. Sinnott, "Virtues of the Haversine," <i>Sky and Telescope</i>, vol. 68, no. 2, p. 159, 1984.</li>
+</ol>
+
+<h2>Acknowledgements</h2>
+<p>We thank our Mobile Application Development lecturer at the National Institute of Business Management for continuous guidance throughout this coursework, and our peers for usability feedback during in-class evaluations. We also acknowledge the open-source Android and Firebase communities whose documentation made advanced feature integration accessible.</p>
+
+<h2>Appendices</h2>
+<h3>Appendix A — Screen Inventory</h3>
+<table>
+<tr><th>Screen</th><th>Purpose</th></tr>
+<tr><td>SplashActivity</td><td>Branded splash; role-aware routing to Login/Customer/Staff</td></tr>
+<tr><td>LoginActivity</td><td>Sign in / sign up, password strength meter, forgot password (Firebase reset)</td></tr>
+<tr><td>HomeActivity (guest)</td><td>Storefront, parts catalog, booking form, branches panel with maps, account tab</td></tr>
+<tr><td>CustomerActivity</td><td>Store, My Repairs (history + payment card), 3-step booking, profile/branches/help</td></tr>
+<tr><td>StaffActivity + 5 fragments</td><td>Overview KPIs, Repair Queue, Parts Inventory, Services Catalog &amp; Technicians &amp; Showcases, Admin directory &amp; diagnostics</td></tr>
+<tr><td>AppointmentDetailActivity</td><td>Docket overview, live progress timeline, settle &amp; pay action</td></tr>
+</table>
+<h3>Appendix B — Running the Project</h3>
+<pre>1. Clone: git clone https://github.com/gavesh-uhh/TechFixSmartApp.git
+2. Open in Android Studio (JDK 11+, SDK 37).
+3. Run configuration "app" on API 24+ device/emulator.
+4. Seeded staff login: staff@techfix.lk / techfix123 (customers self-register).</pre>
+<h3>Appendix C — Build Configuration</h3>
+<pre>compileSdk 37 / minSdk 24 / targetSdk 37 · Java 11 toolchain
+Dependencies: Material Components 1.14, AppCompat 1.8, ConstraintLayout,
+RecyclerView 1.3.2, Play Services Location 21.3.0, Firebase BoM 33.10
+(Auth + Analytics + Firestore)</pre>
+
+<h2 class="pagebreak">GitHub Repository</h2>
+<p>The complete source code, commit history (43 commits), and build configuration are publicly available at:</p>
+<p style="font-size:13pt;"><b>https://github.com/gavesh-uhh/TechFixSmartApp</b></p>
+
+</body>
+</html>

@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:text="Repair Docket Tracker"
             android:textColor="@color/white"
-            android:textSize="19sp"
+            android:textSize="20sp"
             android:textStyle="bold" />
 
         <Space
@@ -74,6 +74,8 @@
                         <TextView
                             android:id="@+id/detailTitle"
                             android:layout_width="0dp"
+                            android:maxLines="2"
+                            android:ellipsize="end"
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:textColor="@color/ink"
@@ -85,8 +87,7 @@
                             style="@style/Widget.TechFix.Stamp"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="@dimen/space_8"
-                            android:background="@drawable/bg_field" />
+                            android:layout_marginStart="@dimen/space_8" />
                     </LinearLayout>
 
                     <!-- Problem Description -->
@@ -95,7 +96,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="12dp"
-                        android:lineSpacingExtra="3dp"
+                        android:lineSpacingExtra="2dp"
                         android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                     <!-- Divider Line -->
@@ -160,6 +161,8 @@
             style="@style/Widget.TechFix.Button.Filled"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="💳 Settle &amp; Pay for this Repair" />
+            android:text="Settle &amp; Pay for this Repair"
+            app:icon="@drawable/ic_money"
+            app:iconGravity="textStart" />
     </LinearLayout>
 </LinearLayout>
