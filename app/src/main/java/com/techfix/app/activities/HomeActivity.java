@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -202,6 +203,7 @@ public class HomeActivity extends AppCompatActivity {
         showStorePanel();
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
         selectCategory(currentCategory != null ? currentCategory : "ALL");
+        updateNavAccountItem();
     }
 
     @Override
@@ -212,6 +214,7 @@ public class HomeActivity extends AppCompatActivity {
         showStorePanel();
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
         selectCategory("ALL");
+        updateNavAccountItem();
     }
 
     /**
@@ -285,10 +288,31 @@ public class HomeActivity extends AppCompatActivity {
                         Toast.makeText(HomeActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
                         showStorePanel();
                         binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+                        updateNavAccountItem();
                     }
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
+    }
+
+    private void updateNavAccountItem() {
+        if (binding == null || binding.bottomNavigation == null) return;
+        MenuItem accountItem = binding.bottomNavigation.getMenu().findItem(R.id.nav_home_account);
+        if (accountItem != null) {
+            SessionManager currentSession = new SessionManager(this);
+            if (currentSession.isLoggedIn()) {
+                if (currentSession.getRole() == UserRole.STAFF) {
+                    accountItem.setTitle("Admin Dash");
+                    accountItem.setIcon(R.drawable.ic_nav_dashboard);
+                } else {
+                    accountItem.setTitle("Account");
+                    accountItem.setIcon(R.drawable.ic_nav_account);
+                }
+            } else {
+                accountItem.setTitle("Sign In");
+                accountItem.setIcon(R.drawable.ic_nav_account);
+            }
+        }
     }
 
     /**
