@@ -128,14 +128,19 @@ public class CustomerActivity extends AppCompatActivity {
 
     private void onPhotoReady(Uri uri) {
         selectedPhotoUri = uri;
-        binding.customerPhotoPreview.setImageURI(uri);
-        binding.customerPhotoPreviewContainer.setVisibility(View.VISIBLE);
-        binding.customerPhotoStatus.setText("Photo attached");
-        binding.customerPhotoStatus.setTextColor(ContextCompat.getColor(this, R.color.success));
+        try {
+            binding.customerPhotoPreview.setImageURI(null);
+            binding.customerPhotoPreview.setImageURI(uri);
+            binding.customerPhotoPreviewContainer.setVisibility(View.VISIBLE);
+            binding.customerPhotoStatus.setText("Photo attached");
+            binding.customerPhotoStatus.setTextColor(ContextCompat.getColor(this, R.color.success));
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to load image preview: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showPhotoOptionsDialog() {
-        CharSequence[] options = {"Take Photo with Camera", "Choose from Gallery"};
+        CharSequence[] options = {"📷 Take Photo with Camera", "🖼️ Choose from Gallery / Files"};
         new AlertDialog.Builder(this)
                 .setTitle("Attach Device Photo")
                 .setItems(options, (dialog, which) -> {
@@ -159,18 +164,30 @@ public class CustomerActivity extends AppCompatActivity {
 
     private void launchCamera() {
         try {
-            File cacheDir = new File(getCacheDir(), "images");
-            if (!cacheDir.exists()) {
-                cacheDir.mkdirs();
+            File storageDir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
+            if (storageDir == null) {
+                storageDir = new File(getCacheDir(), "images");
             }
-            File photoFile = new File(cacheDir, "device_photo_" + System.currentTimeMillis() + ".jpg");
-            if (!photoFile.exists()) {
-                photoFile.createNewFile();
+            if (!storageDir.exists()) {
+                storageDir.mkdirs();
             }
+            File photoFile = File.createTempFile("device_" + System.currentTimeMillis(), ".jpg", storageDir);
             tempCameraUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
+
+            Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, tempCameraUri);
+            takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+            List<android.content.pm.ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(takePictureIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (android.content.pm.ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                grantUriPermission(packageName, tempCameraUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
             takePictureLauncher.launch(tempCameraUri);
         } catch (Exception e) {
-            Toast.makeText(this, "Failed to open camera: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Camera unavailable (" + e.getMessage() + "). Opening gallery instead...", Toast.LENGTH_SHORT).show();
+            photoPickerLauncher.launch("image/*");
         }
     }
 
@@ -692,9 +709,9 @@ public class CustomerActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // Setup Attach Photo Button & Drop Zone (Direct Camera Permission & Launch)
-        binding.cameraButton.setOnClickListener(v -> checkCameraPermissionAndLaunch());
-        binding.customerPhotoDropZone.setOnClickListener(v -> checkCameraPermissionAndLaunch());
+        // Setup Attach Photo Button & Drop Zone
+        binding.cameraButton.setOnClickListener(v -> showPhotoOptionsDialog());
+        binding.customerPhotoDropZone.setOnClickListener(v -> showPhotoOptionsDialog());
 
         binding.customerRemovePhotoButton.setOnClickListener(v -> {
             selectedPhotoUri = null;
