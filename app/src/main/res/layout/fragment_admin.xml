@@ -113,61 +113,7 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Customer Accounts Directory Section -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            android:text="Registered Customer Directory"
-            style="@style/Widget.TechFix.SectionTitle" />
 
-        <!-- Customer Search Input -->
-        <EditText
-            android:id="@+id/searchCustomersInput"
-            style="@style/Widget.TechFix.Input"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:maxLines="1"
-            android:hint="Search Name, Email, or Phone…"
-            android:inputType="text" />
-
-        <!-- Empty Customers Container -->
-        <LinearLayout
-            android:id="@+id/emptyCustomersContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="vertical"
-            android:padding="24dp"
-            android:visibility="gone">
-
-            <ImageView
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_nav_account"
-                app:tint="@color/muted_text" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:text="No customers registered yet"
-                android:textColor="@color/ink"
-                android:textSize="16sp"
-                android:textStyle="bold" />
-        </LinearLayout>
-
-        <!-- Customers RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/customersList"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:clipToPadding="false"
-            android:nestedScrollingEnabled="false"
-            android:paddingBottom="8dp" />
 
         <!-- System & Data Sync Card -->
         <com.google.android.material.card.MaterialCardView
