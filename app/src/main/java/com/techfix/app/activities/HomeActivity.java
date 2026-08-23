@@ -464,9 +464,9 @@ public class HomeActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // 4. Setup Attach Photo Button & Drop Zone
-        binding.bookingPhotoButton.setOnClickListener(v -> showPhotoOptionsDialog());
-        binding.bookingPhotoDropZone.setOnClickListener(v -> showPhotoOptionsDialog());
+        // 4. Setup Attach Photo Button & Drop Zone (Direct Camera Permission & Launch)
+        binding.bookingPhotoButton.setOnClickListener(v -> checkCameraPermissionAndLaunch());
+        binding.bookingPhotoDropZone.setOnClickListener(v -> checkCameraPermissionAndLaunch());
 
         // 5. Setup Remove Photo Button
         binding.removePhotoButton.setOnClickListener(v -> {
