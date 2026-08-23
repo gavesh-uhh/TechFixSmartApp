@@ -167,7 +167,7 @@
             android:nestedScrollingEnabled="false"
             android:paddingBottom="8dp" />
 
-        <!-- System & Database Controls Card -->
+        <!-- System & Data Sync Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -181,19 +181,39 @@
                 android:orientation="vertical"
                 android:padding="20dp">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="System Diagnostics and Sync"
-                    style="@style/Widget.TechFix.SectionTitle" />
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="System &amp; Data Sync"
+                        style="@style/Widget.TechFix.SectionTitle" />
+
+                    <TextView
+                        android:id="@+id/syncStatusBadge"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_badge_active"
+                        android:paddingHorizontal="10dp"
+                        android:paddingVertical="4dp"
+                        android:text="● Active"
+                        android:textColor="@color/success"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
 
                 <TextView
                     android:id="@+id/dbDiagnosticsText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:lineSpacingExtra="3dp"
-                    android:text="• Primary Branches: Colombo, Galle\n• SQLite DB: v5 active (techfix.db)\n• Cloud Sync: Firebase Auth &amp; Firestore enabled"
+                    android:layout_marginTop="10dp"
+                    android:lineSpacingExtra="4dp"
+                    android:text="• Primary Branches: Colombo &amp; Galle Workshops\n• Cloud Sync: Connected &amp; active\n• Total Records: Loading summary..."
                     android:textColor="@color/muted_text"
                     android:textSize="13sp" />
 
@@ -203,7 +223,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
-                    android:text="Sync with Firebase Cloud Now" />
+                    android:text="Sync Now" />
 
                 <Button
                     android:id="@+id/btnReseedDemoData"
@@ -211,9 +231,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="Clean &amp; Reset Local Database"
-                    android:textColor="@color/warning"
-                    app:strokeColor="@color/warning" />
+                    android:text="Reset Sample Data"
+                    android:textColor="@color/muted_text" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

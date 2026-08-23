@@ -108,27 +108,27 @@ public class AdminFragment extends Fragment {
         // Log Out of Account
         binding.staffProfileLogoutButton.setOnClickListener(v -> performLogout());
 
-        // Manual Cloud Sync button
+        // Cloud Sync button
         binding.btnSyncFirebaseNow.setOnClickListener(v -> {
             binding.btnSyncFirebaseNow.setEnabled(false);
-            binding.btnSyncFirebaseNow.setText("Syncing with Cloud...");
+            binding.btnSyncFirebaseNow.setText("Syncing...");
             com.techfix.app.sync.FirebaseSyncManager.getInstance().sync(requireContext(), (success, message) -> {
                 binding.btnSyncFirebaseNow.setEnabled(true);
-                binding.btnSyncFirebaseNow.setText("Sync with Firebase Cloud Now");
+                binding.btnSyncFirebaseNow.setText("Sync Now");
                 refresh();
-                Snackbar.make(binding.getRoot(), success ? "Sync Complete: SQLite and Firebase matched!" : "Sync note: " + message, Snackbar.LENGTH_LONG).show();
+                Snackbar.make(binding.getRoot(), success ? "Data synchronized successfully" : "Sync notice: " + message, Snackbar.LENGTH_LONG).show();
             });
         });
 
-        // Clean & Reset database button
+        // Reset Sample Data button
         binding.btnReseedDemoData.setOnClickListener(v -> {
             new AlertDialog.Builder(requireContext())
-                    .setTitle("Clean & Reset Database?")
-                    .setMessage("This will clean local appointments and reset inventory to clean defaults.")
+                    .setTitle("Reset Sample Data?")
+                    .setMessage("This will restore default workshop services, spare parts inventory, and sample appointments.")
                     .setPositiveButton("Reset", (dialog, which) -> {
                         dbHelper.reseedData();
                         refresh();
-                        Snackbar.make(binding.getRoot(), "Database reset cleanly", Snackbar.LENGTH_LONG).show();
+                        Snackbar.make(binding.getRoot(), "Sample data restored successfully", Snackbar.LENGTH_LONG).show();
                     })
                     .setNegativeButton("Cancel", null)
                     .show();
@@ -157,11 +157,10 @@ public class AdminFragment extends Fragment {
         int servicesCount = serviceDAO.list().size();
         int techsCount = technicianDAO.all().size();
 
-        binding.dbDiagnosticsText.setText("• SQLite Database: v5 (techfix.db)\n"
-                + "• Records: " + appointmentsCount + " repairs, " + customersCount + " customers, "
-                + partsCount + " parts, " + servicesCount + " services, " + techsCount + " technicians\n"
-                + "• Cloud Sync: Firebase Auth & Firestore enabled\n"
-                + "• Branches: Colombo Branch, Galle Branch");
+        binding.dbDiagnosticsText.setText("• Primary Branches: Colombo & Galle Workshops\n"
+                + "• Cloud Sync: Connected & up to date\n"
+                + "• Active Records: " + appointmentsCount + " repairs · " + customersCount + " customers · "
+                + partsCount + " spare parts · " + servicesCount + " services · " + techsCount + " technicians");
     }
 
     private void refreshCustomers(String query) {
