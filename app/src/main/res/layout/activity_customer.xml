@@ -869,10 +869,22 @@
 
                             <Button
                                 android:id="@+id/cameraButton"
-                                style="@style/Widget.TechFix.Button.Secondary"
+                                style="@style/Widget.Material3.Button.TonalButton"
                                 android:layout_width="wrap_content"
-                                android:layout_height="42dp"
-                                android:text="Attach Photo" />
+                                android:layout_height="44dp"
+                                android:insetTop="0dp"
+                                android:insetBottom="0dp"
+                                android:minWidth="0dp"
+                                android:paddingHorizontal="16dp"
+                                android:text="Attach Photo"
+                                android:textColor="@color/primary"
+                                android:textSize="13sp"
+                                android:textStyle="bold"
+                                app:cornerRadius="12dp"
+                                app:icon="@drawable/ic_camera"
+                                app:iconGravity="textStart"
+                                app:iconSize="18dp"
+                                app:iconTint="@color/primary" />
 
                             <TextView
                                 android:id="@+id/customerPhotoStatus"

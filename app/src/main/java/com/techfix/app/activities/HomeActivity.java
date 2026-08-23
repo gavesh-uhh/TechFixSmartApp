@@ -87,13 +87,10 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
 
-    // 1. Photo Picker Launcher (Gallery) — OpenDocument so the URI permission is persistable
-    private final ActivityResultLauncher<String[]> photoPickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.OpenDocument(), (Uri uri) -> {
+    // 1. Photo Picker Launcher (Gallery)
+    private final ActivityResultLauncher<String> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
                 if (uri != null) {
-                    try {
-                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } catch (SecurityException ignored) { }
                     onPhotoReady(uri);
                 }
             });
@@ -132,7 +129,7 @@ public class HomeActivity extends AppCompatActivity {
                     if (which == 0) {
                         checkCameraPermissionAndLaunch();
                     } else {
-                        photoPickerLauncher.launch(new String[]{"image/*"});
+                        photoPickerLauncher.launch("image/*");
                     }
                 })
                 .setNegativeButton("Cancel", null)
