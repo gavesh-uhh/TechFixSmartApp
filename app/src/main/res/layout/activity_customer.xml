@@ -887,6 +887,15 @@
                             android:layout_height="52dp"
                             android:layout_marginTop="4dp" />
 
+                        <TextView
+                            android:id="@+id/nearestBranchHint"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:textColor="@color/muted_text"
+                            android:textSize="12sp"
+                            android:visibility="gone" />
+
                         <Button
                             android:id="@+id/bookButton"
                             style="@style/Widget.TechFix.Button.Filled"

@@ -350,6 +350,8 @@ public class HomeActivity extends AppCompatActivity {
                 int pos = adapter.getPosition(display);
                 if (pos >= 0 && binding.bookingBranchSpinner.getSelectedItemPosition() != pos) {
                     binding.bookingBranchSpinner.setSelection(pos, false);
+                    binding.nearestBranchHint.setText(String.format("Auto-selected nearest branch: %s (%.1f km away)", display, km));
+                    binding.nearestBranchHint.setVisibility(View.VISIBLE);
                     Toast.makeText(this, String.format("Nearest branch: %s (%.1f km away)", display, km), Toast.LENGTH_LONG).show();
                 }
             }));
