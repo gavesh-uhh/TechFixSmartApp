@@ -245,7 +245,6 @@ public class HomeActivity extends AppCompatActivity {
                 if (currentSession.isLoggedIn()) {
                     Class<?> target = currentSession.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
                     Intent intent = new Intent(HomeActivity.this, target);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
                     startActivity(intent);
                 } else {
                     Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
