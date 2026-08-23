@@ -12,29 +12,55 @@
         android:id="@+id/homeHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
         android:paddingHorizontal="20dp"
         android:paddingTop="18dp"
         android:paddingBottom="14dp"
         android:background="@color/white">
 
-        <TextView
-            android:id="@+id/topBarTitle"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="TechFix Store"
-            android:textColor="@color/ink"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/topBarSubtitle"
+            <TextView
+                android:id="@+id/topBarTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TechFix Store"
+                android:textColor="@color/ink"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/topBarSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:text="Computer &amp; Mobile Phone Repairs"
+                android:textColor="@color/muted_text"
+                android:textSize="13sp" />
+        </LinearLayout>
+
+        <!-- Admin Dash / My Dashboard Header Button (visible when logged in) -->
+        <Button
+            android:id="@+id/homeDashboardButton"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="2dp"
-            android:text="Computer &amp; Mobile Phone Repairs"
-            android:textColor="@color/muted_text"
-            android:textSize="13sp" />
+            android:layout_height="38dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:paddingHorizontal="12dp"
+            android:text="Admin Dash"
+            android:textColor="@color/primary"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/primary_container"
+            app:cornerRadius="12dp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <!-- Divider Line -->
