@@ -24,20 +24,12 @@
             android:gravity="center_horizontal"
             android:orientation="vertical">
 
-            <FrameLayout
-                android:layout_width="64dp"
-                android:layout_height="64dp"
-                android:background="@drawable/bg_circle_category_selected">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:text="TF"
-                    android:textColor="@color/white"
-                    android:textSize="24sp"
-                    android:textStyle="bold" />
-            </FrameLayout>
+            <ImageView
+                android:id="@+id/authLogo"
+                android:layout_width="76dp"
+                android:layout_height="76dp"
+                android:contentDescription="@string/app_name"
+                android:src="@drawable/techfix_logo" />
 
             <TextView
                 android:id="@+id/authTitle"

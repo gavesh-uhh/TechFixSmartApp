@@ -29,6 +29,8 @@
     <color name="muted_text">#6C627E</color>
 
     <!-- Semantic Alerts & Status Tints -->
+    <color name="techfix_accent_yellow">#F5C518</color>
+    <color name="techfix_yellow">#FFC107</color>
     <color name="success">#16A34A</color>
     <color name="success_container">#EAF8EE</color>
     <color name="error">#DC2626</color>
