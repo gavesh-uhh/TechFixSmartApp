@@ -199,13 +199,19 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         session = new SessionManager(this);
-        // Only reset to the Store panel on first entry; keep the user's place
-        // when returning from Maps/Login/etc.
-        if (!resumedOnce) {
-            resumedOnce = true;
-            showStorePanel();
-            binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
-        }
+        showStorePanel();
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+        selectCategory(currentCategory != null ? currentCategory : "ALL");
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        session = new SessionManager(this);
+        showStorePanel();
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+        selectCategory("ALL");
     }
 
     /**
