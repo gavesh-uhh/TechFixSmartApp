@@ -239,31 +239,26 @@ public class CustomerActivity extends AppCompatActivity {
      * Loads logged-in user profile details into the header and profile card.
      */
     private void setupUserProfile() {
-        User user = userDAO.get(session.getUserId());
-        if (user != null) {
-            binding.welcomeUserText.setText("Hello, " + user.name);
-            binding.userEmailText.setText(user.email);
-
-            binding.profileNameText.setText(user.name);
-            binding.profileEmailText.setText(user.email);
-            binding.profilePhoneText.setText(user.phone.isEmpty() ? "Phone: Not provided" : "Phone: " + user.phone);
-        }
-
         binding.customerTopLogoutButton.setOnClickListener(v -> performLogout());
         binding.profileLogoutButton.setOnClickListener(v -> performLogout());
+
+        try {
+            User user = userDAO.get(session.getUserId());
+            if (user != null) {
+                binding.welcomeUserText.setText("Hello, " + user.name);
+                binding.userEmailText.setText(user.email);
+
+                binding.profileNameText.setText(user.name);
+                binding.profileEmailText.setText(user.email);
+                binding.profilePhoneText.setText(user.phone.isEmpty() ? "Phone: Not provided" : "Phone: " + user.phone);
+            }
+        } catch (Exception ignored) {}
     }
 
     private void performLogout() {
-        new AlertDialog.Builder(this)
-                .setTitle("Log Out")
-                .setMessage("Are you sure you want to sign out?")
-                .setPositiveButton("Log Out", (dialog, which) -> {
-                    session.logout();
-                    Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-                    goHome();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        session.logout();
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+        goHome();
     }
 
     private void goHome() {
