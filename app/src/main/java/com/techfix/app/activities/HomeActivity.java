@@ -267,67 +267,64 @@ public class HomeActivity extends AppCompatActivity {
 
             } else if (itemId == R.id.nav_home_account) {
                 // Open Customer / Staff dashboard if logged in, or Login screen if not
-                SessionManager currentSession = new SessionManager(HomeActivity.this);
-                if (currentSession.isLoggedIn()) {
-                    showAccountDialog(currentSession);
-                } else {
-                    Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                    startActivity(intent);
-                }
+                navigateToDashboard();
                 return false;
             }
 
             return false;
         });
 
+        if (binding.homeDashboardButton != null) {
+            binding.homeDashboardButton.setOnClickListener(v -> navigateToDashboard());
+        }
+
+        updateNavAccountItem();
         setupBranchesPanel();
     }
 
-    private void showAccountDialog(SessionManager currentSession) {
-        com.techfix.app.models.User user = new com.techfix.app.database.UserDAO(dbHelper).get(currentSession.getUserId());
-        String userName = (user != null && user.name != null && !user.name.isEmpty()) ? user.name : "Active User";
-        String userRoleStr = (currentSession.getRole() == UserRole.STAFF) ? "Staff / Admin" : "Customer";
-
-        CharSequence[] options = {
-                "Open " + userRoleStr + " Dashboard",
-                "Log Out of Account"
-        };
-
-        new AlertDialog.Builder(this)
-                .setTitle("Account: " + userName)
-                .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
-                        Class<?> target = currentSession.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
-                        Intent intent = new Intent(HomeActivity.this, target);
-                        startActivity(intent);
-                    } else if (which == 1) {
-                        currentSession.logout();
-                        Toast.makeText(HomeActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-                        showStorePanel();
-                        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
-                        updateNavAccountItem();
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+    private void navigateToDashboard() {
+        SessionManager currentSession = new SessionManager(HomeActivity.this);
+        if (currentSession.isLoggedIn()) {
+            Class<?> target = (currentSession.getRole() == UserRole.STAFF) ? StaffActivity.class : CustomerActivity.class;
+            Intent intent = new Intent(HomeActivity.this, target);
+            intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            startActivity(intent);
+        } else {
+            Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+            startActivity(intent);
+        }
     }
 
     private void updateNavAccountItem() {
-        if (binding == null || binding.bottomNavigation == null) return;
-        MenuItem accountItem = binding.bottomNavigation.getMenu().findItem(R.id.nav_home_account);
-        if (accountItem != null) {
-            SessionManager currentSession = new SessionManager(this);
-            if (currentSession.isLoggedIn()) {
-                if (currentSession.getRole() == UserRole.STAFF) {
-                    accountItem.setTitle("Admin Dash");
-                    accountItem.setIcon(R.drawable.ic_nav_dashboard);
+        if (binding == null) return;
+        SessionManager currentSession = new SessionManager(this);
+        boolean loggedIn = currentSession.isLoggedIn();
+        boolean isStaff = loggedIn && currentSession.getRole() == UserRole.STAFF;
+
+        if (binding.bottomNavigation != null) {
+            MenuItem accountItem = binding.bottomNavigation.getMenu().findItem(R.id.nav_home_account);
+            if (accountItem != null) {
+                if (loggedIn) {
+                    if (isStaff) {
+                        accountItem.setTitle("Admin Dash");
+                        accountItem.setIcon(R.drawable.ic_nav_dashboard);
+                    } else {
+                        accountItem.setTitle("My Account");
+                        accountItem.setIcon(R.drawable.ic_nav_account);
+                    }
                 } else {
-                    accountItem.setTitle("Account");
+                    accountItem.setTitle("Sign In");
                     accountItem.setIcon(R.drawable.ic_nav_account);
                 }
+            }
+        }
+
+        if (binding.homeDashboardButton != null) {
+            if (loggedIn) {
+                binding.homeDashboardButton.setVisibility(View.VISIBLE);
+                binding.homeDashboardButton.setText(isStaff ? "Admin Dash" : "My Account");
             } else {
-                accountItem.setTitle("Sign In");
-                accountItem.setIcon(R.drawable.ic_nav_account);
+                binding.homeDashboardButton.setVisibility(View.GONE);
             }
         }
     }

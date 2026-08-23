@@ -234,6 +234,21 @@ public class CustomerActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        session = new SessionManager(this);
+        if (!session.isLoggedIn()) {
+            goHome();
+            return;
+        }
+        setupUserProfile();
+        refreshRepairs();
+        loadCustomerServices(currentCategory);
+        loadCustomerParts();
+    }
+
+    @Override
     protected void onResume() {
         super.onResume();
         session = new SessionManager(this);
