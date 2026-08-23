@@ -340,7 +340,10 @@ public class HomeActivity extends AppCompatActivity {
     private void suggestNearestBranch() {
         if (com.techfix.app.util.NearestBranch.hasPermission(this)) {
             com.techfix.app.util.NearestBranch.resolve(this, dbHelper, (branchName, km) -> runOnUiThread(() -> {
-                if (branchName == null) return;
+                if (branchName == null) {
+                    Toast.makeText(this, "Couldn't get your location \u2014 enable GPS and reopen the booking form", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 String display = com.techfix.app.database.BranchDAO.toDisplayName(branchName);
                 ArrayAdapter adapter = (ArrayAdapter) binding.bookingBranchSpinner.getAdapter();
                 if (adapter == null) return;

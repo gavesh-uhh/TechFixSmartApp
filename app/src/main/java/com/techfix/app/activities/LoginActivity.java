@@ -20,6 +20,7 @@ import com.techfix.app.databinding.ActivityLoginBinding;
 import com.techfix.app.models.User;
 import com.techfix.app.models.UserRole;
 import com.techfix.app.session.SessionManager;
+import com.techfix.app.util.Analytics;
 import com.techfix.app.util.WindowInsetsHelper;
 
 import java.util.HashMap;
@@ -265,7 +266,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             session.start(userId, UserRole.CUSTOMER);
             Toast.makeText(this, "Account created successfully", Toast.LENGTH_SHORT).show();
-            com.techfix.app.util.Analytics.log(this, "sign_up");
+            Analytics.log(this, "sign_up");
             openDashboard(UserRole.CUSTOMER);
         }
     }

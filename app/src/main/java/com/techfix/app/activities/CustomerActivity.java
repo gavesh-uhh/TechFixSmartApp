@@ -50,6 +50,7 @@ import com.techfix.app.models.User;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.sync.FirebaseSyncManager;
 import com.techfix.app.util.Feedback;
+import com.techfix.app.util.RepairPhotoStorage;
 import com.techfix.app.util.WindowInsetsHelper;
 
 import java.io.File;
@@ -78,6 +79,7 @@ public class CustomerActivity extends AppCompatActivity {
 
     private Uri selectedPhotoUri = null;
     private Uri tempCameraUri = null;
+    private boolean locationPermissionRequested = false;
     private String repairFilter = "Active";
     private String currentCategory = "ALL";
     private String currentPartsBranch = "All Branches";
@@ -337,7 +339,10 @@ public class CustomerActivity extends AppCompatActivity {
     private void suggestNearestBranch() {
         if (com.techfix.app.util.NearestBranch.hasPermission(this)) {
             com.techfix.app.util.NearestBranch.resolve(this, dbHelper, (branchName, km) -> runOnUiThread(() -> {
-                if (branchName == null) return;
+                if (branchName == null) {
+                    Toast.makeText(this, "Couldn't get your location \u2014 enable GPS and reopen the Book tab", Toast.LENGTH_LONG).show();
+                    return;
+                }
                 String display = BranchDAO.toDisplayName(branchName);
                 ArrayAdapter adapter = (ArrayAdapter) binding.branchSpinner.getAdapter();
                 if (adapter == null) return;
@@ -347,7 +352,8 @@ public class CustomerActivity extends AppCompatActivity {
                     Toast.makeText(this, String.format("Nearest branch: %s (%.1f km away)", display, km), Toast.LENGTH_LONG).show();
                 }
             }));
-        } else {
+        } else if (!locationPermissionRequested) {
+            locationPermissionRequested = true;
             locationPermissionLauncher.launch(android.Manifest.permission.ACCESS_FINE_LOCATION);
         }
     }
@@ -783,6 +789,7 @@ public class CustomerActivity extends AppCompatActivity {
 
             if (selectedPhotoUri != null && appointmentId > 0) {
                 appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
+                RepairPhotoStorage.upload(this, appointmentId, selectedPhotoUri);
             }
 
             FirebaseSyncManager.getInstance().sync(this, null);

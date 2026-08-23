@@ -67,6 +67,15 @@ public class FirebaseSyncManager {
             }
         });
 
+        try {
+            FirebaseFirestore.getInstance().collection("appointments")
+                    .addSnapshotListener((snap, e) -> {
+                        if (e == null && snap != null && !snap.getMetadata().hasPendingWrites()) {
+                            sync(appContext, null);
+                        }
+                    });
+        } catch (Exception ignored) {}
+
         if (NetworkUtils.isOnline(appContext)) {
             sync(appContext, null);
         }
