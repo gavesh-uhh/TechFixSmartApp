@@ -138,12 +138,21 @@ public class AdminFragment extends Fragment {
     }
 
     private void performLogout() {
-        new SessionManager(requireContext()).logout();
-        Toast.makeText(requireContext(), "Logged out of admin workspace", Toast.LENGTH_SHORT).show();
-        Intent intent = new Intent(requireContext(), HomeActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        startActivity(intent);
-        requireActivity().finish();
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Log Out")
+                .setMessage("Are you sure you want to log out of the admin workspace?")
+                .setPositiveButton("Log Out", (dialog, which) -> {
+                    new SessionManager(requireContext()).logout();
+                    Toast.makeText(requireContext(), "Logged out of admin workspace", Toast.LENGTH_SHORT).show();
+                    Intent intent = new Intent(requireContext(), HomeActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    if (getActivity() != null) {
+                        requireActivity().finish();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     private void refresh() {
