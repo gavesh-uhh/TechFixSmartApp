@@ -63,21 +63,23 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
             startActivity(intent);
         });
         binding.staffLogoutButton.setOnClickListener(v -> {
-            new AlertDialog.Builder(this)
-                    .setTitle("Log Out")
-                    .setMessage("Are you sure you want to log out of the admin workspace?")
-                    .setPositiveButton("Log Out", (dialog, which) -> {
-                        session.logout();
-                        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-                        goHome();
-                    })
-                    .setNegativeButton("Cancel", null)
-                    .show();
+            session.logout();
+            Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+            goHome();
         });
         setupBottomNavigation();
 
         if (savedInstanceState == null) {
             showPanel(0);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        session = new SessionManager(this);
+        if (!session.isLoggedIn()) {
+            goHome();
         }
     }
 

@@ -143,7 +143,9 @@ public class AdminFragment extends Fragment {
         Intent intent = new Intent(requireContext(), HomeActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(intent);
-        requireActivity().finish();
+        if (getActivity() != null) {
+            requireActivity().finish();
+        }
     }
 
     private void refresh() {

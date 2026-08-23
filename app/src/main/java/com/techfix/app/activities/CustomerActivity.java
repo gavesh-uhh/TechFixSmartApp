@@ -101,12 +101,9 @@ public class CustomerActivity extends AppCompatActivity {
             });
 
     // Photo picker launcher (Gallery)
-    private final ActivityResultLauncher<String[]> photoPickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.OpenDocument(), (Uri uri) -> {
+    private final ActivityResultLauncher<String> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
                 if (uri != null) {
-                    try {
-                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } catch (SecurityException ignored) { }
                     onPhotoReady(uri);
                 }
             });
@@ -131,23 +128,29 @@ public class CustomerActivity extends AppCompatActivity {
 
     private void onPhotoReady(Uri uri) {
         selectedPhotoUri = uri;
-        binding.customerPhotoPreview.setImageURI(uri);
-        binding.customerPhotoPreviewContainer.setVisibility(View.VISIBLE);
-        binding.customerPhotoStatus.setText("Photo attached: " + uri.getLastPathSegment());
-        binding.customerPhotoStatus.setTextColor(ContextCompat.getColor(this, R.color.primary));
+        try {
+            binding.customerPhotoPreview.setImageURI(null);
+            binding.customerPhotoPreview.setImageURI(uri);
+            binding.customerPhotoPreviewContainer.setVisibility(View.VISIBLE);
+            binding.customerPhotoStatus.setText("Photo attached");
+            binding.customerPhotoStatus.setTextColor(ContextCompat.getColor(this, R.color.success));
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to load image preview: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showPhotoOptionsDialog() {
-        String[] options = {"Choose from Gallery", "Take a Photo with Camera"};
+        CharSequence[] options = {"📷 Take Photo with Camera", "🖼️ Choose from Gallery / Files"};
         new AlertDialog.Builder(this)
                 .setTitle("Attach Device Photo")
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
-                        photoPickerLauncher.launch(new String[]{"image/*"});
-                    } else if (which == 1) {
                         checkCameraPermissionAndLaunch();
+                    } else if (which == 1) {
+                        photoPickerLauncher.launch("image/*");
                     }
                 })
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 
@@ -161,15 +164,30 @@ public class CustomerActivity extends AppCompatActivity {
 
     private void launchCamera() {
         try {
-            File cacheDir = new File(getCacheDir(), "images");
-            if (!cacheDir.exists()) {
-                cacheDir.mkdirs();
+            File storageDir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
+            if (storageDir == null) {
+                storageDir = new File(getCacheDir(), "images");
             }
-            File photoFile = new File(cacheDir, "device_photo_" + System.currentTimeMillis() + ".jpg");
+            if (!storageDir.exists()) {
+                storageDir.mkdirs();
+            }
+            File photoFile = File.createTempFile("device_" + System.currentTimeMillis(), ".jpg", storageDir);
             tempCameraUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
+
+            Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, tempCameraUri);
+            takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+            List<android.content.pm.ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(takePictureIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (android.content.pm.ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                grantUriPermission(packageName, tempCameraUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
             takePictureLauncher.launch(tempCameraUri);
         } catch (Exception e) {
-            Toast.makeText(this, "Failed to open camera: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Camera unavailable (" + e.getMessage() + "). Opening gallery instead...", Toast.LENGTH_SHORT).show();
+            photoPickerLauncher.launch("image/*");
         }
     }
 
@@ -218,6 +236,12 @@ public class CustomerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        session = new SessionManager(this);
+        if (!session.isLoggedIn()) {
+            goHome();
+            return;
+        }
+        setupUserProfile();
         refreshRepairs();
         loadCustomerServices(currentCategory);
         loadCustomerParts();
@@ -233,31 +257,26 @@ public class CustomerActivity extends AppCompatActivity {
      * Loads logged-in user profile details into the header and profile card.
      */
     private void setupUserProfile() {
-        User user = userDAO.get(session.getUserId());
-        if (user != null) {
-            binding.welcomeUserText.setText("Hello, " + user.name);
-            binding.userEmailText.setText(user.email);
-
-            binding.profileNameText.setText(user.name);
-            binding.profileEmailText.setText(user.email);
-            binding.profilePhoneText.setText(user.phone.isEmpty() ? "Phone: Not provided" : "Phone: " + user.phone);
-        }
-
         binding.customerTopLogoutButton.setOnClickListener(v -> performLogout());
         binding.profileLogoutButton.setOnClickListener(v -> performLogout());
+
+        try {
+            User user = userDAO.get(session.getUserId());
+            if (user != null) {
+                binding.welcomeUserText.setText("Hello, " + user.name);
+                binding.userEmailText.setText(user.email);
+
+                binding.profileNameText.setText(user.name);
+                binding.profileEmailText.setText(user.email);
+                binding.profilePhoneText.setText(user.phone.isEmpty() ? "Phone: Not provided" : "Phone: " + user.phone);
+            }
+        } catch (Exception ignored) {}
     }
 
     private void performLogout() {
-        new AlertDialog.Builder(this)
-                .setTitle("Log Out")
-                .setMessage("Are you sure you want to sign out?")
-                .setPositiveButton("Log Out", (dialog, which) -> {
-                    session.logout();
-                    Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
-                    goHome();
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
+        session.logout();
+        Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+        goHome();
     }
 
     private void goHome() {
@@ -690,7 +709,9 @@ public class CustomerActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        binding.cameraButton.setOnClickListener(v -> showPhotoOptionsDialog());
+        // Setup Attach Photo Button & Drop Zone (Direct Camera Permission & Launch)
+        binding.cameraButton.setOnClickListener(v -> checkCameraPermissionAndLaunch());
+        binding.customerPhotoDropZone.setOnClickListener(v -> checkCameraPermissionAndLaunch());
 
         binding.customerRemovePhotoButton.setOnClickListener(v -> {
             selectedPhotoUri = null;
