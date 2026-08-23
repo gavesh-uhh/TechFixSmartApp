@@ -243,9 +243,7 @@ public class HomeActivity extends AppCompatActivity {
                 // Open Customer / Staff dashboard if logged in, or Login screen if not
                 SessionManager currentSession = new SessionManager(HomeActivity.this);
                 if (currentSession.isLoggedIn()) {
-                    Class<?> target = currentSession.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
-                    Intent intent = new Intent(HomeActivity.this, target);
-                    startActivity(intent);
+                    showAccountDialog(currentSession);
                 } else {
                     Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -257,6 +255,34 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         setupBranchesPanel();
+    }
+
+    private void showAccountDialog(SessionManager currentSession) {
+        com.techfix.app.models.User user = new com.techfix.app.database.UserDAO(dbHelper).get(currentSession.getUserId());
+        String userName = (user != null && user.name != null && !user.name.isEmpty()) ? user.name : "Active User";
+        String userRoleStr = (currentSession.getRole() == UserRole.STAFF) ? "Staff / Admin" : "Customer";
+
+        CharSequence[] options = {
+                "Open " + userRoleStr + " Dashboard",
+                "Log Out of Account"
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle("Account: " + userName)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        Class<?> target = currentSession.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
+                        Intent intent = new Intent(HomeActivity.this, target);
+                        startActivity(intent);
+                    } else if (which == 1) {
+                        currentSession.logout();
+                        Toast.makeText(HomeActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+                        showStorePanel();
+                        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
     }
 
     /**

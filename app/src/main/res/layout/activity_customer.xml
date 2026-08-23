@@ -47,14 +47,19 @@
         <!-- Quick Log Out Button -->
         <Button
             android:id="@+id/customerTopLogoutButton"
-            style="@style/Widget.TechFix.Button.Outlined"
+            style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
             android:layout_height="38dp"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
             android:minWidth="0dp"
             android:paddingHorizontal="14dp"
             android:text="Log Out"
             android:textColor="@color/error"
-            android:textSize="12sp" />
+            android:textSize="12sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/error_container"
+            app:cornerRadius="12dp" />
     </LinearLayout>
 
     <!-- Divider Line -->
