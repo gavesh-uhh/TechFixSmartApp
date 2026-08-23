@@ -692,9 +692,9 @@ public class CustomerActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // Setup Attach Photo Button & Drop Zone
-        binding.cameraButton.setOnClickListener(v -> showPhotoOptionsDialog());
-        binding.customerPhotoDropZone.setOnClickListener(v -> showPhotoOptionsDialog());
+        // Setup Attach Photo Button & Drop Zone (Direct Camera Permission & Launch)
+        binding.cameraButton.setOnClickListener(v -> checkCameraPermissionAndLaunch());
+        binding.customerPhotoDropZone.setOnClickListener(v -> checkCameraPermissionAndLaunch());
 
         binding.customerRemovePhotoButton.setOnClickListener(v -> {
             selectedPhotoUri = null;
