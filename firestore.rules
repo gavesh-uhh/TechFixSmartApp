@@ -1,0 +1,62 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================================
+    // TechFix Smart App - Cloud Firestore Security Rules
+    // ============================================================================
+
+    // 1. Users Collection
+    // Allows users and sync manager to read and write user profile documents
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+
+    // 2. Appointments Collection
+    // Supports customer booking and staff status updates
+    match /appointments/{appointmentId} {
+      allow read, write: if true;
+    }
+
+    // 3. Spare Parts Inventory Collection
+    match /parts/{partId} {
+      allow read, write: if true;
+    }
+
+    // 4. Repair Services Catalog Collection
+    match /services/{serviceId} {
+      allow read, write: if true;
+    }
+
+    // 5. Technicians Collection
+    match /technicians/{technicianId} {
+      allow read, write: if true;
+    }
+
+    // 6. Appointment Status History Collection
+    match /status_history/{historyId} {
+      allow read, write: if true;
+    }
+
+    // 7. Payments Collection
+    match /payments/{paymentId} {
+      allow read, write: if true;
+    }
+
+    // 8. Branches Collection
+    match /branches/{branchId} {
+      allow read, write: if true;
+    }
+
+    // 9. Repair Showcase Samples Collection
+    match /samples/{sampleId} {
+      allow read, write: if true;
+    }
+
+    // Default fallback rule for any nested/other documents
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
