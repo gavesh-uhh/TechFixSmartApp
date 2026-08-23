@@ -377,17 +377,35 @@
                     android:id="@+id/customerSamplesEmptyText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:paddingBottom="24dp"
                     android:text="No repair showcases published yet. Check back soon!"
                     android:textAlignment="center"
                     android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ================= PANEL 1: DEDICATED SPARE PARTS CATALOG ================= -->
+        <ScrollView
+            android:id="@+id/customerPartsPanel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/screen_padding"
+                android:paddingVertical="@dimen/space_16">
+
                 <!-- Hardware Parts Section Header -->
                 <TextView
+                    style="@style/Widget.TechFix.SectionTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Hardware Spare Parts"
-                    style="@style/Widget.TechFix.SectionTitle" />
+                    android:text="Hardware Spare Parts" />
 
                 <TextView
                     android:layout_width="wrap_content"

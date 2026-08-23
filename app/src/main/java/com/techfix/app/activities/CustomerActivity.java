@@ -326,7 +326,7 @@ public class CustomerActivity extends AppCompatActivity {
     }
 
     /**
-     * Setup bottom navigation bar (Store, My Repairs, Book Repair, Profile).
+     * Setup bottom navigation bar (Store, Parts, My Repairs, Book Repair, Profile).
      */
     private void setupBottomNavigation() {
         binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_store);
@@ -337,15 +337,18 @@ public class CustomerActivity extends AppCompatActivity {
             if (itemId == R.id.nav_customer_store) {
                 showPanel(0);
                 return true;
-            } else if (itemId == R.id.nav_customer_repairs) {
+            } else if (itemId == R.id.nav_customer_parts) {
                 showPanel(1);
                 return true;
-            } else if (itemId == R.id.nav_customer_book) {
+            } else if (itemId == R.id.nav_customer_repairs) {
                 showPanel(2);
+                return true;
+            } else if (itemId == R.id.nav_customer_book) {
+                showPanel(3);
                 suggestNearestBranch();
                 return true;
             } else if (itemId == R.id.nav_customer_profile) {
-                showPanel(3);
+                showPanel(4);
                 return true;
             }
 
@@ -404,20 +407,22 @@ public class CustomerActivity extends AppCompatActivity {
     }
 
     /**
-     * Shows the active tab panel (0: Store, 1: Repairs, 2: Book, 3: Profile).
+     * Shows the active tab panel (0: Store, 1: Parts, 2: Repairs, 3: Book, 4: Profile).
      */
     private void showPanel(int position) {
         binding.customerStorePanel.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
-        binding.repairsPanel.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
-        binding.bookPanel.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
-        binding.explorePanel.setVisibility(position == 3 ? View.VISIBLE : View.GONE);
+        binding.customerPartsPanel.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
+        binding.repairsPanel.setVisibility(position == 2 ? View.VISIBLE : View.GONE);
+        binding.bookPanel.setVisibility(position == 3 ? View.VISIBLE : View.GONE);
+        binding.explorePanel.setVisibility(position == 4 ? View.VISIBLE : View.GONE);
 
         if (position == 0) {
             loadCustomerServices(currentCategory);
-            loadCustomerParts();
         } else if (position == 1) {
-            refreshRepairs();
+            loadCustomerParts();
         } else if (position == 2) {
+            refreshRepairs();
+        } else if (position == 3) {
             suggestNearestBranch();
         }
     }

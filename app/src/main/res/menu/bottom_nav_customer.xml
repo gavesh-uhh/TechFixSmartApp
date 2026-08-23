@@ -5,6 +5,10 @@
         android:icon="@drawable/ic_nav_store"
         android:title="Store" />
     <item
+        android:id="@+id/nav_customer_parts"
+        android:icon="@drawable/ic_nav_inventory"
+        android:title="Parts" />
+    <item
         android:id="@+id/nav_customer_repairs"
         android:icon="@drawable/ic_nav_queue"
         android:title="My Repairs" />
