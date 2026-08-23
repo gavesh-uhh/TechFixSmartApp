@@ -164,6 +164,9 @@ public class CustomerActivity extends AppCompatActivity {
                 cacheDir.mkdirs();
             }
             File photoFile = new File(cacheDir, "device_photo_" + System.currentTimeMillis() + ".jpg");
+            if (!photoFile.exists()) {
+                photoFile.createNewFile();
+            }
             tempCameraUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
             takePictureLauncher.launch(tempCameraUri);
         } catch (Exception e) {
@@ -689,7 +692,9 @@ public class CustomerActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
+        // Setup Attach Photo Button & Drop Zone
         binding.cameraButton.setOnClickListener(v -> showPhotoOptionsDialog());
+        binding.customerPhotoDropZone.setOnClickListener(v -> showPhotoOptionsDialog());
 
         binding.customerRemovePhotoButton.setOnClickListener(v -> {
             selectedPhotoUri = null;
