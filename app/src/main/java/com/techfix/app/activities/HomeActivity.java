@@ -283,10 +283,6 @@ public class HomeActivity extends AppCompatActivity {
             return false;
         });
 
-        if (binding.homeDashboardButton != null) {
-            binding.homeDashboardButton.setOnClickListener(v -> navigateToDashboard());
-        }
-
         updateNavAccountItem();
         setupBranchesPanel();
     }
@@ -305,35 +301,24 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void updateNavAccountItem() {
-        if (binding == null) return;
+        if (binding == null || binding.bottomNavigation == null) return;
         SessionManager currentSession = new SessionManager(this);
         boolean loggedIn = currentSession.isLoggedIn();
         boolean isStaff = loggedIn && currentSession.getRole() == UserRole.STAFF;
 
-        if (binding.bottomNavigation != null) {
-            MenuItem accountItem = binding.bottomNavigation.getMenu().findItem(R.id.nav_home_account);
-            if (accountItem != null) {
-                if (loggedIn) {
-                    if (isStaff) {
-                        accountItem.setTitle("Admin Dash");
-                        accountItem.setIcon(R.drawable.ic_nav_dashboard);
-                    } else {
-                        accountItem.setTitle("My Account");
-                        accountItem.setIcon(R.drawable.ic_nav_account);
-                    }
+        MenuItem accountItem = binding.bottomNavigation.getMenu().findItem(R.id.nav_home_account);
+        if (accountItem != null) {
+            if (loggedIn) {
+                if (isStaff) {
+                    accountItem.setTitle("Admin Dash");
+                    accountItem.setIcon(R.drawable.ic_nav_dashboard);
                 } else {
-                    accountItem.setTitle("Sign In");
+                    accountItem.setTitle("My Account");
                     accountItem.setIcon(R.drawable.ic_nav_account);
                 }
-            }
-        }
-
-        if (binding.homeDashboardButton != null) {
-            if (loggedIn) {
-                binding.homeDashboardButton.setVisibility(View.VISIBLE);
-                binding.homeDashboardButton.setText(isStaff ? "Admin Dash" : "My Account");
             } else {
-                binding.homeDashboardButton.setVisibility(View.GONE);
+                accountItem.setTitle("Sign In");
+                accountItem.setIcon(R.drawable.ic_nav_account);
             }
         }
     }
