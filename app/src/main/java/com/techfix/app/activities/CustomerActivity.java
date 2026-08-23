@@ -302,9 +302,6 @@ public class CustomerActivity extends AppCompatActivity {
         try {
             User user = userDAO.get(session.getUserId());
             if (user != null) {
-                binding.welcomeUserText.setText("Hello, " + user.name);
-                binding.userEmailText.setText(user.email);
-
                 binding.profileNameText.setText(user.name);
                 binding.profileEmailText.setText(user.email);
                 binding.profilePhoneText.setText(user.phone.isEmpty() ? "Phone: Not provided" : "Phone: " + user.phone);
