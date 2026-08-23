@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -87,13 +88,10 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
 
-    // 1. Photo Picker Launcher (Gallery) — OpenDocument so the URI permission is persistable
-    private final ActivityResultLauncher<String[]> photoPickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.OpenDocument(), (Uri uri) -> {
+    // 1. Photo Picker Launcher (Gallery)
+    private final ActivityResultLauncher<String> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
                 if (uri != null) {
-                    try {
-                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } catch (SecurityException ignored) { }
                     onPhotoReady(uri);
                 }
             });
@@ -118,21 +116,26 @@ public class HomeActivity extends AppCompatActivity {
 
     private void onPhotoReady(Uri uri) {
         selectedPhotoUri = uri;
-        binding.bookingPhotoPreview.setImageURI(uri);
-        binding.photoPreviewContainer.setVisibility(View.VISIBLE);
-        binding.photoStatusText.setText("Photo attached");
-        binding.photoStatusText.setTextColor(ContextCompat.getColor(this, R.color.success));
+        try {
+            binding.bookingPhotoPreview.setImageURI(null);
+            binding.bookingPhotoPreview.setImageURI(uri);
+            binding.photoPreviewContainer.setVisibility(View.VISIBLE);
+            binding.photoStatusText.setText("Photo attached");
+            binding.photoStatusText.setTextColor(ContextCompat.getColor(this, R.color.success));
+        } catch (Exception e) {
+            Toast.makeText(this, "Failed to load image preview: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     private void showPhotoOptionsDialog() {
-        CharSequence[] options = {"Take Photo with Camera", "Choose from Gallery"};
+        CharSequence[] options = {"📷 Take Photo with Camera", "🖼️ Choose from Gallery / Files"};
         new AlertDialog.Builder(this)
                 .setTitle("Attach Device Photo")
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
                         checkCameraPermissionAndLaunch();
                     } else {
-                        photoPickerLauncher.launch(new String[]{"image/*"});
+                        photoPickerLauncher.launch("image/*");
                     }
                 })
                 .setNegativeButton("Cancel", null)
@@ -149,15 +152,30 @@ public class HomeActivity extends AppCompatActivity {
 
     private void launchCamera() {
         try {
-            File cacheDir = new File(getCacheDir(), "images");
-            if (!cacheDir.exists()) {
-                cacheDir.mkdirs();
+            File storageDir = getExternalFilesDir(android.os.Environment.DIRECTORY_PICTURES);
+            if (storageDir == null) {
+                storageDir = new File(getCacheDir(), "images");
             }
-            File photoFile = new File(cacheDir, "repair_photo_" + System.currentTimeMillis() + ".jpg");
+            if (!storageDir.exists()) {
+                storageDir.mkdirs();
+            }
+            File photoFile = File.createTempFile("repair_" + System.currentTimeMillis(), ".jpg", storageDir);
             tempCameraUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
+
+            Intent takePictureIntent = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+            takePictureIntent.putExtra(android.provider.MediaStore.EXTRA_OUTPUT, tempCameraUri);
+            takePictureIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+
+            List<android.content.pm.ResolveInfo> resInfoList = getPackageManager().queryIntentActivities(takePictureIntent, PackageManager.MATCH_DEFAULT_ONLY);
+            for (android.content.pm.ResolveInfo resolveInfo : resInfoList) {
+                String packageName = resolveInfo.activityInfo.packageName;
+                grantUriPermission(packageName, tempCameraUri, Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            }
+
             takePictureLauncher.launch(tempCameraUri);
         } catch (Exception e) {
-            Toast.makeText(this, "Failed to open camera: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Camera unavailable (" + e.getMessage() + "). Opening gallery instead...", Toast.LENGTH_SHORT).show();
+            photoPickerLauncher.launch("image/*");
         }
     }
 
@@ -199,13 +217,21 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         session = new SessionManager(this);
-        // Only reset to the Store panel on first entry; keep the user's place
-        // when returning from Maps/Login/etc.
-        if (!resumedOnce) {
-            resumedOnce = true;
-            showStorePanel();
-            binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
-        }
+        showStorePanel();
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+        selectCategory(currentCategory != null ? currentCategory : "ALL");
+        updateNavAccountItem();
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        session = new SessionManager(this);
+        showStorePanel();
+        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+        selectCategory("ALL");
+        updateNavAccountItem();
     }
 
     /**
@@ -243,10 +269,7 @@ public class HomeActivity extends AppCompatActivity {
                 // Open Customer / Staff dashboard if logged in, or Login screen if not
                 SessionManager currentSession = new SessionManager(HomeActivity.this);
                 if (currentSession.isLoggedIn()) {
-                    Class<?> target = currentSession.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
-                    Intent intent = new Intent(HomeActivity.this, target);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-                    startActivity(intent);
+                    showAccountDialog(currentSession);
                 } else {
                     Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                     startActivity(intent);
@@ -258,6 +281,55 @@ public class HomeActivity extends AppCompatActivity {
         });
 
         setupBranchesPanel();
+    }
+
+    private void showAccountDialog(SessionManager currentSession) {
+        com.techfix.app.models.User user = new com.techfix.app.database.UserDAO(dbHelper).get(currentSession.getUserId());
+        String userName = (user != null && user.name != null && !user.name.isEmpty()) ? user.name : "Active User";
+        String userRoleStr = (currentSession.getRole() == UserRole.STAFF) ? "Staff / Admin" : "Customer";
+
+        CharSequence[] options = {
+                "Open " + userRoleStr + " Dashboard",
+                "Log Out of Account"
+        };
+
+        new AlertDialog.Builder(this)
+                .setTitle("Account: " + userName)
+                .setItems(options, (dialog, which) -> {
+                    if (which == 0) {
+                        Class<?> target = currentSession.getRole() == UserRole.STAFF ? StaffActivity.class : CustomerActivity.class;
+                        Intent intent = new Intent(HomeActivity.this, target);
+                        startActivity(intent);
+                    } else if (which == 1) {
+                        currentSession.logout();
+                        Toast.makeText(HomeActivity.this, "Logged out successfully", Toast.LENGTH_SHORT).show();
+                        showStorePanel();
+                        binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
+                        updateNavAccountItem();
+                    }
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    private void updateNavAccountItem() {
+        if (binding == null || binding.bottomNavigation == null) return;
+        MenuItem accountItem = binding.bottomNavigation.getMenu().findItem(R.id.nav_home_account);
+        if (accountItem != null) {
+            SessionManager currentSession = new SessionManager(this);
+            if (currentSession.isLoggedIn()) {
+                if (currentSession.getRole() == UserRole.STAFF) {
+                    accountItem.setTitle("Admin Dash");
+                    accountItem.setIcon(R.drawable.ic_nav_dashboard);
+                } else {
+                    accountItem.setTitle("Account");
+                    accountItem.setIcon(R.drawable.ic_nav_account);
+                }
+            } else {
+                accountItem.setTitle("Sign In");
+                accountItem.setIcon(R.drawable.ic_nav_account);
+            }
+        }
     }
 
     /**
@@ -392,8 +464,9 @@ public class HomeActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // 4. Setup Attach Photo Button
-        binding.bookingPhotoButton.setOnClickListener(v -> showPhotoOptionsDialog());
+        // 4. Setup Attach Photo Button & Drop Zone (Direct Camera Permission & Launch)
+        binding.bookingPhotoButton.setOnClickListener(v -> checkCameraPermissionAndLaunch());
+        binding.bookingPhotoDropZone.setOnClickListener(v -> checkCameraPermissionAndLaunch());
 
         // 5. Setup Remove Photo Button
         binding.removePhotoButton.setOnClickListener(v -> {
