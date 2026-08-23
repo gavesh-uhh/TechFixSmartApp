@@ -78,7 +78,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:hint="Service Name (e.g. Camera Lens Fix)" />
+                    android:hint="Service Name" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -109,7 +109,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:hint="Required Part (optional, e.g. Phone Display)" />
+                    android:hint="Required Part (optional)" />
 
                 <EditText
                     android:id="@+id/newServicePrice"
@@ -117,7 +117,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:hint="Standard Price in LKR (e.g. 7500)"
+                    android:hint="Standard Price in LKR"
                     android:inputType="numberDecimal" />
 
                 <Button
@@ -173,7 +173,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:hint="Technician Full Name (e.g. Ravindu Perera)" />
+                    android:hint="Technician Full Name" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -241,7 +241,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:hint="Showcase Title (e.g. MacBook Water Fix)" />
+                    android:hint="Showcase Title" />
 
                 <Button
                     android:id="@+id/addSampleButton"

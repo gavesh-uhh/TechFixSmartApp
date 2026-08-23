@@ -14,13 +14,7 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Enter the spare component details and initial inventory quantity."
-        android:textColor="@color/muted_text"
-        android:textSize="14sp" />
+
 
     <!-- Part Name Field -->
     <TextView
@@ -38,7 +32,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
-        android:hint="Part Name (e.g. iPhone 14 Display)"
+        android:hint="Part Name"
         android:inputType="text"
         android:maxLines="1" />
 

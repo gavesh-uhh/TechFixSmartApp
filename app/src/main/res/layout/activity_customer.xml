@@ -674,12 +674,7 @@
                     android:text="Book a Smart Repair"
                     android:textSize="22sp" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:text="3 simple steps to schedule your device diagnosis &amp; fix."
-                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
 
                 <!-- STEP 1 CARD: Device & Service -->
                 <com.google.android.material.card.MaterialCardView
@@ -702,13 +697,7 @@
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:layout_marginBottom="12dp"
-                            android:text="Select your repair service and device details."
-                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
 
                         <!-- 1. Service Type -->
                         <TextView
@@ -759,7 +748,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:hint="e.g. iPhone 14 Pro, MacBook Pro M2, Dell XPS"
+                            android:hint="Brand &amp; Model"
                             android:inputType="text"
                             android:maxLines="1" />
                     </LinearLayout>
@@ -786,13 +775,7 @@
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:layout_marginBottom="12dp"
-                            android:text="Describe the issue and attach a photo if available."
-                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
 
                         <!-- 4. Problem Description -->
                         <TextView
@@ -810,7 +793,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:gravity="top"
-                            android:hint="Describe the damage, symptoms, or malfunction…"
+                            android:hint="Problem details"
                             android:inputType="textMultiLine"
                             android:minLines="3" />
 
@@ -915,13 +898,7 @@
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:layout_marginBottom="12dp"
-                            android:text="Select your workshop branch and submit your appointment."
-                            android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
 
                         <!-- 6. Preferred Branch -->
                         <TextView

@@ -558,7 +558,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
-                            android:hint="e.g. iPhone 13 Pro, ThinkPad X1"
+                            android:hint="Brand &amp; Model"
                             android:inputType="text" />
 
                         <!-- Problem Description -->
@@ -578,7 +578,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:gravity="top"
-                            android:hint="Describe the problem…"
+                            android:hint="Problem details"
                             android:inputType="textMultiLine"
                             android:minLines="3" />
 
