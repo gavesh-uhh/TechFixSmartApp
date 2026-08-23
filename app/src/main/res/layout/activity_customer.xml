@@ -149,7 +149,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:contentDescription="Browse all repair categories"
-                                android:src="@drawable/ic_cat_all" />
+                                android:src="@drawable/ic_cat_all"
+                                app:tint="@color/white" />
                         </FrameLayout>
 
                         <TextView
@@ -190,7 +191,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:contentDescription="Phone repair services"
-                                android:src="@drawable/ic_cat_phones" />
+                                android:src="@drawable/ic_cat_phones"
+                                app:tint="@color/primary" />
                         </FrameLayout>
 
                         <TextView
@@ -230,7 +232,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:contentDescription="Computer repair services"
-                                android:src="@drawable/ic_cat_computers" />
+                                android:src="@drawable/ic_cat_computers"
+                                app:tint="@color/primary" />
                         </FrameLayout>
 
                         <TextView
@@ -270,7 +273,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:contentDescription="Screen repair services"
-                                android:src="@drawable/ic_cat_screens" />
+                                android:src="@drawable/ic_cat_screens"
+                                app:tint="@color/primary" />
                         </FrameLayout>
 
                         <TextView
@@ -310,7 +314,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:contentDescription="Battery replacement services"
-                                android:src="@drawable/ic_cat_batteries" />
+                                android:src="@drawable/ic_cat_batteries"
+                                app:tint="@color/primary" />
                         </FrameLayout>
 
                         <TextView

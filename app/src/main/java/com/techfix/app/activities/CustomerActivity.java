@@ -456,7 +456,7 @@ public class CustomerActivity extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        loadCustomerServices("ALL");
+        selectCategory("ALL");
         loadCustomerParts();
         loadCustomerShowcase();
     }
