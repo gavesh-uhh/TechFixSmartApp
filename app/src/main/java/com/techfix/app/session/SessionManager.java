@@ -27,14 +27,15 @@ public class SessionManager {
     }
 
     public boolean isLoggedIn() {
-        return prefs.contains(KEY_USER_ID) && prefs.getLong(KEY_USER_ID, -1) > 0;
+        return prefs != null && prefs.contains(KEY_USER_ID) && prefs.getLong(KEY_USER_ID, -1) > 0;
     }
 
     public long getUserId() {
-        return prefs.getLong(KEY_USER_ID, -1);
+        return prefs != null ? prefs.getLong(KEY_USER_ID, -1) : -1;
     }
 
     public UserRole getRole() {
+        if (prefs == null) return UserRole.CUSTOMER;
         try {
             return UserRole.valueOf(prefs.getString(KEY_ROLE, UserRole.CUSTOMER.name()));
         } catch (Exception e) {
@@ -49,6 +50,8 @@ public class SessionManager {
                 auth.signOut();
             }
         } catch (Exception ignored) {}
-        prefs.edit().clear().commit();
+        if (prefs != null) {
+            prefs.edit().remove(KEY_USER_ID).remove(KEY_ROLE).clear().commit();
+        }
     }
 }
