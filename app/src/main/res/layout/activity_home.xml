@@ -595,10 +595,13 @@
 
                         <!-- Attach Photo Drop Zone -->
                         <LinearLayout
+                            android:id="@+id/bookingPhotoDropZone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="14dp"
                             android:background="@drawable/bg_dashed_border"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="16dp">

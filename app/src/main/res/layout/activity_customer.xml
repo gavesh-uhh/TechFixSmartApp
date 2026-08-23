@@ -859,10 +859,13 @@
                             android:textStyle="bold" />
 
                         <LinearLayout
+                            android:id="@+id/customerPhotoDropZone"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
                             android:background="@drawable/bg_dashed_border"
+                            android:clickable="true"
+                            android:focusable="true"
                             android:gravity="center"
                             android:orientation="vertical"
                             android:padding="16dp">

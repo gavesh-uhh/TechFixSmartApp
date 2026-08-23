@@ -151,6 +151,9 @@ public class HomeActivity extends AppCompatActivity {
                 cacheDir.mkdirs();
             }
             File photoFile = new File(cacheDir, "repair_photo_" + System.currentTimeMillis() + ".jpg");
+            if (!photoFile.exists()) {
+                photoFile.createNewFile();
+            }
             tempCameraUri = FileProvider.getUriForFile(this, getPackageName() + ".fileprovider", photoFile);
             takePictureLauncher.launch(tempCameraUri);
         } catch (Exception e) {
@@ -420,8 +423,9 @@ public class HomeActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // 4. Setup Attach Photo Button
+        // 4. Setup Attach Photo Button & Drop Zone
         binding.bookingPhotoButton.setOnClickListener(v -> showPhotoOptionsDialog());
+        binding.bookingPhotoDropZone.setOnClickListener(v -> showPhotoOptionsDialog());
 
         // 5. Setup Remove Photo Button
         binding.removePhotoButton.setOnClickListener(v -> {
