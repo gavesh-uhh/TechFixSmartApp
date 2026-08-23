@@ -62,8 +62,8 @@ captures/
 .externalNativeBuild
 .cxx
 
-# Google Services / Crashlytics (uncomment if you want to keep secrets local)
-# google-services.json
+# Google Services / Crashlytics (keep secrets local)
+google-services.json
 
 # OS specific files
 .DS_Store
