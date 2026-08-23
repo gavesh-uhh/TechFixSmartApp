@@ -2,10 +2,9 @@
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     style="@style/Widget.TechFix.ShadowCard"
-    android:layout_width="match_parent"
+    android:layout_width="270dp"
     android:layout_height="wrap_content"
-    android:layout_marginTop="8dp"
-    android:layout_marginBottom="8dp">
+    android:layout_marginEnd="12dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -23,18 +22,22 @@
 
         <TextView
             android:id="@+id/sampleTitle"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="@color/ink"
             android:textSize="16sp"
             android:textStyle="bold" />
 
         <TextView
             android:id="@+id/sampleService"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textAppearance="@style/TextAppearance.TechFix.Body" />
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.techfix.app.R;
+import com.techfix.app.adapters.SampleImageAdapter;
 import com.techfix.app.adapters.ServiceCatalogAdapter;
 import com.techfix.app.adapters.TechnicianAdapter;
 import com.techfix.app.database.DatabaseHelper;
@@ -105,6 +106,11 @@ public class CatalogFragment extends Fragment {
         newServiceBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.newServiceBranchSpinner.setAdapter(newServiceBranchAdapter);
 
+        String[] categoryOptions = {"Mobile phone", "Laptop / computer"};
+        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, categoryOptions);
+        categoryAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.newServiceCategorySpinner.setAdapter(categoryAdapter);
+
         ServiceCatalogAdapter serviceCatalogAdapter = new ServiceCatalogAdapter(new ServiceCatalogAdapter.OnServiceActionListener() {
             @Override
             public void onEditPrice(Service service) {
@@ -132,7 +138,7 @@ public class CatalogFragment extends Fragment {
         // Add Service Button
         binding.addServiceButton.setOnClickListener(v -> {
             String name = binding.newServiceName.getText().toString().trim();
-            String category = binding.newServiceCategory.getText().toString().trim();
+            String category = (String) binding.newServiceCategorySpinner.getSelectedItem();
             String part = binding.newServiceRequiredPart.getText().toString().trim();
             String priceStr = binding.newServicePrice.getText().toString().trim();
             String branch = com.techfix.app.database.BranchDAO.toDbName((String) binding.newServiceBranchSpinner.getSelectedItem());
@@ -151,7 +157,6 @@ public class CatalogFragment extends Fragment {
                 serviceDAO.add(name, category.isEmpty() ? "Mobile phone" : category, price, part, branch);
                 FirebaseSyncManager.getInstance().sync(requireContext(), null);
                 binding.newServiceName.setText("");
-                binding.newServiceCategory.setText("");
                 binding.newServiceRequiredPart.setText("");
                 binding.newServicePrice.setText("");
 
@@ -192,22 +197,31 @@ public class CatalogFragment extends Fragment {
         binding.techniciansList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.techniciansList.setAdapter(technicianAdapter);
 
+        // Branch & Skill selectors (fixed values so auto-assignment matching never breaks)
+        String[] techBranchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).filterNamesArray();
+        ArrayAdapter<String> techBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, techBranchOptions);
+        techBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.newTechBranchSpinner.setAdapter(techBranchAdapter);
+
+        String[] skillOptions = {"Mobile phone", "Laptop / computer"};
+        ArrayAdapter<String> skillAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, skillOptions);
+        skillAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
+        binding.newTechSkillSpinner.setAdapter(skillAdapter);
+
         // Add Tech Button
         binding.addTechButton.setOnClickListener(v -> {
             String name = binding.newTechName.getText().toString().trim();
-            String branch = binding.newTechBranch.getText().toString().trim();
-            String skill = binding.newTechSkill.getText().toString().trim();
+            String branch = com.techfix.app.database.BranchDAO.toDbName((String) binding.newTechBranchSpinner.getSelectedItem());
+            String skill = (String) binding.newTechSkillSpinner.getSelectedItem();
 
             if (name.isEmpty()) {
                 binding.newTechName.setError("Enter technician name");
                 return;
             }
 
-            technicianDAO.add(name, branch.isEmpty() ? "Colombo branch" : branch, skill.isEmpty() ? "Mobile phone" : skill);
+            technicianDAO.add(name, branch, skill);
             FirebaseSyncManager.getInstance().sync(requireContext(), null);
             binding.newTechName.setText("");
-            binding.newTechBranch.setText("");
-            binding.newTechSkill.setText("");
 
             refresh();
             Snackbar.make(v, "Technician " + name + " registered successfully", Snackbar.LENGTH_LONG).show();
@@ -215,6 +229,20 @@ public class CatalogFragment extends Fragment {
     }
 
     private void setupShowcase() {
+        // Published showcases gallery (long-press to remove)
+        binding.samplesList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
+        binding.samplesList.setAdapter(new SampleImageAdapter(sample -> new AlertDialog.Builder(requireContext())
+                .setTitle("Remove Showcase?")
+                .setMessage("Remove \"" + sample.title + "\" from the customer gallery?")
+                .setPositiveButton("Remove", (dialog, which) -> {
+                    sampleRepairDAO.delete(sample.id);
+                    FirebaseSyncManager.getInstance().sync(requireContext(), null);
+                    refresh();
+                    Snackbar.make(binding.getRoot(), "Showcase removed", Snackbar.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show()));
+
         // Publish Showcase Button
         binding.addSampleButton.setOnClickListener(v -> {
             String title = binding.sampleTitleInput.getText().toString().trim();
@@ -232,6 +260,7 @@ public class CatalogFragment extends Fragment {
             } catch (Exception e) {
                 sampleRepairDAO.add(title, "Staff showcase", "");
                 binding.sampleTitleInput.setText("");
+                refresh();
                 Snackbar.make(v, "Showcase published to Explore", Snackbar.LENGTH_LONG).show();
             }
         });
@@ -247,6 +276,14 @@ public class CatalogFragment extends Fragment {
         if (binding.techniciansList.getAdapter() != null) {
             ((TechnicianAdapter) binding.techniciansList.getAdapter()).submit(techs);
         }
+
+        List<com.techfix.app.models.SampleRepair> samples = sampleRepairDAO.all();
+        if (binding.samplesList.getAdapter() != null) {
+            ((SampleImageAdapter) binding.samplesList.getAdapter()).submit(samples);
+        }
+        boolean hasSamples = !samples.isEmpty();
+        binding.samplesList.setVisibility(hasSamples ? View.VISIBLE : View.GONE);
+        binding.emptySamplesText.setVisibility(hasSamples ? View.GONE : View.VISIBLE);
     }
 
     private void showEditServicePriceDialog(Service service) {
@@ -280,6 +317,7 @@ public class CatalogFragment extends Fragment {
             if (title.isEmpty()) title = "Repair Showcase";
             sampleRepairDAO.add(title, "Staff showcase", String.valueOf(pendingSampleUri));
             binding.sampleTitleInput.setText("");
+            refresh();
             Snackbar.make(binding.getRoot(), "Sample photo published to Explore", Snackbar.LENGTH_LONG).show();
         } catch (Exception e) {
             Snackbar.make(binding.getRoot(), "Could not save showcase", Snackbar.LENGTH_LONG).show();

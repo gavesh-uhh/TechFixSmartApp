@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
             android:text="Smart repairs, done right."
-            android:textColor="#D8CEEE"
+            android:textColor="@color/techfix_sky"
             android:textSize="14sp" />
     </LinearLayout>
 </FrameLayout>
