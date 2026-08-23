@@ -10,4 +10,3 @@ public final class Feedback {
     public static void error(View view,String message){show(view,message,R.color.error);}
     private static void show(View view,String message,int color){Snackbar bar=Snackbar.make(view,message,Snackbar.LENGTH_LONG);bar.setBackgroundTint(view.getContext().getColor(color));bar.setTextColor(view.getContext().getColor(R.color.white));bar.show();}
 }
-

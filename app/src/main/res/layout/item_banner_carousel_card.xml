@@ -14,7 +14,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <!-- Generated Banner Image -->
         <ImageView
             android:id="@+id/bannerImageView"
             android:layout_width="match_parent"
@@ -23,13 +22,11 @@
             android:scaleType="centerCrop"
             android:src="@drawable/hero_banner_1" />
 
-        <!-- Gradient Dark Scrim Overlay for Legibility -->
         <View
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/bg_banner_scrim" />
 
-        <!-- Banner Text Content -->
         <LinearLayout
             android:id="@+id/bannerCardBackground"
             android:layout_width="match_parent"

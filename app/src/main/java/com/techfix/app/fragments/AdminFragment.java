@@ -24,9 +24,6 @@ import com.techfix.app.databinding.FragmentAdminBinding;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
-/**
- * TAB 5: Admin Workspace (profile, DB diagnostics, cloud sync, logout).
- */
 public class AdminFragment extends Fragment {
 
     private FragmentAdminBinding binding;
@@ -55,13 +52,10 @@ public class AdminFragment extends Fragment {
         sparePartDAO = new SparePartDAO(dbHelper);
         userDAO = new UserDAO(dbHelper);
 
-        // Bottom inset so content clears the gesture nav bar / keyboard
         WindowInsetsHelper.applyBottomInset(binding.tabProfile);
 
-        // Log Out of Account
         binding.staffProfileLogoutButton.setOnClickListener(v -> performLogout());
 
-        // Cloud Sync button
         binding.btnSyncFirebaseNow.setOnClickListener(v -> {
             binding.btnSyncFirebaseNow.setEnabled(false);
             binding.btnSyncFirebaseNow.setText("Syncing...");
@@ -73,7 +67,6 @@ public class AdminFragment extends Fragment {
             });
         });
 
-        // Reset Sample Data button
         binding.btnReseedDemoData.setOnClickListener(v -> {
             new AlertDialog.Builder(requireContext())
                     .setTitle("Reset Sample Data?")

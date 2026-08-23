@@ -25,13 +25,6 @@ import com.techfix.app.util.WindowInsetsHelper;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * LoginActivity - Unified Authentication for TechFix Repair App.
- * Supports:
- * 1. Seamless login for accounts created before or after Firebase setup.
- * 2. Real-time Firebase Authentication with local SQLite offline sync.
- * 3. Automatic routing to CustomerActivity or StaffActivity based on user role.
- */
 public class LoginActivity extends AppCompatActivity {
 
     private enum Mode { SIGN_IN, SIGN_UP }
@@ -49,35 +42,27 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Initialize session and DAOs
         session = new SessionManager(this);
         userDAO = new UserDAO(DatabaseHelper.getInstance(this));
 
-        // 2. Check if already logged in
         if (session.isLoggedIn()) {
             resumeSession(session);
             return;
         }
 
-        // 3. Initialize Firebase
         try {
             firebaseAuth = FirebaseAuth.getInstance();
             firestore = FirebaseFirestore.getInstance();
         } catch (Exception ignored) {}
 
-        // 4. Inflate layout
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        // Single listener pads top by statusBars/cutout and bottom by navigationBars + ime(),
-        // so the scroll content clears system bars and rises above the keyboard (adjustResize).
         WindowInsetsHelper.applyScrollContent(binding.loginContent);
 
-        // 5. Setup click listeners
         binding.loginButton.setOnClickListener(this::submitAuthForm);
         binding.switchAuthButton.setOnClickListener(v -> switchMode(mode == Mode.SIGN_UP ? Mode.SIGN_IN : Mode.SIGN_UP));
         binding.forgotPasswordText.setOnClickListener(this::showForgotPasswordDialog);
 
-        // 6. Password strength watcher
         binding.passwordInput.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -88,7 +73,6 @@ public class LoginActivity extends AppCompatActivity {
             @Override public void afterTextChanged(Editable s) {}
         });
 
-        // 7. Initial view state
         switchMode(Mode.SIGN_IN);
     }
 
@@ -136,30 +120,21 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Handles User Sign In:
-     * 1. Checks local SQLite credentials (supports accounts created before Firebase).
-     * 2. Checks Firebase Authentication.
-     * 3. Syncs between both platforms automatically.
-     */
     private void handleSignIn(View view, String email, String password) {
         binding.loginButton.setEnabled(false);
         binding.loginButton.setText("Signing in...");
 
         boolean isStaff = email.equalsIgnoreCase("staff@techfix.lk");
 
-        // Step 1: Check if credentials exist locally in SQLite (created previously)
         if (userDAO.authenticate(email, password)) {
             User localUser = userDAO.findByEmail(email);
             UserRole role = (isStaff || (localUser != null && localUser.role == UserRole.STAFF)) ? UserRole.STAFF : UserRole.CUSTOMER;
             long userId = (localUser != null) ? localUser.id : 1;
 
-            // In background, register into Firebase Auth if not already there
             if (firebaseAuth != null) {
                 final String uName = (localUser != null) ? localUser.name : "User";
                 firebaseAuth.signInWithEmailAndPassword(email, password)
                         .addOnFailureListener(e -> {
-                            // User doesn't exist in Firebase yet; create them in Firebase Auth
                             firebaseAuth.createUserWithEmailAndPassword(email, password)
                                     .addOnSuccessListener(authResult -> {
                                         if (firebaseAuth.getCurrentUser() != null) {
@@ -178,7 +153,6 @@ public class LoginActivity extends AppCompatActivity {
             return;
         }
 
-        // Step 2: Try Firebase Authentication
         if (firebaseAuth != null) {
             firebaseAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(this, task -> {
@@ -186,7 +160,6 @@ public class LoginActivity extends AppCompatActivity {
                             FirebaseUser firebaseUser = firebaseAuth.getCurrentUser();
                             String name = (firebaseUser != null && firebaseUser.getDisplayName() != null) ? firebaseUser.getDisplayName() : "Customer";
 
-                            // Ensure local user exists in SQLite
                             User localUser = userDAO.findByEmail(email);
                             if (localUser == null) {
                                 userDAO.create(name, email, "", password);
@@ -215,11 +188,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Handles User Sign Up:
-     * 1. Creates account in Firebase Auth + Firestore.
-     * 2. Saves profile in SQLite for offline and local appointment mapping.
-     */
     private void handleSignUp(View view, String email, String password) {
         String fullName = binding.nameInput.getText().toString().trim();
         String phone = binding.phoneInput.getText().toString().trim();
@@ -245,7 +213,6 @@ public class LoginActivity extends AppCompatActivity {
         binding.loginButton.setEnabled(false);
         binding.loginButton.setText("Creating account...");
 
-        // Save to SQLite
         userDAO.create(fullName, email, phone, password);
         User localUser = userDAO.findByEmail(email);
         long userId = (localUser != null) ? localUser.id : 1;
@@ -280,7 +247,6 @@ public class LoginActivity extends AppCompatActivity {
                             openDashboard(UserRole.CUSTOMER);
 
                         } else {
-                            // If user already existed in Firebase, try sign in with same password
                             firebaseAuth.signInWithEmailAndPassword(email, password)
                                     .addOnSuccessListener(authResult -> {
                                         session.start(userId, UserRole.CUSTOMER);
@@ -304,9 +270,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Sends a Firebase password-reset email for the given (or pre-filled) address.
-     */
     private void showForgotPasswordDialog(View v) {
         android.widget.EditText emailField = new android.widget.EditText(this);
         emailField.setInputType(android.text.InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);

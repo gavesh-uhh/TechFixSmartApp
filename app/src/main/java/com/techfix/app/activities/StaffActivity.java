@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
@@ -19,16 +18,6 @@ import com.techfix.app.fragments.StaffTabHost;
 import com.techfix.app.session.SessionManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
-/**
- * StaffActivity - Executive Workshop & Admin Dashboard host.
- * Keeps only the header (title/badge/email/Store), BottomNavigationView and the
- * FragmentContainerView hosting one tab fragment at a time:
- * 1. OverviewFragment  - Overview & Financial KPIs
- * 2. QueueFragment     - Repair Queue & Docket Master
- * 3. InventoryFragment - Inventory & Spare Parts
- * 4. CatalogFragment   - Catalog & Staff Roster
- * 5. AdminFragment     - Admin & Customer Directory (+ Log Out of Account)
- */
 public class StaffActivity extends AppCompatActivity implements StaffTabHost {
 
     private ActivityStaffBinding binding;
@@ -39,24 +28,18 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Session Verification
         session = new SessionManager(this);
         if (!session.isLoggedIn()) {
             goHome();
             return;
         }
 
-        // 2. View Binding & Insets
         binding = ActivityStaffBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        // Top insets handled here; the BottomNavigationView (staffBottomNavigation) applies its
-        // own navigationBars inset via Material, so we don't pad it again (avoids double inset).
         WindowInsetsHelper.apply(binding.staffHeader, binding.staffContent);
 
-        // Initialize Firebase Sync Manager
         com.techfix.app.sync.FirebaseSyncManager.getInstance().init(this);
 
-        // 3. Header & Navigation
         binding.staffHomeStoreButton.setOnClickListener(v -> {
             Intent intent = new Intent(StaffActivity.this, HomeActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
@@ -100,9 +83,6 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
         finish();
     }
 
-    /**
-     * Setup 5-tab bottom navigation (Overview, Queue, Inventory, Catalog, Admin).
-     */
     private void setupBottomNavigation() {
         binding.staffBottomNavigation.setOnItemSelectedListener(item -> {
             int itemId = item.getItemId();
@@ -145,15 +125,6 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
                 .commit();
     }
 
-    // =========================================================================
-    // StaffTabHost implementation (fragment -> activity bridge)
-    // =========================================================================
-
-    @Override
-    public void setHeaderBadge(String text) {
-        // Badge removed from top header bar
-    }
-
     @Override
     public void switchToTab(int position) {
         int navId;
@@ -169,7 +140,6 @@ public class StaffActivity extends AppCompatActivity implements StaffTabHost {
 
     @Override
     public String getSelectedBranch() {
-        // Kept across tab switches so Queue filters follow the Overview branch picker.
         return selectedBranch;
     }
 

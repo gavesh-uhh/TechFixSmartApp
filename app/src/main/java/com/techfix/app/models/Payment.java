@@ -11,4 +11,3 @@ public class Payment {
         this.method = method; this.paidAt = paidAt;
     }
 }
-

@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- ===== TechFix "Deep Royal Lilac & White" Palette — Single Source of Truth ===== -->
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
-    <!-- Deep Royal Lilac Core Ramp -->
     <color name="lilac_900">#1C122C</color>
     <color name="lilac_800">#382064</color>
     <color name="lilac_700">#4A2E80</color>
@@ -15,7 +14,6 @@
     <color name="lilac_100">#ECE5F8</color>
     <color name="lilac_50">#F8F6FC</color>
 
-    <!-- Light Neutrals & Canvas Surfaces -->
     <color name="cloud">#F8F6FC</color>
     <color name="paper">#F8F6FC</color>
     <color name="surface">#FFFFFFFF</color>
@@ -28,7 +26,6 @@
     <color name="ink">#1C122C</color>
     <color name="muted_text">#6C627E</color>
 
-    <!-- Semantic Alerts & Status Tints -->
     <color name="techfix_accent_yellow">#F5C518</color>
     <color name="techfix_yellow">#FFC107</color>
     <color name="success">#16A34A</color>
@@ -39,7 +36,6 @@
     <color name="warning_container">#FEF4E6</color>
     <color name="info_container">#ECE5F8</color>
 
-    <!-- ===== Compatibility Aliases (Navy/Blue names mapped to Deep Lilac) ===== -->
     <color name="primary">#4A2E80</color>
     <color name="on_primary">#FFFFFF</color>
     <color name="primary_container">#ECE5F8</color>

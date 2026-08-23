@@ -1,5 +1,5 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+
     <style name="Base.Theme.TechFixSmartApp" parent="Theme.Material3.Light.NoActionBar">
         <item name="colorPrimary">@color/primary</item>
         <item name="colorOnPrimary">@color/on_primary</item>
@@ -91,7 +91,6 @@
         <item name="android:textSize">12sp</item>
     </style>
 
-    <!-- Modern soft shadow card (E1): 3dp elevation, 20dp radius, lilac-tinted hairline stroke -->
     <style name="Widget.TechFix.ShadowCard" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">20dp</item>
         <item name="cardElevation">3dp</item>
@@ -100,7 +99,6 @@
         <item name="strokeWidth">1dp</item>
     </style>
 
-    <!-- Bento KPI & Hero Card -->
     <style name="Widget.TechFix.BentoCard" parent="Widget.Material3.CardView.Elevated">
         <item name="cardCornerRadius">20dp</item>
         <item name="cardElevation">2dp</item>
@@ -116,7 +114,6 @@
         <item name="android:textColor">@color/primary</item>
     </style>
 
-    <!-- Aliases used by layouts -->
     <style name="Widget.TechFix.Filled" parent="Widget.TechFix.Button.Filled" />
     <style name="Widget.TechFix.Secondary" parent="Widget.TechFix.Button.Secondary" />
     <style name="TextAppearance.TechFix.LabelSmall" parent="TextAppearance.Material3.LabelSmall">
@@ -143,7 +140,6 @@
         <item name="android:spinnerMode">dropdown</item>
     </style>
 
-    <!-- Scaffold styles -->
     <style name="Widget.TechFix.ScreenHeader" parent="">
         <item name="android:background">@drawable/bg_service_band</item>
         <item name="android:padding">20dp</item>
@@ -155,7 +151,6 @@
         <item name="android:textColor">@color/ink</item>
     </style>
 
-    <!-- Single visual language for status pills: uppercase, letterspaced pill. -->
     <style name="Widget.TechFix.StatusChip" parent="">
         <item name="android:background">@drawable/bg_field</item>
         <item name="android:paddingLeft">10dp</item>

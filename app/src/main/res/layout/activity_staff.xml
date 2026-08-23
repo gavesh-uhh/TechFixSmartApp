@@ -7,7 +7,6 @@
     android:background="@color/cloud"
     android:orientation="vertical">
 
-    <!-- Top Header Bar -->
     <LinearLayout
         android:id="@+id/staffHeader"
         android:layout_width="match_parent"
@@ -52,7 +51,6 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Customer Store Mode Button -->
         <Button
             android:id="@+id/staffHomeStoreButton"
             style="@style/Widget.TechFix.Button.Secondary"
@@ -68,7 +66,6 @@
             android:textStyle="bold"
             app:strokeColor="@color/lilac_200" />
 
-        <!-- Log Out Button -->
         <Button
             android:id="@+id/staffLogoutButton"
             style="@style/Widget.TechFix.Button.Secondary"
@@ -86,20 +83,17 @@
             app:strokeColor="@color/error" />
     </LinearLayout>
 
-    <!-- Divider Line -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/line" />
 
-    <!-- Fragment Host for the 5 staff tabs (Overview, Queue, Inventory, Catalog, Admin) -->
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/staffContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1" />
 
-    <!-- Staff Bottom Navigation Bar -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/staffBottomNavigation"
         android:layout_width="match_parent"

@@ -12,9 +12,6 @@ import com.techfix.app.models.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adapter for managing repair service catalog & pricing in the Admin Dashboard.
- */
 public class ServiceCatalogAdapter extends RecyclerView.Adapter<ServiceCatalogAdapter.Holder> {
 
     public interface OnServiceActionListener {

@@ -22,10 +22,6 @@ public final class WindowInsetsHelper {
         ViewCompat.requestApplyInsets(header); ViewCompat.requestApplyInsets(bottom);
     }
 
-    /**
-     * Pads only the top by max(statusBars, displayCutout) inset, preserving existing padding.
-     * Use for headers when the bottom view handles its own insets (e.g. Material BottomNavigationView).
-     */
     public static void applyHeader(View header) {
         int left=header.getPaddingLeft(), top=header.getPaddingTop(), right=header.getPaddingRight(), bottom=header.getPaddingBottom();
         ViewCompat.setOnApplyWindowInsetsListener(header,(view,windowInsets)->{
@@ -37,10 +33,6 @@ public final class WindowInsetsHelper {
         ViewCompat.requestApplyInsets(header);
     }
 
-    /**
-     * Pads only the bottom by navigationBars + ime() insets so footers stay above the
-     * gesture nav bar and the keyboard. Preserves existing padding.
-     */
     public static void applyBottomInset(View footer) {
         int left=footer.getPaddingLeft(), top=footer.getPaddingTop(), right=footer.getPaddingRight(), bottom=footer.getPaddingBottom();
         ViewCompat.setOnApplyWindowInsetsListener(footer,(view,windowInsets)->{
@@ -52,10 +44,6 @@ public final class WindowInsetsHelper {
         ViewCompat.requestApplyInsets(footer);
     }
 
-    /**
-     * For scrollable content screens: pads top by max(statusBars, displayCutout) and bottom by
-     * navigationBars + ime(). Single listener so both edges work on the same view.
-     */
     public static void applyScrollContent(View content) {
         int left=content.getPaddingLeft(), top=content.getPaddingTop(), right=content.getPaddingRight(), bottom=content.getPaddingBottom();
         ViewCompat.setOnApplyWindowInsetsListener(content,(view,windowInsets)->{
@@ -69,4 +57,3 @@ public final class WindowInsetsHelper {
         ViewCompat.requestApplyInsets(content);
     }
 }
-

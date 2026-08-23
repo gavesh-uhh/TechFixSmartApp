@@ -14,9 +14,6 @@ import com.techfix.app.models.PaymentStatus;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * StaffAppointmentAdapter - Displays repair appointments for staff with interactive workflow actions.
- */
 public class StaffAppointmentAdapter extends RecyclerView.Adapter<StaffAppointmentAdapter.Holder> {
 
     public interface OnAppointmentClick { void onClick(Appointment appointment); }
@@ -52,7 +49,6 @@ public class StaffAppointmentAdapter extends RecyclerView.Adapter<StaffAppointme
         String paymentBadge = PaymentStatus.PAID.label.equalsIgnoreCase(a.payment) ? "PAID 🟢" : "PENDING ⏳";
         holder.meta.setText(a.branch + " · " + a.technician + " · Rs " + String.format("%,.0f", a.price) + " · " + paymentBadge);
 
-        // Customize badge color based on status
         if (AppointmentStatus.COMPLETED.label.equalsIgnoreCase(a.status)) {
             holder.stamp.setTextColor(holder.itemView.getContext().getColor(R.color.success));
         } else if (AppointmentStatus.READY_FOR_COLLECTION.label.equalsIgnoreCase(a.status)) {

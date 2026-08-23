@@ -14,7 +14,6 @@
         android:paddingHorizontal="@dimen/screen_padding"
         android:paddingVertical="@dimen/space_16">
 
-        <!-- SECTION 1: SERVICES CATALOG -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -36,7 +35,6 @@
                 android:minWidth="140dp" />
         </LinearLayout>
 
-        <!-- Services RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/servicesList"
             android:layout_width="match_parent"
@@ -46,7 +44,6 @@
             android:nestedScrollingEnabled="false"
             android:paddingBottom="8dp" />
 
-        <!-- Add New Service Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -130,7 +127,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SECTION 2: TECHNICIANS ROSTER -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -138,7 +134,6 @@
             android:text="Technicians &amp; Duty Roster"
             style="@style/Widget.TechFix.SectionTitle" />
 
-        <!-- Technicians RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/techniciansList"
             android:layout_width="match_parent"
@@ -148,7 +143,6 @@
             android:nestedScrollingEnabled="false"
             android:paddingBottom="8dp" />
 
-        <!-- Register New Technician Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -208,7 +202,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- SECTION 3: SHOWCASE PHOTO PUBLISHER -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"

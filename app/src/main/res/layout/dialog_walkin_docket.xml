@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="18dp">
+
+    <EditText
+        android:id="@+id/walkinCustomerInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_field"
+        android:hint="Customer Name (e.g. Ruwan Silva)"
+        android:inputType="textPersonName|textCapWords"
+        android:maxLines="1"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:textColor="@color/ink"
+        android:textColorHint="@color/muted_text"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/walkinDeviceInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_field"
+        android:hint="Device (e.g. iPhone 14 Pro, ThinkPad X1)"
+        android:inputType="textCapSentences"
+        android:maxLines="1"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:textColor="@color/ink"
+        android:textColorHint="@color/muted_text"
+        android:textSize="14sp" />
+
+    <EditText
+        android:id="@+id/walkinProblemInput"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/bg_field"
+        android:hint="Problem Description (e.g. Cracked screen, battery drain)"
+        android:inputType="textMultiLine|textCapSentences"
+        android:minLines="2"
+        android:paddingHorizontal="12dp"
+        android:paddingVertical="10dp"
+        android:textColor="@color/ink"
+        android:textColorHint="@color/muted_text"
+        android:textSize="14sp" />
+
+    <Spinner
+        android:id="@+id/walkinBranchSpinner"
+        style="@style/Widget.TechFix.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp" />
+
+    <Spinner
+        android:id="@+id/walkinServiceSpinner"
+        style="@style/Widget.TechFix.Spinner"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp" />
+
+</LinearLayout>

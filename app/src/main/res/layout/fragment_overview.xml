@@ -14,7 +14,6 @@
         android:paddingHorizontal="@dimen/screen_padding"
         android:paddingVertical="@dimen/space_16">
 
-        <!-- ================= SLEEK DASHBOARD HEADER & BRANCH SELECTOR ================= -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -61,7 +60,6 @@
                     app:iconTint="@color/primary" />
             </LinearLayout>
 
-            <!-- Branch Filter Selector -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -98,7 +96,6 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- ================= EXECUTIVE METRICS LIST ================= -->
         <TextView
             style="@style/Widget.TechFix.SectionTitle"
             android:layout_width="wrap_content"
@@ -106,7 +103,6 @@
             android:layout_marginBottom="12dp"
             android:text="Executive Metrics" />
 
-        <!-- Metric 1: Active Workshop Jobs -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -171,7 +167,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Metric 2: Total Revenue Stream -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -236,7 +231,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Metric 3: Lifetime Bookings -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -301,7 +295,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Metric 4: Inventory & Staff Duty -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -368,7 +361,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- ================= QUICK ACTIONS (2x2 Grid) ================= -->
         <TextView
             style="@style/Widget.TechFix.SectionTitle"
             android:layout_width="wrap_content"
@@ -377,7 +369,6 @@
             android:layout_marginBottom="12dp"
             android:text="Quick Workshop Actions" />
 
-        <!-- Row 1: Walk-in & Restock -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -410,41 +401,17 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!-- Row 2: Add Service & Add Tech -->
-        <LinearLayout
+        <Button
+            android:id="@+id/btnQuickCatalog"
+            style="@style/Widget.TechFix.Button.Secondary"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_marginTop="10dp"
-            android:orientation="horizontal">
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:text="+ New Service / Technician"
+            android:textSize="14sp" />
 
-            <Button
-                android:id="@+id/btnQuickAddService"
-                style="@style/Widget.TechFix.Button.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginEnd="6dp"
-                android:layout_weight="1"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:minWidth="0dp"
-                android:text="+ New Service"
-                android:textSize="14sp" />
-
-            <Button
-                android:id="@+id/btnQuickAddTech"
-                style="@style/Widget.TechFix.Button.Secondary"
-                android:layout_width="0dp"
-                android:layout_height="48dp"
-                android:layout_marginStart="6dp"
-                android:layout_weight="1"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:minWidth="0dp"
-                android:text="+ Register Tech"
-                android:textSize="14sp" />
-        </LinearLayout>
-
-        <!-- ================= RECENT WORKSHOP STREAM ================= -->
         <TextView
             style="@style/Widget.TechFix.SectionTitle"
             android:layout_width="wrap_content"
@@ -453,7 +420,6 @@
             android:layout_marginBottom="12dp"
             android:text="Recent Workshop Dockets" />
 
-        <!-- Recent Dockets List -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/overviewRecentDocketsList"
             android:layout_width="match_parent"
@@ -461,6 +427,17 @@
             android:clipToPadding="false"
             android:nestedScrollingEnabled="false"
             android:paddingBottom="24dp" />
+
+        <TextView
+            android:id="@+id/overviewRecentEmpty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:paddingVertical="24dp"
+            android:text="No dockets yet — create the first walk-in order above."
+            android:textColor="@color/muted_text"
+            android:textSize="13sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 </ScrollView>

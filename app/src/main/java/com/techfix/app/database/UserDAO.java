@@ -7,10 +7,6 @@ import com.techfix.app.models.UserRole;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Data Access Object for Users table in SQLite.
- * Supports case-insensitive email lookup, hashed & plain password matching for smooth migration.
- */
 public class UserDAO {
     private final DatabaseHelper helper;
 
@@ -37,7 +33,6 @@ public class UserDAO {
         String cleanEmail = email.trim().toLowerCase();
         String hashedPassword = DatabaseHelper.hash(password);
 
-        // Check against both hashed password and plain password for seamless backward compatibility
         Cursor c = helper.getReadableDatabase().rawQuery(
                 "SELECT id FROM users WHERE LOWER(email)=? AND (password=? OR password=?)",
                 new String[]{cleanEmail, hashedPassword, password});
@@ -68,32 +63,6 @@ public class UserDAO {
         while (c.moveToNext()) list.add(read(c));
         c.close();
         return list;
-    }
-
-    /** Promotes/demotes a user's role (e.g. CUSTOMER -> STAFF from the Admin directory). */
-    public boolean setRole(long id, String role) {
-        ContentValues v = new ContentValues();
-        v.put("role", role);
-        return helper.getWritableDatabase().update("users", v, "id=?", new String[]{String.valueOf(id)}) > 0;
-    }
-
-    public List<User> searchCustomers(String query) {
-        if (query == null || query.trim().isEmpty()) return allCustomers();
-        String q = "%" + query.trim().toLowerCase() + "%";
-        List<User> list = new ArrayList<>();
-        Cursor c = helper.getReadableDatabase().rawQuery(
-                "SELECT id,name,email,role,phone FROM users WHERE role!='STAFF' AND (LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR phone LIKE ?) ORDER BY id DESC",
-                new String[]{q, q, q});
-        while (c.moveToNext()) list.add(read(c));
-        c.close();
-        return list;
-    }
-
-    public int getRepairCountForUser(long userId) {
-        Cursor c = helper.getReadableDatabase().rawQuery("SELECT COUNT(*) FROM appointments WHERE user_id=?", new String[]{String.valueOf(userId)});
-        int count = c.moveToFirst() ? c.getInt(0) : 0;
-        c.close();
-        return count;
     }
 
     private static User read(Cursor c) {

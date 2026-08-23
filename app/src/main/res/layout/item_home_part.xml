@@ -12,7 +12,6 @@
         android:orientation="vertical"
         android:padding="18dp">
 
-        <!-- Top Row: Clean Branch & OEM Label -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,7 +30,6 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Middle Row: Image Thumbnail & Part Name / Count -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

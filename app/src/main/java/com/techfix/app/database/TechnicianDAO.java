@@ -58,10 +58,6 @@ public class TechnicianDAO {
         return helper.getWritableDatabase().delete("technicians", "id=?", new String[]{String.valueOf(id)}) > 0;
     }
 
-    public boolean deleteByName(String name) {
-        return helper.getWritableDatabase().delete("technicians", "name=?", new String[]{name}) > 0;
-    }
-
     public int getActiveJobCount(String techName) {
         if (techName == null || techName.isEmpty()) return 0;
         Cursor c = helper.getReadableDatabase().rawQuery(

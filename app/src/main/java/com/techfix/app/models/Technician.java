@@ -9,4 +9,3 @@ public class Technician {
         this.id = id; this.name = name; this.branch = branch; this.skill = skill; this.available = available;
     }
 }
-

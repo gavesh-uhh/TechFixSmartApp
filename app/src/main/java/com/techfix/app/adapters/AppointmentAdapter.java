@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.techfix.app.R;
 import com.techfix.app.models.Appointment;
 
-/** RecyclerView adapter for the customer's repair list (Complex Data Model &amp; Adaptors deliverable). */
 public class AppointmentAdapter extends ListAdapter<Appointment, AppointmentAdapter.Holder> {
 
     public interface OnAppointmentClick { void onClick(Appointment appointment); }

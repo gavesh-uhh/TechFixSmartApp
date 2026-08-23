@@ -14,7 +14,6 @@
         android:paddingHorizontal="@dimen/screen_padding"
         android:paddingVertical="@dimen/space_16">
 
-        <!-- Admin Profile Hero Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -32,7 +31,6 @@
                     android:gravity="center_vertical"
                     android:orientation="horizontal">
 
-                    <!-- Admin Avatar Circle -->
                     <FrameLayout
                         android:layout_width="48dp"
                         android:layout_height="48dp"
@@ -113,9 +111,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-
-
-        <!-- System & Data Sync Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"

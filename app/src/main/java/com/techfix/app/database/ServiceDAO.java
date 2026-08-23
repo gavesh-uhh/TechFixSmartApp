@@ -36,10 +36,6 @@ public class ServiceDAO {
         return out;
     }
 
-    public List<String> search(String query) {
-        return searchByBranch(query, "All Branches");
-    }
-
     public List<String> searchByBranch(String query, String branch) {
         List<String> out = new ArrayList<>();
         String sql;
@@ -81,25 +77,6 @@ public class ServiceDAO {
         helper.getWritableDatabase().update("services", v, "name=?", new String[]{service});
     }
 
-    public void upsert(String name, String category, double price, String requiredPart, String branch) {
-        ContentValues v = new ContentValues();
-        v.put("name", name);
-        v.put("category", category);
-        v.put("price", price);
-        v.put("requiredPart", requiredPart);
-        v.put("branch", (branch != null && !branch.trim().isEmpty()) ? branch.trim() : "Colombo branch");
-        long id = helper.getWritableDatabase().insertWithOnConflict("services", null, v, android.database.sqlite.SQLiteDatabase.CONFLICT_IGNORE);
-        if (id < 0) helper.getWritableDatabase().update("services", v, "name=?", new String[]{name});
-    }
-
-    public boolean add(String name, String category, double price) {
-        return add(name, category, price, "", "All Branches");
-    }
-
-    public boolean add(String name, String category, double price, String requiredPart) {
-        return add(name, category, price, requiredPart, "All Branches");
-    }
-
     public boolean add(String name, String category, double price, String requiredPart, String branch) {
         if (name == null || name.trim().isEmpty() || price <= 0) return false;
         ContentValues v = new ContentValues();
@@ -113,16 +90,5 @@ public class ServiceDAO {
 
     public boolean delete(long id) {
         return helper.getWritableDatabase().delete("services", "id=?", new String[]{String.valueOf(id)}) > 0;
-    }
-
-    public boolean deleteByName(String name) {
-        return helper.getWritableDatabase().delete("services", "name=?", new String[]{name}) > 0;
-    }
-
-    public String catalog() {
-        StringBuilder out = new StringBuilder("Services offered:\n");
-        for (String s : all()) out.append("• ").append(s).append("\n");
-        out.append("\nBranches: Colombo · Galle\nTechnicians available · Spare parts tracked");
-        return out.toString();
     }
 }

@@ -14,7 +14,6 @@
         android:paddingHorizontal="@dimen/screen_padding"
         android:paddingVertical="@dimen/space_16">
 
-        <!-- Inventory Header Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -83,7 +82,6 @@
                         android:textSize="14sp" />
                 </LinearLayout>
 
-                <!-- Branch Filter Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -121,7 +119,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Inventory Items Title -->
         <TextView
             style="@style/Widget.TechFix.SectionTitle"
             android:layout_width="wrap_content"
@@ -130,7 +127,6 @@
             android:layout_marginBottom="12dp"
             android:text="Registered Components" />
 
-        <!-- Empty Parts Container -->
         <LinearLayout
             android:id="@+id/emptyPartsContainer"
             android:layout_width="match_parent"
@@ -165,7 +161,6 @@
                 android:textSize="14sp" />
         </LinearLayout>
 
-        <!-- Parts RecyclerView -->
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/partsList"
             android:layout_width="match_parent"

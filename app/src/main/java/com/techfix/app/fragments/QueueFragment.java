@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -34,9 +33,6 @@ import com.techfix.app.util.WindowInsetsHelper;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * TAB 2: Repair Queue & Docket Control (search, status filters, workflow stage transitions).
- */
 public class QueueFragment extends Fragment {
 
     private FragmentQueueBinding binding;
@@ -73,17 +69,14 @@ public class QueueFragment extends Fragment {
         technicianDAO = new TechnicianDAO(dbHelper);
         branchFilter = host().getSelectedBranch();
 
-        // Bottom inset so content clears the gesture nav bar / keyboard
         WindowInsetsHelper.applyBottomInset(binding.tabQueue);
 
         FirebaseSyncManager.getInstance().addListener(syncListener);
 
-        // Status update spinner
         ArrayAdapter<String> statusAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, AppointmentStatus.labels());
         statusAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.statusSpinner.setAdapter(statusAdapter);
 
-        // Sort order spinner
         String[] sortOptions = {"Newest First", "Oldest First", "Price: High → Low", "Price: Low → High", "Status", "Device / Brand"};
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, sortOptions);
         sortAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
@@ -101,7 +94,6 @@ public class QueueFragment extends Fragment {
         binding.appointmentList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.appointmentList.setAdapter(queueAdapter);
 
-        // Real-time search listener
         binding.searchQueueInput.addTextChangedListener(new TextWatcher() {
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
@@ -112,7 +104,6 @@ public class QueueFragment extends Fragment {
 
         setupFilterChips();
 
-        // Quick status update by ID
         binding.updateStatusButton.setOnClickListener(this::updateStatusById);
 
         refresh();
@@ -215,7 +206,6 @@ public class QueueFragment extends Fragment {
     }
 
     private void showTechnicianPicker(Appointment a) {
-        // Only offer AVAILABLE technicians; prefer ones at the appointment's branch
         List<com.techfix.app.models.Technician> available = new ArrayList<>();
         for (com.techfix.app.models.Technician t : technicianDAO.all()) {
             if (t.available) available.add(t);

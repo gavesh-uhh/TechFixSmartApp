@@ -8,4 +8,3 @@ public class SampleRepair {
         this.id = id; this.title = title; this.service = service; this.imageUri = imageUri == null ? "" : imageUri;
     }
 }
-

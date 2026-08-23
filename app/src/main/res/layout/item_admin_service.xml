@@ -12,7 +12,6 @@
         android:orientation="vertical"
         android:padding="18dp">
 
-        <!-- Top Row: Service Name & Price -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -92,14 +91,12 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <!-- Divider Line -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="12dp"
             android:background="@color/line" />
 
-        <!-- Actions Row -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

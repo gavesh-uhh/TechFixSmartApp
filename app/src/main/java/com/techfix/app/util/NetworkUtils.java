@@ -8,18 +8,12 @@ import android.net.NetworkRequest;
 import android.os.Handler;
 import android.os.Looper;
 
-/**
- * Utility class to check and monitor network connectivity status.
- */
 public class NetworkUtils {
 
     public interface NetworkChangeListener {
         void onNetworkChanged(boolean isOnline);
     }
 
-    /**
-     * Checks if the device currently has an active, valid internet connection.
-     */
     public static boolean isOnline(Context context) {
         if (context == null) return false;
         try {
@@ -42,9 +36,6 @@ public class NetworkUtils {
         }
     }
 
-    /**
-     * Registers a continuous network callback to notify when internet becomes available or is lost.
-     */
     public static ConnectivityManager.NetworkCallback registerNetworkCallback(Context context, NetworkChangeListener listener) {
         if (context == null || listener == null) return null;
         try {
@@ -80,18 +71,5 @@ public class NetworkUtils {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    /**
-     * Unregisters a previously registered network callback.
-     */
-    public static void unregisterNetworkCallback(Context context, ConnectivityManager.NetworkCallback callback) {
-        if (context == null || callback == null) return;
-        try {
-            ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            if (cm != null) {
-                cm.unregisterNetworkCallback(callback);
-            }
-        } catch (Exception ignored) {}
     }
 }

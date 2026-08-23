@@ -11,14 +11,9 @@ import com.google.android.gms.location.Priority;
 import com.techfix.app.database.BranchDAO;
 import com.techfix.app.models.Branch;
 
-/**
- * Resolves the device's coarse location and picks the nearest TechFix branch.
- * Fail-safe everywhere: any denial/error just reports null so callers keep defaults.
- */
 public final class NearestBranch {
 
     public interface Callback {
-        /** Called with the nearest branch name and distance in km, or (null, 0) when unavailable. */
         void onResult(String branchName, double km);
     }
 
@@ -31,7 +26,6 @@ public final class NearestBranch {
                 == PackageManager.PERMISSION_GRANTED;
     }
 
-    //noinspection MissingPermission — permission is checked by hasPermission() before this call
     public static void resolve(Activity activity, com.techfix.app.database.DatabaseHelper dbHelper, Callback callback) {
         if (!hasPermission(activity)) {
             callback.onResult(null, 0);

@@ -10,4 +10,3 @@ public class RepairStatus {
         this.updatedAt = updatedAt; this.note = note == null ? "" : note;
     }
 }
-

@@ -15,14 +15,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.firestore.WriteBatch;
 import com.techfix.app.database.DatabaseHelper;
-import com.techfix.app.models.Appointment;
-import com.techfix.app.models.Service;
-import com.techfix.app.models.SparePart;
-import com.techfix.app.models.Technician;
-import com.techfix.app.models.User;
 import com.techfix.app.util.NetworkUtils;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -31,11 +25,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * Offline-First Firebase Sync Manager for TechFix Smart App.
- * Automatically synchronizes SQLite database (techfix.db) with Firebase Cloud Firestore
- * whenever active internet connectivity is detected.
- */
 public class FirebaseSyncManager {
 
     private static final String TAG = "FirebaseSyncManager";
@@ -66,9 +55,6 @@ public class FirebaseSyncManager {
 
     private FirebaseSyncManager() {}
 
-    /**
-     * Initializes network connectivity monitoring and triggers auto-sync on active connection.
-     */
     public synchronized void init(Context context) {
         if (isInitialized || context == null) return;
         isInitialized = true;
@@ -81,7 +67,6 @@ public class FirebaseSyncManager {
             }
         });
 
-        // Trigger immediate sync if already online on startup
         if (NetworkUtils.isOnline(appContext)) {
             sync(appContext, null);
         }
@@ -109,9 +94,6 @@ public class FirebaseSyncManager {
         });
     }
 
-    /**
-     * Performs full bidirectional sync between SQLite and Firestore.
-     */
     public void sync(Context context, OnSyncCompleteListener completeListener) {
         if (context == null) {
             if (completeListener != null) completeListener.onSyncComplete(false, "Context is null");
@@ -145,10 +127,8 @@ public class FirebaseSyncManager {
                 FirebaseFirestore firestore = FirebaseFirestore.getInstance();
                 DatabaseHelper dbHelper = DatabaseHelper.getInstance(appContext);
 
-                // 1. Push SQLite data to Firestore
                 pushLocalDataToFirestore(dbHelper, firestore);
 
-                // 2. Pull Firestore data to SQLite
                 pullFirestoreDataToLocal(dbHelper, firestore);
 
                 success = true;
@@ -169,15 +149,11 @@ public class FirebaseSyncManager {
         }).start();
     }
 
-    /**
-     * Pushes local SQLite tables (appointments, parts, services, technicians, users, status_history, payments) to Firestore.
-     */
     private void pushLocalDataToFirestore(DatabaseHelper dbHelper, FirebaseFirestore firestore) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         WriteBatch batch = firestore.batch();
         int ops = 0;
 
-        // Push Users
         Cursor cu = db.rawQuery("SELECT id, name, email, phone, role FROM users", null);
         while (cu.moveToNext()) {
             long id = cu.getLong(0);
@@ -192,7 +168,6 @@ public class FirebaseSyncManager {
         }
         cu.close();
 
-        // Push Appointments
         Cursor ca = db.rawQuery("SELECT id, user_id, device, problem, branch, status, service, price, technician, payment, time_slot, created_at, photo_uri FROM appointments", null);
         while (ca.moveToNext()) {
             long id = ca.getLong(0);
@@ -215,7 +190,6 @@ public class FirebaseSyncManager {
         }
         ca.close();
 
-        // Push Spare Parts
         Cursor cp = db.rawQuery("SELECT id, name, quantity, branch FROM parts", null);
         while (cp.moveToNext()) {
             long id = cp.getLong(0);
@@ -229,7 +203,6 @@ public class FirebaseSyncManager {
         }
         cp.close();
 
-        // Push Services
         Set<Long> localServiceIds = new HashSet<>();
         Cursor cs = db.rawQuery("SELECT id, name, category, price, requiredPart, branch FROM services", null);
         while (cs.moveToNext()) {
@@ -247,7 +220,6 @@ public class FirebaseSyncManager {
         }
         cs.close();
 
-        // Clean up services deleted locally
         try {
             QuerySnapshot remoteServices = Tasks.await(firestore.collection("services").get());
             for (DocumentSnapshot doc : remoteServices.getDocuments()) {
@@ -261,7 +233,6 @@ public class FirebaseSyncManager {
             Log.w(TAG, "Clean up deleted remote services skipped: " + e.getMessage());
         }
 
-        // Push Technicians
         Cursor ct = db.rawQuery("SELECT id, name, branch, skill, available FROM technicians", null);
         while (ct.moveToNext()) {
             long id = ct.getLong(0);
@@ -276,7 +247,6 @@ public class FirebaseSyncManager {
         }
         ct.close();
 
-        // Push Status History
         Cursor ch = db.rawQuery("SELECT id, appointment_id, status, updated_at, note FROM status_history", null);
         while (ch.moveToNext()) {
             long id = ch.getLong(0);
@@ -291,7 +261,6 @@ public class FirebaseSyncManager {
         }
         ch.close();
 
-        // Push Payments
         Cursor cpay = db.rawQuery("SELECT id, appointment_id, amount, method, paid_at FROM payments", null);
         while (cpay.moveToNext()) {
             long id = cpay.getLong(0);
@@ -306,7 +275,6 @@ public class FirebaseSyncManager {
         }
         cpay.close();
 
-        // Push Branches
         Cursor cb = db.rawQuery("SELECT id, name, city, latitude, longitude FROM branches", null);
         while (cb.moveToNext()) {
             long id = cb.getLong(0);
@@ -321,7 +289,6 @@ public class FirebaseSyncManager {
         }
         cb.close();
 
-        // Push Samples (Repair Showcase)
         Cursor csm = db.rawQuery("SELECT id, title, service, imageUri FROM samples", null);
         while (csm.moveToNext()) {
             long id = csm.getLong(0);
@@ -345,13 +312,9 @@ public class FirebaseSyncManager {
         }
     }
 
-    /**
-     * Pulls remote Firestore collections and updates local SQLite database.
-     */
     private void pullFirestoreDataToLocal(DatabaseHelper dbHelper, FirebaseFirestore firestore) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        // Pull Appointments
         try {
             QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("appointments").get());
             for (DocumentSnapshot doc : qs.getDocuments()) {
@@ -377,7 +340,6 @@ public class FirebaseSyncManager {
             Log.w(TAG, "Pull appointments skipped: " + e.getMessage());
         }
 
-        // Pull Spare Parts
         try {
             QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("parts").get());
             for (DocumentSnapshot doc : qs.getDocuments()) {
@@ -395,7 +357,6 @@ public class FirebaseSyncManager {
             Log.w(TAG, "Pull parts skipped: " + e.getMessage());
         }
 
-        // Pull Services
         try {
             QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("services").get());
             for (DocumentSnapshot doc : qs.getDocuments()) {
@@ -415,7 +376,6 @@ public class FirebaseSyncManager {
             Log.w(TAG, "Pull services skipped: " + e.getMessage());
         }
 
-        // Pull Technicians
         try {
             QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("technicians").get());
             for (DocumentSnapshot doc : qs.getDocuments()) {
@@ -434,7 +394,6 @@ public class FirebaseSyncManager {
             Log.w(TAG, "Pull technicians skipped: " + e.getMessage());
         }
 
-        // Pull Status History
         try {
             QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("status_history").get());
             for (DocumentSnapshot doc : qs.getDocuments()) {
@@ -452,7 +411,6 @@ public class FirebaseSyncManager {
             Log.w(TAG, "Pull status history skipped: " + e.getMessage());
         }
 
-        // Pull Payments
         try {
             QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("payments").get());
             for (DocumentSnapshot doc : qs.getDocuments()) {
@@ -470,7 +428,6 @@ public class FirebaseSyncManager {
             Log.w(TAG, "Pull payments skipped: " + e.getMessage());
         }
 
-        // Pull Branches
         try {
             QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("branches").get());
             for (DocumentSnapshot doc : qs.getDocuments()) {
@@ -489,7 +446,6 @@ public class FirebaseSyncManager {
             Log.w(TAG, "Pull branches skipped: " + e.getMessage());
         }
 
-        // Pull Samples (Repair Showcase)
         try {
             QuerySnapshot qs = com.google.android.gms.tasks.Tasks.await(firestore.collection("samples").get());
             for (DocumentSnapshot doc : qs.getDocuments()) {

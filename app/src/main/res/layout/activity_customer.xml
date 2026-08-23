@@ -7,7 +7,6 @@
     android:orientation="vertical"
     android:background="@color/cloud">
 
-    <!-- Top Header Bar -->
     <LinearLayout
         android:id="@+id/customerHeader"
         android:layout_width="match_parent"
@@ -51,7 +50,6 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
-        <!-- Quick Log Out Button -->
         <Button
             android:id="@+id/customerTopLogoutButton"
             style="@style/Widget.Material3.Button.TonalButton"
@@ -69,20 +67,17 @@
             app:cornerRadius="12dp" />
     </LinearLayout>
 
-    <!-- Divider Line -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/line" />
 
-    <!-- Main Content Panels -->
     <FrameLayout
         android:id="@+id/dashboardContent"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- ================= PANEL 0: STORE CATALOG ================= -->
         <ScrollView
             android:id="@+id/customerStorePanel"
             android:layout_width="match_parent"
@@ -97,7 +92,6 @@
                 android:paddingHorizontal="@dimen/screen_padding"
                 android:paddingVertical="@dimen/space_16">
 
-                <!-- Hero Store Banner Carousel Container -->
                 <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="160dp"
@@ -109,7 +103,6 @@
                         android:layout_height="160dp" />
                 </RelativeLayout>
 
-                <!-- Round Categories Selector Header -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -117,7 +110,6 @@
                     android:text="Explore Categories"
                     style="@style/Widget.TechFix.SectionTitle" />
 
-                <!-- Evenly Spaced Round Categories Row -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -125,7 +117,6 @@
                     android:paddingVertical="4dp"
                     android:weightSum="5">
 
-                    <!-- Category 1: All -->
                     <LinearLayout
                         android:id="@+id/customerCatAll"
                         android:layout_width="0dp"
@@ -167,7 +158,6 @@
                             android:textStyle="bold" />
                     </LinearLayout>
 
-                    <!-- Category 2: Phones -->
                     <LinearLayout
                         android:id="@+id/customerCatPhones"
                         android:layout_width="0dp"
@@ -208,7 +198,6 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
-                    <!-- Category 3: Computers -->
                     <LinearLayout
                         android:id="@+id/customerCatComputers"
                         android:layout_width="0dp"
@@ -249,7 +238,6 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
-                    <!-- Category 4: Screens -->
                     <LinearLayout
                         android:id="@+id/customerCatScreens"
                         android:layout_width="0dp"
@@ -290,7 +278,6 @@
                             android:textSize="12sp" />
                     </LinearLayout>
 
-                    <!-- Category 5: Batteries -->
                     <LinearLayout
                         android:id="@+id/customerCatBatteries"
                         android:layout_width="0dp"
@@ -332,7 +319,6 @@
                     </LinearLayout>
                 </LinearLayout>
 
-                <!-- Services List Header -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -348,14 +334,12 @@
                     android:text="Tap any repair service to book your appointment."
                     android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
-                <!-- Services Dynamic Container -->
                 <LinearLayout
                     android:id="@+id/customerServicesContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
 
-                <!-- Showcase Samples Gallery Header -->
                 <TextView
                     android:id="@+id/customerSamplesHeaderTitle"
                     android:layout_width="wrap_content"
@@ -365,7 +349,6 @@
                     android:text="Recent Repair Showcases"
                     style="@style/Widget.TechFix.SectionTitle" />
 
-                <!-- Samples Gallery Carousel -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/customerSamplesContainer"
                     android:layout_width="match_parent"
@@ -373,7 +356,6 @@
                     android:clipToPadding="false"
                     android:paddingBottom="8dp" />
 
-                <!-- Samples Empty State -->
                 <TextView
                     android:id="@+id/customerSamplesEmptyText"
                     android:layout_width="match_parent"
@@ -386,7 +368,6 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- ================= PANEL 1: DEDICATED SPARE PARTS CATALOG ================= -->
         <ScrollView
             android:id="@+id/customerPartsPanel"
             android:layout_width="match_parent"
@@ -401,7 +382,6 @@
                 android:paddingHorizontal="@dimen/screen_padding"
                 android:paddingVertical="@dimen/space_16">
 
-                <!-- Hardware Parts Section Header -->
                 <TextView
                     style="@style/Widget.TechFix.SectionTitle"
                     android:layout_width="wrap_content"
@@ -416,7 +396,6 @@
                     android:text="Browse live spare component stock at our workshops."
                     android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
-                <!-- Parts Search & Filter Card -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -472,7 +451,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Empty Parts Container -->
                 <LinearLayout
                     android:id="@+id/emptyCustomerPartsContainer"
                     android:layout_width="match_parent"
@@ -491,7 +469,6 @@
                         android:textStyle="bold" />
                 </LinearLayout>
 
-                <!-- Parts Container -->
                 <LinearLayout
                     android:id="@+id/customerPartsContainer"
                     android:layout_width="match_parent"
@@ -502,7 +479,6 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- ================= PANEL 1: MY REPAIRS ================= -->
         <ScrollView
             android:id="@+id/repairsPanel"
             android:layout_width="match_parent"
@@ -517,7 +493,6 @@
                 android:paddingHorizontal="@dimen/screen_padding"
                 android:paddingVertical="@dimen/space_16">
 
-                <!-- Filter Chips Row -->
                 <HorizontalScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -565,7 +540,6 @@
                     </LinearLayout>
                 </HorizontalScrollView>
 
-                <!-- Empty State View -->
                 <LinearLayout
                     android:id="@+id/emptyStateContainer"
                     android:layout_width="match_parent"
@@ -617,7 +591,6 @@
                         android:text="Book a Repair Now" />
                 </LinearLayout>
 
-                <!-- RecyclerView for User Repairs -->
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/repairList"
                     android:layout_width="match_parent"
@@ -626,7 +599,6 @@
                     android:clipToPadding="false"
                     android:nestedScrollingEnabled="false" />
 
-                <!-- Quick Pay Section (Visible when there are unpaid items) -->
                 <com.google.android.material.card.MaterialCardView
                     android:id="@+id/paymentCard"
                     style="@style/Widget.TechFix.ShadowCard"
@@ -670,7 +642,6 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- ================= PANEL 2: 3-STEP REPAIR BOOKING WIZARD ================= -->
         <ScrollView
             android:id="@+id/bookPanel"
             android:layout_width="match_parent"
@@ -685,7 +656,6 @@
                 android:paddingHorizontal="@dimen/screen_padding"
                 android:paddingVertical="@dimen/space_16">
 
-                <!-- Booking Hero Header -->
                 <TextView
                     style="@style/Widget.TechFix.SectionTitle"
                     android:layout_width="wrap_content"
@@ -693,9 +663,6 @@
                     android:text="Book a Smart Repair"
                     android:textSize="22sp" />
 
-
-
-                <!-- STEP 1 CARD: Device & Service -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -716,9 +683,6 @@
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
-
-
-                        <!-- 1. Service Type -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -734,7 +698,6 @@
                             android:layout_height="52dp"
                             android:layout_marginTop="4dp" />
 
-                        <!-- 2. Device Type -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -751,7 +714,6 @@
                             android:layout_height="52dp"
                             android:layout_marginTop="4dp" />
 
-                        <!-- 3. Device Model / Brand -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -773,7 +735,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- STEP 2 CARD: Problem Details & Photo -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -794,9 +755,6 @@
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
-
-
-                        <!-- 4. Problem Description -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -816,7 +774,6 @@
                             android:inputType="textMultiLine"
                             android:minLines="3" />
 
-                        <!-- 5. Attach Photo Dashed Drop Zone -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -867,7 +824,6 @@
                                 android:textSize="12sp" />
                         </LinearLayout>
 
-                        <!-- Photo Preview Container -->
                         <FrameLayout
                             android:id="@+id/customerPhotoPreviewContainer"
                             android:layout_width="match_parent"
@@ -895,7 +851,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- STEP 3 CARD: Branch & Confirm -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -917,9 +872,6 @@
                             android:textSize="17sp"
                             android:textStyle="bold" />
 
-
-
-                        <!-- 6. Preferred Branch -->
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -935,7 +887,6 @@
                             android:layout_height="52dp"
                             android:layout_marginTop="4dp" />
 
-                        <!-- Submit Button -->
                         <Button
                             android:id="@+id/bookButton"
                             style="@style/Widget.TechFix.Button.Filled"
@@ -949,7 +900,6 @@
             </LinearLayout>
         </ScrollView>
 
-        <!-- ================= PANEL 3: EXPLORE & PROFILE ================= -->
         <ScrollView
             android:id="@+id/explorePanel"
             android:layout_width="match_parent"
@@ -964,7 +914,6 @@
                 android:paddingHorizontal="@dimen/screen_padding"
                 android:paddingVertical="@dimen/space_16">
 
-                <!-- Customer Profile Hero Card -->
                 <TextView
                     style="@style/Widget.TechFix.SectionTitle"
                     android:layout_width="wrap_content"
@@ -1066,7 +1015,6 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
-                <!-- Our Branches Section -->
                 <TextView
                     style="@style/Widget.TechFix.SectionTitle"
                     android:layout_width="wrap_content"
@@ -1088,7 +1036,6 @@
                     android:layout_marginTop="12dp"
                     android:nestedScrollingEnabled="false" />
 
-                <!-- Help & Support Notice -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
@@ -1127,7 +1074,6 @@
 
     </FrameLayout>
 
-    <!-- Bottom Navigation Bar for Customer Dashboard -->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/customerBottomNavigation"
         android:layout_width="match_parent"

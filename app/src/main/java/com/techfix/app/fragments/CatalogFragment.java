@@ -35,9 +35,6 @@ import com.techfix.app.models.Technician;
 import com.techfix.app.sync.FirebaseSyncManager;
 import com.techfix.app.util.WindowInsetsHelper;
 
-/**
- * TAB 4: Services & Staff Catalog (service pricing, technician roster, showcase camera).
- */
 public class CatalogFragment extends Fragment {
 
     private FragmentCatalogBinding binding;
@@ -73,7 +70,6 @@ public class CatalogFragment extends Fragment {
         technicianDAO = new TechnicianDAO(dbHelper);
         sampleRepairDAO = new SampleRepairDAO(dbHelper);
 
-        // Bottom inset so content clears the gesture nav bar / keyboard
         WindowInsetsHelper.applyBottomInset(binding.tabCatalog);
 
         FirebaseSyncManager.getInstance().addListener(syncListener);
@@ -135,7 +131,6 @@ public class CatalogFragment extends Fragment {
         binding.servicesList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.servicesList.setAdapter(serviceCatalogAdapter);
 
-        // Add Service Button
         binding.addServiceButton.setOnClickListener(v -> {
             String name = binding.newServiceName.getText().toString().trim();
             String category = (String) binding.newServiceCategorySpinner.getSelectedItem();
@@ -197,7 +192,6 @@ public class CatalogFragment extends Fragment {
         binding.techniciansList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.techniciansList.setAdapter(technicianAdapter);
 
-        // Branch & Skill selectors (fixed values so auto-assignment matching never breaks)
         String[] techBranchOptions = new com.techfix.app.database.BranchDAO(DatabaseHelper.getInstance(requireContext())).filterNamesArray();
         ArrayAdapter<String> techBranchAdapter = new ArrayAdapter<>(requireContext(), R.layout.item_dropdown, techBranchOptions);
         techBranchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
@@ -208,7 +202,6 @@ public class CatalogFragment extends Fragment {
         skillAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.newTechSkillSpinner.setAdapter(skillAdapter);
 
-        // Add Tech Button
         binding.addTechButton.setOnClickListener(v -> {
             String name = binding.newTechName.getText().toString().trim();
             String branch = com.techfix.app.database.BranchDAO.toDbName((String) binding.newTechBranchSpinner.getSelectedItem());
@@ -229,7 +222,6 @@ public class CatalogFragment extends Fragment {
     }
 
     private void setupShowcase() {
-        // Published showcases gallery (long-press to remove)
         binding.samplesList.setLayoutManager(new LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false));
         binding.samplesList.setAdapter(new SampleImageAdapter(sample -> new AlertDialog.Builder(requireContext())
                 .setTitle("Remove Showcase?")
@@ -243,7 +235,6 @@ public class CatalogFragment extends Fragment {
                 .setNegativeButton("Cancel", null)
                 .show()));
 
-        // Publish Showcase Button
         binding.addSampleButton.setOnClickListener(v -> {
             String title = binding.sampleTitleInput.getText().toString().trim();
             if (title.isEmpty()) {

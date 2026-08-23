@@ -10,4 +10,3 @@ public class Branch {
         this.latitude = latitude; this.longitude = longitude;
     }
 }
-

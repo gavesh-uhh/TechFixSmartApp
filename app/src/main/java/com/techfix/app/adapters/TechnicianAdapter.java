@@ -12,9 +12,6 @@ import com.techfix.app.models.Technician;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adapter for managing technicians roster & availability in the Admin Dashboard.
- */
 public class TechnicianAdapter extends RecyclerView.Adapter<TechnicianAdapter.Holder> {
 
     public interface OnTechnicianActionListener {

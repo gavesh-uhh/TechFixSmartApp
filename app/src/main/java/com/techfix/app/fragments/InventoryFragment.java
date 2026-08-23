@@ -28,9 +28,6 @@ import com.techfix.app.util.WindowInsetsHelper;
 
 import java.util.List;
 
-/**
- * TAB 3: Inventory & Spare Parts (stock badges, 1-tap stock adjustments, part creation).
- */
 public class InventoryFragment extends Fragment {
 
     private FragmentInventoryBinding binding;
@@ -56,7 +53,6 @@ public class InventoryFragment extends Fragment {
         DatabaseHelper dbHelper = DatabaseHelper.getInstance(requireContext());
         sparePartDAO = new SparePartDAO(dbHelper);
 
-        // Bottom inset so content clears the gesture nav bar / keyboard
         WindowInsetsHelper.applyBottomInset(binding.tabInventory);
 
         FirebaseSyncManager.getInstance().addListener(syncListener);
@@ -101,15 +97,11 @@ public class InventoryFragment extends Fragment {
         binding.partsList.setLayoutManager(new LinearLayoutManager(requireContext()));
         binding.partsList.setAdapter(sparePartAdapter);
 
-        // Add part button opens popup dialog
         binding.btnAddPartButton.setOnClickListener(v -> showAddPartDialog());
 
         refresh();
     }
 
-    /**
-     * Shows a popup dialog to add a new spare part component into the database.
-     */
     private void showAddPartDialog() {
         View dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_part, null);
         EditText inputName = dialogView.findViewById(R.id.dialogPartNameInput);

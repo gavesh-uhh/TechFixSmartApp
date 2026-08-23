@@ -12,9 +12,6 @@ import com.techfix.app.models.SparePart;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adapter for managing spare parts inventory in the Admin Dashboard.
- */
 public class SparePartAdapter extends RecyclerView.Adapter<SparePartAdapter.Holder> {
 
     public interface OnPartActionListener {
@@ -49,7 +46,6 @@ public class SparePartAdapter extends RecyclerView.Adapter<SparePartAdapter.Hold
         holder.partName.setText(part.name);
         holder.partBranch.setText(part.branch);
 
-        // Dynamic stock status badge
         if (part.quantity == 0) {
             holder.partStockBadge.setText("OUT OF STOCK");
             holder.partStockBadge.setTextColor(holder.itemView.getContext().getColor(R.color.error));

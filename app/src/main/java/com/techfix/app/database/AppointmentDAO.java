@@ -38,8 +38,6 @@ public class AppointmentDAO {
 
     public List<Appointment> forUser(long userId) { return query("WHERE user_id=" + userId + " ORDER BY id DESC"); }
     public List<Appointment> all() { return query("ORDER BY id DESC"); }
-    public List<Appointment> activeFor(long userId) { return query("WHERE user_id=" + userId + " AND status!='" + AppointmentStatus.COMPLETED.label + "' ORDER BY id DESC"); }
-    public List<Appointment> historyFor(long userId) { return query("WHERE user_id=" + userId + " AND status='" + AppointmentStatus.COMPLETED.label + "' ORDER BY id DESC"); }
 
     public int countAll(String branch) {
         String where = (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) ? " WHERE branch='" + branch + "'" : "";
@@ -179,15 +177,6 @@ public class AppointmentDAO {
         return true;
     }
 
-    public Payment paymentFor(long appointmentId) {
-        Cursor c = helper.getReadableDatabase().rawQuery(
-                "SELECT id,appointment_id,amount,method,paid_at FROM payments WHERE appointment_id=? ORDER BY id DESC LIMIT 1",
-                new String[]{String.valueOf(appointmentId)});
-        Payment p = c.moveToFirst() ? new Payment(c.getLong(0), c.getLong(1), c.getDouble(2), c.getString(3), c.getString(4)) : null;
-        c.close();
-        return p;
-    }
-
     public void setPhoto(long id, String uri) {
         ContentValues v = new ContentValues(); v.put("photo_uri", uri);
         helper.getWritableDatabase().update("appointments", v, "id=?", new String[]{String.valueOf(id)});
@@ -198,7 +187,6 @@ public class AppointmentDAO {
         helper.getWritableDatabase().update("appointments", v, "id=?", new String[]{String.valueOf(id)});
     }
 
-    // ---- internals ----
     private void addHistory(long appointmentId, String status, String note) {
         ContentValues v = new ContentValues();
         v.put("appointment_id", appointmentId); v.put("status", status);

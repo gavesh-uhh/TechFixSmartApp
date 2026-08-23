@@ -15,10 +15,8 @@ import java.util.List;
 import com.techfix.app.R;
 import com.techfix.app.models.SampleRepair;
 
-/** Gallery adapter for sample repaired-device images. */
 public class SampleImageAdapter extends RecyclerView.Adapter<SampleImageAdapter.Holder> {
 
-    /** Optional long-press callback (used by staff to remove showcases). */
     public interface OnSampleLongClickListener {
         void onSampleLongClick(SampleRepair sample);
     }

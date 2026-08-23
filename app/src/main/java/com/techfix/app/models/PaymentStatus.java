@@ -7,4 +7,3 @@ public enum PaymentStatus {
 
     PaymentStatus(String label) { this.label = label; }
 }
-

@@ -23,7 +23,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
-import com.google.android.material.tabs.TabLayoutMediator;
 import com.techfix.app.R;
 import com.techfix.app.adapters.BannerCarouselAdapter;
 import com.techfix.app.adapters.SampleImageAdapter;
@@ -46,22 +45,10 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * HomeActivity - Landing Page & Booking for TechFix Repair Shop.
- * TechFix is a dedicated computer and mobile phone repair shop.
- * Features:
- * - Round category quick-filters (All, Phones, Computers, Screens, Batteries)
- * - Available repair services catalog with pricing in LKR
- * - Dedicated Spare Parts Inventory navigation
- * - Bottom navigation: Store, Parts, Book Appointment, Branches, Account
- * - Mandatory login/account check before placing repair appointments
- */
 public class HomeActivity extends AppCompatActivity {
 
-    // View binding instance for activity_home.xml
     private ActivityHomeBinding binding;
 
-    // Database access objects
     private DatabaseHelper dbHelper;
     private ServiceDAO serviceDAO;
     private SparePartDAO sparePartDAO;
@@ -69,18 +56,14 @@ public class HomeActivity extends AppCompatActivity {
     private SampleRepairDAO sampleRepairDAO;
     private SessionManager session;
 
-    // Showcase gallery adapter
     private SampleImageAdapter sampleImageAdapter;
 
-    // Hero banner carousel auto-scroll handler & runnable
     private final Handler carouselHandler = new Handler(Looper.getMainLooper());
     private Runnable carouselRunnable;
     private BannerCarouselAdapter bannerCarouselAdapter;
 
-    // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES"
     private String currentCategory = "ALL";
     private String currentPartsBranch = "All Branches";
-    private boolean resumedOnce = false;
 
     private final FirebaseSyncManager.SyncListener syncListener = (isSyncing, success) -> {
         if (!isSyncing && success) {
@@ -92,12 +75,10 @@ public class HomeActivity extends AppCompatActivity {
         }
     };
 
-    // Attached device photo URI & temp camera URI
     private Uri selectedPhotoUri = null;
     private Uri tempCameraUri = null;
     private boolean locationPermissionRequested = false;
 
-    // Location permission launcher for nearest-branch detection
     private final ActivityResultLauncher<String> locationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), (Boolean isGranted) -> {
                 if (Boolean.TRUE.equals(isGranted)) {
@@ -105,7 +86,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
 
-    // 1. Photo Picker Launcher (Gallery)
     private final ActivityResultLauncher<String> photoPickerLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
                 if (uri != null) {
@@ -113,7 +93,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
 
-    // 2. Camera Take Picture Launcher
     private final ActivityResultLauncher<Uri> takePictureLauncher =
             registerForActivityResult(new ActivityResultContracts.TakePicture(), (Boolean success) -> {
                 if (Boolean.TRUE.equals(success) && tempCameraUri != null) {
@@ -121,7 +100,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
             });
 
-    // 3. Camera Permission Launcher
     private final ActivityResultLauncher<String> cameraPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), (Boolean isGranted) -> {
                 if (Boolean.TRUE.equals(isGranted)) {
@@ -142,21 +120,6 @@ public class HomeActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Failed to load image preview: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void showPhotoOptionsDialog() {
-        CharSequence[] options = {"📷 Take Photo with Camera", "🖼️ Choose from Gallery / Files"};
-        new AlertDialog.Builder(this)
-                .setTitle("Attach Device Photo")
-                .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
-                        checkCameraPermissionAndLaunch();
-                    } else {
-                        photoPickerLauncher.launch("image/*");
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
     }
 
     private void checkCameraPermissionAndLaunch() {
@@ -200,15 +163,10 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Inflate layout
         binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-        // Edge-to-edge: pad the header below status bar/cutout. The BottomNavigationView is left
-        // alone because Material's BottomNavigationView applies its own navigationBars inset,
-        // so padding it here too would double the bottom inset — apply only the header top inset.
         WindowInsetsHelper.applyHeader(binding.homeHeader);
 
-        // 2. Initialize Database DAOs and Session
         dbHelper = DatabaseHelper.getInstance(this);
         serviceDAO = new ServiceDAO(dbHelper);
         sparePartDAO = new SparePartDAO(dbHelper);
@@ -216,11 +174,9 @@ public class HomeActivity extends AppCompatActivity {
         sampleRepairDAO = new SampleRepairDAO(dbHelper);
         session = new SessionManager(this);
 
-        // 3. Initialize Firebase Cloud Sync (Offline-First auto-sync when online)
         FirebaseSyncManager.getInstance().init(this);
         FirebaseSyncManager.getInstance().addListener(syncListener);
 
-        // 4. Setup UI components
         setupBranchButtons();
         setupBottomNavigation();
         setupRoundCategories();
@@ -228,7 +184,6 @@ public class HomeActivity extends AppCompatActivity {
         setupBookingForm();
         setupBannerCarousel();
 
-        // 5. Initial load of all available repair services
         selectCategory("ALL");
     }
 
@@ -261,9 +216,6 @@ public class HomeActivity extends AppCompatActivity {
         updateNavAccountItem();
     }
 
-    /**
-     * Setup bottom navigation bar (Store, Parts, Book, Branches, Account).
-     */
     private void setupBottomNavigation() {
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
 
@@ -271,29 +223,24 @@ public class HomeActivity extends AppCompatActivity {
             int itemId = item.getItemId();
 
             if (itemId == R.id.nav_home_store) {
-                // Show Store Catalog Panel
                 showStorePanel();
                 binding.storePanel.smoothScrollTo(0, 0);
                 return true;
 
             } else if (itemId == R.id.nav_home_parts) {
-                // Show Dedicated Spare Parts Panel
                 showPartsPanel();
                 return true;
 
             } else if (itemId == R.id.nav_home_book) {
-                // Show Book Appointment Form Panel
                 showBookAppointmentPanel();
                 return true;
 
             } else if (itemId == R.id.nav_home_branches) {
-                // Show Dedicated Store Branches Page
                 showBranchesPanel();
                 binding.branchesPanel.smoothScrollTo(0, 0);
                 return true;
 
             } else if (itemId == R.id.nav_home_account) {
-                // Open Customer / Staff dashboard if logged in, or Login screen if not
                 navigateToDashboard();
                 return false;
             }
@@ -341,9 +288,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Setup click listeners for dedicated Branches page.
-     */
     private void setupBranchesPanel() {
         binding.btnColomboMap.setOnClickListener(v -> openLocationInMaps("6.9271,79.8612", "TechFix Repair Shop - Colombo Branch"));
         binding.btnGalleMap.setOnClickListener(v -> openLocationInMaps("6.0535,80.2210", "TechFix Repair Shop - Galle Branch"));
@@ -364,9 +308,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Shows the Store Catalog panel and hides others.
-     */
     private void showStorePanel() {
         binding.storePanel.setVisibility(View.VISIBLE);
         binding.partsPanel.setVisibility(View.GONE);
@@ -376,9 +317,6 @@ public class HomeActivity extends AppCompatActivity {
         binding.topBarSubtitle.setText("Computer & Mobile Phone Repairs");
     }
 
-    /**
-     * Shows the Dedicated Spare Parts panel and hides others.
-     */
     private void showPartsPanel() {
         binding.storePanel.setVisibility(View.GONE);
         binding.partsPanel.setVisibility(View.VISIBLE);
@@ -389,9 +327,6 @@ public class HomeActivity extends AppCompatActivity {
         loadAvailableParts();
     }
 
-    /**
-     * Shows the Book Appointment panel and hides others.
-     */
     private void showBookAppointmentPanel() {
         binding.storePanel.setVisibility(View.GONE);
         binding.partsPanel.setVisibility(View.GONE);
@@ -402,10 +337,6 @@ public class HomeActivity extends AppCompatActivity {
         suggestNearestBranch();
     }
 
-    /**
-     * If location permission is granted, auto-selects the nearest branch and tells
-     * the customer how far away it is. Requests permission once if needed.
-     */
     private void suggestNearestBranch() {
         if (com.techfix.app.util.NearestBranch.hasPermission(this)) {
             com.techfix.app.util.NearestBranch.resolve(this, dbHelper, (branchName, km) -> runOnUiThread(() -> {
@@ -425,9 +356,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Shows the Dedicated Store Branches panel and hides others.
-     */
     private void showBranchesPanel() {
         binding.storePanel.setVisibility(View.GONE);
         binding.partsPanel.setVisibility(View.GONE);
@@ -437,11 +365,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.topBarSubtitle.setText("Colombo & Galle Repair Centers");
     }
 
-    /**
-     * Setup the Book Repair Appointment form with service dropdown, device info, photo picker, and submit button.
-     */
     private void setupBookingForm() {
-        // 1. Setup Service Type Dropdown (no mock fallback — disable if DB is empty)
         List<String> serviceOptions = serviceDAO.all();
         if (serviceOptions.isEmpty()) {
             serviceOptions.add("No services available right now");
@@ -451,13 +375,11 @@ public class HomeActivity extends AppCompatActivity {
         binding.bookingServiceSpinner.setAdapter(serviceAdapter);
         binding.bookingServiceSpinner.setEnabled(!serviceDAO.all().isEmpty());
 
-        // 2. Setup Device Category Dropdown
         String[] deviceCategories = {"Mobile phone", "Laptop / computer", "Tablet", "Other smart device"};
         ArrayAdapter<String> deviceAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, deviceCategories);
         deviceAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
         binding.bookingDeviceSpinner.setAdapter(deviceAdapter);
 
-        // 3. Setup Branch Dropdown & Dynamic Service Loading (from BranchDAO — single source of truth)
         String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).displayNamesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
         branchAdapter.setDropDownViewResource(R.layout.item_dropdown_popup);
@@ -473,11 +395,9 @@ public class HomeActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // 4. Setup Attach Photo Button & Drop Zone (Direct Camera Permission & Launch)
         binding.bookingPhotoButton.setOnClickListener(v -> checkCameraPermissionAndLaunch());
         binding.bookingPhotoDropZone.setOnClickListener(v -> checkCameraPermissionAndLaunch());
 
-        // 5. Setup Remove Photo Button
         binding.removePhotoButton.setOnClickListener(v -> {
             selectedPhotoUri = null;
             tempCameraUri = null;
@@ -487,7 +407,6 @@ public class HomeActivity extends AppCompatActivity {
             binding.photoStatusText.setTextColor(ContextCompat.getColor(this, R.color.muted_text));
         });
 
-        // 6. Setup Submit Booking Button
         binding.submitBookingButton.setOnClickListener(v -> submitAppointmentBooking());
     }
 
@@ -501,12 +420,7 @@ public class HomeActivity extends AppCompatActivity {
         binding.bookingServiceSpinner.setAdapter(serviceAdapter);
     }
 
-    /**
-     * Validates and submits the appointment booking to the SQLite database.
-     * Requires the user to be logged in with an account before placing the appointment.
-     */
     private void submitAppointmentBooking() {
-        // 1. Enforce user login/account requirement
         if (!session.isLoggedIn()) {
             new AlertDialog.Builder(this)
                     .setTitle("Account Required")
@@ -527,7 +441,6 @@ public class HomeActivity extends AppCompatActivity {
         String branchDisplay = (String) binding.bookingBranchSpinner.getSelectedItem();
         String branch = com.techfix.app.database.BranchDAO.toDbName(branchDisplay);
 
-        // 2. Validate input fields
         if (deviceModel.isEmpty()) {
             binding.bookingModelInput.setError("Please enter your device model / brand");
             binding.bookingModelInput.requestFocus();
@@ -540,17 +453,13 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        // 3. Parse service name and price
         String serviceName = serviceDAO.serviceName(serviceSelection != null ? serviceSelection : "Repair Service");
         double price = serviceDAO.price(serviceSelection != null ? serviceSelection : "0");
 
-        // 4. Combine device info: e.g. "Mobile phone (iPhone 13 Pro)"
         String fullDeviceInfo = deviceCategory + " (" + deviceModel + ")";
 
-        // 5. Get logged-in user ID
         long userId = session.getUserId();
 
-        // 5b. Reserve the service's required spare part at this branch, if it needs one
         com.techfix.app.database.SparePartDAO sparePartDAO = new com.techfix.app.database.SparePartDAO(dbHelper);
         String requiredPart = serviceDAO.requiredPart(serviceName);
         if (requiredPart != null && !requiredPart.isEmpty()) {
@@ -560,13 +469,11 @@ public class HomeActivity extends AppCompatActivity {
             }
         }
 
-        // 6. Auto-assign available technician for the branch
         String technician = new TechnicianDAO(dbHelper).availableFor(branch, deviceCategory);
         if (technician == null || technician.trim().isEmpty()) {
             technician = "Unassigned";
         }
 
-        // 7-9. DB writes + sync off the main thread; dialog returns via runOnUiThread
         final String fServiceName = serviceName;
         final double fPrice = price;
         final String fDeviceInfo = fullDeviceInfo;
@@ -585,7 +492,6 @@ public class HomeActivity extends AppCompatActivity {
                 appointmentDAO.setPhoto(appointmentId, selectedPhotoUri.toString());
             }
 
-            // Trigger instant cloud sync to Firebase if online
             FirebaseSyncManager.getInstance().sync(this, null);
             com.techfix.app.util.Analytics.log(this, "booking_created", "branch", branch);
 
@@ -597,14 +503,12 @@ public class HomeActivity extends AppCompatActivity {
                         .setMessage("Your repair appointment #" + fAppointmentId + " has been booked successfully at " + branch + ".\n\nTechnician assigned: " + ("Unassigned".equals(fTechnician) ? "will be assigned at the counter" : fTechnician) + "\nService: " + fServiceName + " (Rs " + (long) fPrice + ")"
                                 + (fPartReserved ? "\nPart reserved: " + fRequiredPart : ""))
                         .setPositiveButton("OK", (dialog, which) -> {
-                            // Reset form fields
                             binding.bookingModelInput.setText("");
                             binding.bookingProblemInput.setText("");
                             selectedPhotoUri = null;
                             binding.photoPreviewContainer.setVisibility(View.GONE);
                             binding.photoStatusText.setText("No photo attached");
 
-                            // Switch back to Store panel
                             binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
                         })
                         .show();
@@ -612,9 +516,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Setup round category click listeners.
-     */
     private void setupRoundCategories() {
         binding.catAll.setOnClickListener(v -> selectCategory("ALL"));
         binding.catPhones.setOnClickListener(v -> selectCategory("PHONES"));
@@ -623,16 +524,11 @@ public class HomeActivity extends AppCompatActivity {
         binding.catBatteries.setOnClickListener(v -> selectCategory("BATTERIES"));
     }
 
-    /**
-     * Updates visual state of round category circles and re-filters the store items.
-     */
     private void selectCategory(String categoryKey) {
         currentCategory = categoryKey;
 
-        // Reset all category circles to default unselected appearance (Navy icon on White circle)
         resetCategoryStyles();
 
-        // Highlight the chosen category circle (White icon on Navy circle)
         if ("ALL".equals(categoryKey)) {
             highlightCategory(binding.circleCatAll, binding.iconCatAll, binding.labelCatAll);
         } else if ("PHONES".equals(categoryKey)) {
@@ -645,57 +541,41 @@ public class HomeActivity extends AppCompatActivity {
             highlightCategory(binding.circleCatBatteries, binding.iconCatBatteries, binding.labelCatBatteries);
         }
 
-        // Reload repair services according to the selected filter
         loadAvailableServices(categoryKey);
     }
 
-    /**
-     * Reset all category circles to unselected appearance.
-     * Sets icon tint to Navy so icons are clearly visible on the white circle background.
-     */
     private void resetCategoryStyles() {
         int unselectedBg = R.drawable.bg_circle_category;
         int mutedColor = getResources().getColor(R.color.muted_text, null);
         int primaryColor = getResources().getColor(R.color.primary, null);
 
-        // Category: All
         binding.circleCatAll.setBackgroundResource(unselectedBg);
         binding.iconCatAll.setColorFilter(primaryColor);
         binding.labelCatAll.setTextColor(mutedColor);
 
-        // Category: Phones
         binding.circleCatPhones.setBackgroundResource(unselectedBg);
         binding.iconCatPhones.setColorFilter(primaryColor);
         binding.labelCatPhones.setTextColor(mutedColor);
 
-        // Category: Computers
         binding.circleCatComputers.setBackgroundResource(unselectedBg);
         binding.iconCatComputers.setColorFilter(primaryColor);
         binding.labelCatComputers.setTextColor(mutedColor);
 
-        // Category: Screens
         binding.circleCatScreens.setBackgroundResource(unselectedBg);
         binding.iconCatScreens.setColorFilter(primaryColor);
         binding.labelCatScreens.setTextColor(mutedColor);
 
-        // Category: Batteries
         binding.circleCatBatteries.setBackgroundResource(unselectedBg);
         binding.iconCatBatteries.setColorFilter(primaryColor);
         binding.labelCatBatteries.setTextColor(mutedColor);
     }
 
-    /**
-     * Highlight a single category circle when active.
-     */
     private void highlightCategory(View circleView, ImageView iconView, TextView labelView) {
         circleView.setBackgroundResource(R.drawable.bg_circle_category_selected);
         iconView.setColorFilter(getResources().getColor(R.color.white, null));
         labelView.setTextColor(getResources().getColor(R.color.ink, null));
     }
 
-    /**
-     * Load computer and mobile phone repair services from the SQLite database with category filtering.
-     */
     private void loadAvailableServices(String filter) {
         binding.servicesContainer.removeAllViews();
 
@@ -731,7 +611,6 @@ public class HomeActivity extends AppCompatActivity {
                 partText.setVisibility(View.VISIBLE);
             }
 
-            // Click service -> open Book Appointment in bottom nav and pre-fill
             itemView.setOnClickListener(v -> {
                 binding.bookingProblemInput.setText(service.name + " - " + (service.requiredPart != null && !service.requiredPart.isEmpty() ? service.requiredPart : "Diagnostic & Repair"));
                 binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
@@ -745,9 +624,6 @@ public class HomeActivity extends AppCompatActivity {
         binding.servicesContainer.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
     }
 
-    /**
-     * Load sample repaired-device images published by staff into the customer showcase gallery.
-     */
     private void loadSampleShowcase() {
         if (binding.samplesContainer.getAdapter() == null) {
             sampleImageAdapter = new SampleImageAdapter();
@@ -763,9 +639,6 @@ public class HomeActivity extends AppCompatActivity {
         binding.samplesEmptyText.setVisibility(hasSamples ? View.GONE : View.VISIBLE);
     }
 
-    /**
-     * Checks if an item matches the current active category filter.
-     */
     private boolean matchesFilter(String name, String extra, String filter) {
         if ("ALL".equals(filter)) return true;
         String combined = (name + " " + extra).toLowerCase();
@@ -784,17 +657,11 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Setup Branch click listeners for Google Maps.
-     */
     private void setupBranchButtons() {
         binding.btnColomboMap.setOnClickListener(v -> openLocationInMaps("6.9271,79.8612", "TechFix Colombo Branch"));
         binding.btnGalleMap.setOnClickListener(v -> openLocationInMaps("6.0329,80.2168", "TechFix Galle Branch"));
     }
 
-    /**
-     * Helper method to choose an image for a repair service.
-     */
     private int getServiceImageResource(String serviceName, String category) {
         String query = (serviceName + " " + category).toLowerCase();
         if (query.contains("screen") || query.contains("display")) {
@@ -810,9 +677,6 @@ public class HomeActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Setup the Spare Parts panel: branch filter dropdown & real-time search input.
-     */
     private void setupPartsPanel() {
         String[] branches = new com.techfix.app.database.BranchDAO(dbHelper).filterNamesArray();
         ArrayAdapter<String> branchAdapter = new ArrayAdapter<>(this, R.layout.item_dropdown, branches);
@@ -837,9 +701,6 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Loads spare parts from SQLite database and inflates them into homePartsContainer.
-     */
     private void loadAvailableParts() {
         binding.homePartsContainer.removeAllViews();
         List<SparePart> parts = sparePartDAO.allByBranch(currentPartsBranch);
@@ -866,7 +727,6 @@ public class HomeActivity extends AppCompatActivity {
             nameText.setText(part.name);
             qtyText.setText(part.quantity + " units available in store");
 
-            // Choose icon
             if (part.name.toLowerCase().contains("screen") || part.name.toLowerCase().contains("display")) {
                 imageView.setImageResource(R.drawable.ic_store_phone_screen);
             } else if (part.name.toLowerCase().contains("battery")) {
@@ -879,7 +739,6 @@ public class HomeActivity extends AppCompatActivity {
                 imageView.setImageResource(R.drawable.ic_store_hardware_part);
             }
 
-            // Stock badge status
             if (part.quantity == 0) {
                 badgeText.setText("Out of Stock");
                 badgeText.setTextColor(getColor(R.color.error));
@@ -891,7 +750,6 @@ public class HomeActivity extends AppCompatActivity {
                 badgeText.setTextColor(getColor(R.color.success));
             }
 
-            // When customer taps part -> switch to Booking tab
             itemView.setOnClickListener(v -> {
                 binding.bottomNavigation.setSelectedItemId(R.id.nav_home_book);
                 Toast.makeText(this, "Selected " + part.name + " for repair booking", Toast.LENGTH_SHORT).show();
@@ -904,18 +762,12 @@ public class HomeActivity extends AppCompatActivity {
         binding.homePartsContainer.setVisibility(count == 0 ? View.GONE : View.VISIBLE);
     }
 
-    /**
-     * Helper method to open geographical coordinates in Google Maps app.
-     */
     private void openLocationInMaps(String coordinates, String label) {
         Uri mapUri = Uri.parse("geo:" + coordinates + "?q=" + Uri.encode(label));
         Intent mapIntent = new Intent(Intent.ACTION_VIEW, mapUri);
         startActivity(mapIntent);
     }
 
-    /**
-     * Setup Hero Store Banner Swipable ViewPager2 Carousel with auto-scroll.
-     */
     private void setupBannerCarousel() {
         List<BannerItem> banners = new ArrayList<>();
         banners.add(new BannerItem(

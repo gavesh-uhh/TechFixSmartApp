@@ -17,7 +17,6 @@
         android:paddingHorizontal="24dp"
         android:paddingVertical="32dp">
 
-        <!-- App Logo Emblem & Brand Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -51,7 +50,6 @@
                 android:textAppearance="@style/TextAppearance.TechFix.Body" />
         </LinearLayout>
 
-        <!-- Floating Auth Card -->
         <com.google.android.material.card.MaterialCardView
             style="@style/Widget.TechFix.ShadowCard"
             android:layout_width="match_parent"
@@ -64,7 +62,6 @@
                 android:orientation="vertical"
                 android:padding="24dp">
 
-                <!-- 1. Full Name (Only visible for sign up) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/nameLayout"
                     style="@style/Widget.TechFix.TextInput"
@@ -80,7 +77,6 @@
                         android:inputType="textPersonName" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- 2. Phone Number (Only visible for sign up) -->
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/phoneLayout"
                     style="@style/Widget.TechFix.TextInput"
@@ -97,7 +93,6 @@
                         android:inputType="phone" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- 3. Email Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.TechFix.TextInput"
                     android:layout_width="match_parent"
@@ -112,7 +107,6 @@
                         android:inputType="textEmailAddress" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- 4. Password Input -->
                 <com.google.android.material.textfield.TextInputLayout
                     style="@style/Widget.TechFix.TextInput"
                     android:layout_width="match_parent"
@@ -128,7 +122,6 @@
                         android:inputType="textPassword" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Password Strength Indicator (For sign up) -->
                 <com.google.android.material.progressindicator.LinearProgressIndicator
                     android:id="@+id/passwordStrength"
                     android:layout_width="match_parent"
@@ -151,7 +144,6 @@
                     android:textColor="@color/muted_text"
                     android:visibility="gone" />
 
-                <!-- Forgot Password -->
                 <TextView
                     android:id="@+id/forgotPasswordText"
                     android:layout_width="wrap_content"
@@ -164,7 +156,6 @@
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <!-- Action Button -->
                 <Button
                     android:id="@+id/loginButton"
                     style="@style/Widget.TechFix.Button.Filled"
@@ -176,7 +167,6 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Switch between Sign In and Sign Up -->
         <Button
             android:id="@+id/switchAuthButton"
             style="@style/Widget.TechFix.Button.Text"

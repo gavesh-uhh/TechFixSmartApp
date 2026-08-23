@@ -4,10 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
-/**
- * Thin wrapper around Firebase Analytics so feature code stays clean.
- * All calls are fail-safe: analytics must never crash the app.
- */
 public final class Analytics {
     private static FirebaseAnalytics instance;
 
@@ -32,7 +28,6 @@ public final class Analytics {
             }
             get(context).logEvent(event, params);
         } catch (Exception ignored) {
-            // Analytics must never break app flow
         }
     }
 }

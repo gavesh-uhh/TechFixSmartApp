@@ -12,7 +12,6 @@
         android:orientation="vertical"
         android:padding="18dp">
 
-        <!-- Top Row: Tech Name, Branch, Specialty -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,7 +62,6 @@
                     android:textSize="12sp" />
             </LinearLayout>
 
-            <!-- Status Indicator Pill -->
             <TextView
                 android:id="@+id/techStatusBadge"
                 style="@style/Widget.TechFix.Stamp"
@@ -76,14 +74,12 @@
                 android:textColor="@color/success" />
         </LinearLayout>
 
-        <!-- Divider Line -->
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginVertical="12dp"
             android:background="@color/line" />
 
-        <!-- Bottom Controls Row: Active Jobs Load & Duty Toggle -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -106,7 +102,6 @@
                 android:layout_height="1dp"
                 android:layout_weight="1" />
 
-            <!-- Toggle Duty Status Button -->
             <Button
                 android:id="@+id/btnToggleDuty"
                 style="@style/Widget.Material3.Button.OutlinedButton"
@@ -121,7 +116,6 @@
                 android:textSize="12sp"
                 app:cornerRadius="10dp" />
 
-            <!-- Delete / Remove Tech Button -->
             <Button
                 android:id="@+id/btnDeleteTech"
                 style="@style/Widget.Material3.Button.TextButton"

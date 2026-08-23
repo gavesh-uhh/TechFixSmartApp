@@ -14,7 +14,6 @@ import com.techfix.app.models.Branch;
 import java.util.ArrayList;
 import java.util.List;
 
-/** Shows TechFix branches with their location and a Maps shortcut. */
 public class BranchAdapter extends RecyclerView.Adapter<BranchAdapter.Holder> {
 
     private final List<Branch> items = new ArrayList<>();

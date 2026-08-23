@@ -13,7 +13,6 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <!-- TechFix Brand Logo -->
         <ImageView
             android:id="@+id/splashLogo"
             android:layout_width="150dp"
@@ -30,7 +29,6 @@
             android:textSize="15sp"
             android:letterSpacing="0.02" />
 
-        <!-- Loading Indicator -->
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/splashProgressBar"
             android:layout_width="wrap_content"

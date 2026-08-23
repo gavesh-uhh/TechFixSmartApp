@@ -11,9 +11,6 @@ import com.techfix.app.models.User;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Adapter for browsing registered customer accounts in the Admin Dashboard.
- */
 public class UserDirectoryAdapter extends RecyclerView.Adapter<UserDirectoryAdapter.Holder> {
 
     public interface UserRepairCountProvider {
@@ -54,7 +51,6 @@ public class UserDirectoryAdapter extends RecyclerView.Adapter<UserDirectoryAdap
         holder.userEmail.setText(user.email);
         holder.userPhone.setText(user.phone != null && !user.phone.isEmpty() ? "📞 " + user.phone : "📞 No phone registered");
 
-        // Compute initials for avatar
         String initials = "TF";
         if (user.name != null && !user.name.trim().isEmpty()) {
             String[] parts = user.name.trim().split("\\s+");

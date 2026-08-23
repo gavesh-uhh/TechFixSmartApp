@@ -18,4 +18,3 @@ public class Service {
         this(id, name, category, price, requiredPart, "All Branches");
     }
 }
-

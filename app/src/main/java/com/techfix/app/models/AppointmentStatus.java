@@ -23,4 +23,3 @@ public enum AppointmentStatus {
         return REQUEST_RECEIVED;
     }
 }
-

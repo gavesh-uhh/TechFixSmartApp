@@ -5,7 +5,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
-import com.google.android.material.snackbar.Snackbar;
 import com.techfix.app.R;
 import com.techfix.app.database.AppointmentDAO;
 
@@ -18,7 +17,6 @@ import com.techfix.app.util.Feedback;
 import com.techfix.app.util.WindowInsetsHelper;
 import java.util.List;
 
-/** Shows one repair's full details and its live progress timeline. */
 public class AppointmentDetailActivity extends AppCompatActivity {
     private ActivityAppointmentDetailBinding binding;
     private AppointmentDAO appointments;
@@ -29,7 +27,6 @@ public class AppointmentDetailActivity extends AppCompatActivity {
         binding = ActivityAppointmentDetailBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        // Edge-to-edge: pad the 64dp header below status bar/cutout and keep the Pay footer above gesture nav/IME.
         WindowInsetsHelper.applyHeader(binding.detailHeader);
         WindowInsetsHelper.applyBottomInset(binding.detailFooter);
         appointments = new AppointmentDAO(DatabaseHelper.getInstance(this));

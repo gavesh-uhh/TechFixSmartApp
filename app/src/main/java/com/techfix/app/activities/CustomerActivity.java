@@ -26,7 +26,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.google.android.material.tabs.TabLayoutMediator;
 import com.techfix.app.R;
 import com.techfix.app.adapters.AppointmentAdapter;
 import com.techfix.app.adapters.BannerCarouselAdapter;
@@ -56,22 +55,12 @@ import com.techfix.app.util.WindowInsetsHelper;
 import java.io.File;
 import java.util.List;
 
-/**
- * CustomerActivity - Unified Customer Workspace with Integrated Store, Repairs, Booking, and Profile.
- * Features:
- * - 4 Unified Bottom Navigation tabs: Store, My Repairs, Book Repair, Profile
- * - Instant in-app booking from store service cards
- * - Real-time repair queue tracking and invoice settlement
- * - Descriptive branch dropdowns and GPS nearest-branch assistance
- * - Single-task routing eliminating all navigation loops
- */
 public class CustomerActivity extends AppCompatActivity {
 
     private ActivityCustomerBinding binding;
     private SessionManager session;
     private DatabaseHelper dbHelper;
 
-    // DAOs
     private AppointmentDAO appointmentDAO;
     private ServiceDAO serviceDAO;
     private SparePartDAO sparePartDAO;
@@ -80,16 +69,13 @@ public class CustomerActivity extends AppCompatActivity {
     private SampleRepairDAO sampleRepairDAO;
     private UserDAO userDAO;
 
-    // Adapters
     private AppointmentAdapter appointmentAdapter;
     private BranchAdapter branchAdapter;
 
-    // Carousel Banner fields
     private final Handler carouselHandler = new Handler(Looper.getMainLooper());
     private Runnable carouselRunnable;
     private BannerCarouselAdapter bannerCarouselAdapter;
 
-    // Photo capture / selection
     private Uri selectedPhotoUri = null;
     private Uri tempCameraUri = null;
     private String repairFilter = "Active";
@@ -106,7 +92,6 @@ public class CustomerActivity extends AppCompatActivity {
         }
     };
 
-    // Location permission launcher for nearest-branch detection
     private final ActivityResultLauncher<String> locationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), (Boolean isGranted) -> {
                 if (Boolean.TRUE.equals(isGranted)) {
@@ -114,7 +99,6 @@ public class CustomerActivity extends AppCompatActivity {
                 }
             });
 
-    // Photo picker launcher (Gallery)
     private final ActivityResultLauncher<String> photoPickerLauncher =
             registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
                 if (uri != null) {
@@ -122,7 +106,6 @@ public class CustomerActivity extends AppCompatActivity {
                 }
             });
 
-    // Camera Take Picture Launcher
     private final ActivityResultLauncher<Uri> takePictureLauncher =
             registerForActivityResult(new ActivityResultContracts.TakePicture(), (Boolean success) -> {
                 if (Boolean.TRUE.equals(success) && tempCameraUri != null) {
@@ -130,7 +113,6 @@ public class CustomerActivity extends AppCompatActivity {
                 }
             });
 
-    // Camera Permission Launcher
     private final ActivityResultLauncher<String> cameraPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), (Boolean isGranted) -> {
                 if (Boolean.TRUE.equals(isGranted)) {
@@ -151,21 +133,6 @@ public class CustomerActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "Failed to load image preview: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void showPhotoOptionsDialog() {
-        CharSequence[] options = {"📷 Take Photo with Camera", "🖼️ Choose from Gallery / Files"};
-        new AlertDialog.Builder(this)
-                .setTitle("Attach Device Photo")
-                .setItems(options, (dialog, which) -> {
-                    if (which == 0) {
-                        checkCameraPermissionAndLaunch();
-                    } else if (which == 1) {
-                        photoPickerLauncher.launch("image/*");
-                    }
-                })
-                .setNegativeButton("Cancel", null)
-                .show();
     }
 
     private void checkCameraPermissionAndLaunch() {
@@ -209,19 +176,16 @@ public class CustomerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // 1. Verify user session
         session = new SessionManager(this);
         if (!session.isLoggedIn()) {
             goHome();
             return;
         }
 
-        // 2. Inflate layout
         binding = ActivityCustomerBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         WindowInsetsHelper.apply(binding.customerHeader, binding.dashboardContent);
 
-        // 3. Initialize DAOs
         dbHelper = DatabaseHelper.getInstance(this);
         appointmentDAO = new AppointmentDAO(dbHelper);
         serviceDAO = new ServiceDAO(dbHelper);
@@ -231,11 +195,9 @@ public class CustomerActivity extends AppCompatActivity {
         sampleRepairDAO = new SampleRepairDAO(dbHelper);
         userDAO = new UserDAO(dbHelper);
 
-        // 4. Cloud Sync
         FirebaseSyncManager.getInstance().init(this);
         FirebaseSyncManager.getInstance().addListener(syncListener);
 
-        // 5. Initialize UI Components
         setupUserProfile();
         setupRepairsList();
         setupBookingForm();
@@ -244,7 +206,6 @@ public class CustomerActivity extends AppCompatActivity {
         setupBottomNavigation();
         setupBannerCarousel();
 
-        // Default open to Store tab (0)
         showPanel(0);
     }
 
@@ -292,9 +253,6 @@ public class CustomerActivity extends AppCompatActivity {
         FirebaseSyncManager.getInstance().removeListener(syncListener);
     }
 
-    /**
-     * Loads logged-in user profile details into the header and profile card.
-     */
     private void setupUserProfile() {
         binding.customerTopLogoutButton.setOnClickListener(v -> performLogout());
         binding.profileLogoutButton.setOnClickListener(v -> performLogout());
@@ -322,9 +280,6 @@ public class CustomerActivity extends AppCompatActivity {
         finish();
     }
 
-    /**
-     * Setup bottom navigation bar (Store, Parts, My Repairs, Book Repair, Profile).
-     */
     private void setupBottomNavigation() {
         binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_store);
 
@@ -356,10 +311,8 @@ public class CustomerActivity extends AppCompatActivity {
             binding.customerBottomNavigation.setSelectedItemId(R.id.nav_customer_book);
         });
 
-        // Pay pending repairs button
         binding.payButton.setOnClickListener(this::payFirstPending);
 
-        // Repairs filter chips
         binding.chipFilterActive.setOnClickListener(v -> selectRepairFilter("Active", v));
         binding.chipFilterCompleted.setOnClickListener(v -> selectRepairFilter("Completed", v));
         binding.chipFilterAll.setOnClickListener(v -> selectRepairFilter("All", v));
@@ -381,10 +334,6 @@ public class CustomerActivity extends AppCompatActivity {
         refreshRepairs();
     }
 
-    /**
-     * If location permission is granted, auto-selects the nearest branch in the
-     * booking form and tells the customer how far away it is.
-     */
     private void suggestNearestBranch() {
         if (com.techfix.app.util.NearestBranch.hasPermission(this)) {
             com.techfix.app.util.NearestBranch.resolve(this, dbHelper, (branchName, km) -> runOnUiThread(() -> {
@@ -403,9 +352,6 @@ public class CustomerActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Shows the active tab panel (0: Store, 1: Parts, 2: Repairs, 3: Book, 4: Profile).
-     */
     private void showPanel(int position) {
         binding.customerStorePanel.setVisibility(position == 0 ? View.VISIBLE : View.GONE);
         binding.customerPartsPanel.setVisibility(position == 1 ? View.VISIBLE : View.GONE);
@@ -424,9 +370,6 @@ public class CustomerActivity extends AppCompatActivity {
         }
     }
 
-    // ==========================================
-    // STORE CATALOG TAB METHODS
-    // ==========================================
     private void setupCustomerStore() {
         binding.customerCatAll.setOnClickListener(v -> selectCategory("ALL"));
         binding.customerCatPhones.setOnClickListener(v -> selectCategory("PHONES"));
@@ -461,9 +404,6 @@ public class CustomerActivity extends AppCompatActivity {
         loadCustomerShowcase();
     }
 
-    /**
-     * Load sample repaired-device images published by staff into the customer showcase gallery.
-     */
     private void loadCustomerShowcase() {
         if (binding.customerSamplesContainer.getAdapter() == null) {
             binding.customerSamplesContainer.setLayoutManager(
@@ -572,7 +512,6 @@ public class CustomerActivity extends AppCompatActivity {
     }
 
     private void prefillBooking(String serviceName, String category, String branch) {
-        // 1. Select service
         ArrayAdapter<String> serviceAdapter = (ArrayAdapter<String>) binding.serviceSpinner.getAdapter();
         if (serviceAdapter != null) {
             for (int i = 0; i < serviceAdapter.getCount(); i++) {
@@ -583,7 +522,6 @@ public class CustomerActivity extends AppCompatActivity {
             }
         }
 
-        // 2. Select device category
         ArrayAdapter<String> deviceAdapter = (ArrayAdapter<String>) binding.deviceSpinner.getAdapter();
         if (deviceAdapter != null && category != null) {
             for (int i = 0; i < deviceAdapter.getCount(); i++) {
@@ -594,7 +532,6 @@ public class CustomerActivity extends AppCompatActivity {
             }
         }
 
-        // 3. Select branch if specific
         if (branch != null && !branch.isEmpty() && !"All Branches".equalsIgnoreCase(branch)) {
             String display = BranchDAO.toDisplayName(branch);
             ArrayAdapter<String> branchAdapter = (ArrayAdapter<String>) binding.branchSpinner.getAdapter();
@@ -696,9 +633,6 @@ public class CustomerActivity extends AppCompatActivity {
         }
     }
 
-    // ==========================================
-    // MY REPAIRS TAB METHODS
-    // ==========================================
     private void setupRepairsList() {
         appointmentAdapter = new AppointmentAdapter(appointment -> {
             Intent intent = new Intent(CustomerActivity.this, AppointmentDetailActivity.class);
@@ -736,9 +670,6 @@ public class CustomerActivity extends AppCompatActivity {
         binding.paymentCard.setVisibility(hasPendingPayment ? View.VISIBLE : View.GONE);
     }
 
-    // ==========================================
-    // BOOK REPAIR TAB METHODS
-    // ==========================================
     private void setupBookingForm() {
         List<String> serviceOptions = serviceDAO.all();
         if (serviceOptions.isEmpty()) {
@@ -768,7 +699,6 @@ public class CustomerActivity extends AppCompatActivity {
             @Override public void onNothingSelected(AdapterView<?> parent) {}
         });
 
-        // Setup Attach Photo Button & Drop Zone (Direct Camera Permission & Launch)
         binding.cameraButton.setOnClickListener(v -> checkCameraPermissionAndLaunch());
         binding.customerPhotoDropZone.setOnClickListener(v -> checkCameraPermissionAndLaunch());
 
@@ -879,9 +809,6 @@ public class CustomerActivity extends AppCompatActivity {
         });
     }
 
-    // ==========================================
-    // PROFILE & BRANCHES TAB METHODS
-    // ==========================================
     private void setupBranchesList() {
         branchAdapter = new BranchAdapter();
         binding.branchList.setLayoutManager(new LinearLayoutManager(this));
@@ -925,9 +852,6 @@ public class CustomerActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    /**
-     * Setup Customer Hub Hero Store Banner Swipable ViewPager2 Carousel with auto-scroll.
-     */
     private void setupBannerCarousel() {
         List<BannerItem> banners = new ArrayList<>();
         banners.add(new BannerItem(

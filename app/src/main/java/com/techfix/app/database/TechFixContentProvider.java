@@ -10,15 +10,6 @@ import android.net.Uri;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-/**
- * ContentProvider over the appointments table — the structured, external-facing
- * face of TechFix's offline SQLite store (Content Providers deliverable).
- *
- * URIs:
- *   content://com.techfix.app.providers/appointments          → all appointments
- *   content://com.techfix.app.providers/appointments/{id}     → one appointment
- *   content://com.techfix.app.providers/appointments/user/{userId} → one customer's repairs
- */
 public class TechFixContentProvider extends ContentProvider {
     public static final String AUTHORITY = "com.techfix.app.providers";
     public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY + "/appointments");

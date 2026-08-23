@@ -9,4 +9,3 @@ public class SparePart {
         this.id = id; this.name = name; this.quantity = quantity; this.branch = branch;
     }
 }
-

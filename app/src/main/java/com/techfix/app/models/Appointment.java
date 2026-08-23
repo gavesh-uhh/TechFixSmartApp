@@ -1,6 +1,5 @@
 package com.techfix.app.models;
 
-/** Repair appointment for a customer's device. */
 public class Appointment {
     public final long id;
     public final long userId;
@@ -16,7 +15,4 @@ public class Appointment {
         this.createdAt = createdAt == null ? "" : createdAt;
         this.photoUri = photoUri == null ? "" : photoUri;
     }
-
-    public boolean isCompleted() { return AppointmentStatus.COMPLETED.label.equals(status); }
 }
-
