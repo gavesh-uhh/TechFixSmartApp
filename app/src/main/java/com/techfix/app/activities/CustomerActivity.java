@@ -10,6 +10,8 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,8 +23,13 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.techfix.app.R;
 import com.techfix.app.adapters.AppointmentAdapter;
+import com.techfix.app.adapters.BannerCarouselAdapter;
 import com.techfix.app.adapters.BranchAdapter;
 import com.techfix.app.adapters.SampleImageAdapter;
 import com.techfix.app.database.AppointmentDAO;
@@ -35,6 +42,7 @@ import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.database.UserDAO;
 import com.techfix.app.databinding.ActivityCustomerBinding;
 import com.techfix.app.models.Appointment;
+import com.techfix.app.models.BannerItem;
 import com.techfix.app.models.PaymentStatus;
 import com.techfix.app.models.SampleRepair;
 import com.techfix.app.models.Service;
@@ -75,6 +83,11 @@ public class CustomerActivity extends AppCompatActivity {
     // Adapters
     private AppointmentAdapter appointmentAdapter;
     private BranchAdapter branchAdapter;
+
+    // Carousel Banner fields
+    private final Handler carouselHandler = new Handler(Looper.getMainLooper());
+    private Runnable carouselRunnable;
+    private BannerCarouselAdapter bannerCarouselAdapter;
 
     // Photo capture / selection
     private Uri selectedPhotoUri = null;
@@ -229,6 +242,7 @@ public class CustomerActivity extends AppCompatActivity {
         setupBranchesList();
         setupCustomerStore();
         setupBottomNavigation();
+        setupBannerCarousel();
 
         // Default open to Store tab (0)
         showPanel(0);
@@ -262,11 +276,19 @@ public class CustomerActivity extends AppCompatActivity {
         loadCustomerServices(currentCategory);
         loadCustomerParts();
         loadCustomerShowcase();
+        startCarouselAutoScroll();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopCarouselAutoScroll();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopCarouselAutoScroll();
         FirebaseSyncManager.getInstance().removeListener(syncListener);
     }
 
@@ -899,5 +921,68 @@ public class CustomerActivity extends AppCompatActivity {
         Intent intent = new Intent(this, AppointmentDetailActivity.class);
         intent.putExtra("appointmentId", appointmentId);
         startActivity(intent);
+    }
+
+    /**
+     * Setup Customer Hub Hero Store Banner Swipable ViewPager2 Carousel with auto-scroll.
+     */
+    private void setupBannerCarousel() {
+        List<BannerItem> banners = new ArrayList<>();
+        banners.add(new BannerItem(
+                "EXPRESS WORKSHOP",
+                "Smart Repairs, Done Right",
+                "Certified technicians & genuine replacement parts in Colombo & Galle.",
+                R.drawable.hero_banner_1,
+                0xFFB5A5FB
+        ));
+        banners.add(new BannerItem(
+                "ORIGINAL PARTS",
+                "100% Genuine Components",
+                "Direct inventory of authentic laptop & smartphone parts with full warranty.",
+                R.drawable.hero_banner_2,
+                0xFF80D8FF
+        ));
+        banners.add(new BannerItem(
+                "SAME DAY SERVICE",
+                "Fast Repair Turnaround",
+                "Most screen & battery replacements completed in under 2 hours.",
+                R.drawable.hero_banner_3,
+                0xFFA7FFEB
+        ));
+        banners.add(new BannerItem(
+                "EXCLUSIVE PROMO",
+                "10% Off Online Bookings",
+                "Schedule your repair service online today and save on your total bill.",
+                R.drawable.hero_banner_4,
+                0xFFFF80AB
+        ));
+
+        bannerCarouselAdapter = new BannerCarouselAdapter(banners);
+        binding.customerHeroBannerCarousel.setAdapter(bannerCarouselAdapter);
+
+        carouselRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (binding != null && binding.customerHeroBannerCarousel != null && bannerCarouselAdapter != null && bannerCarouselAdapter.getItemCount() > 0) {
+                    int currentItem = binding.customerHeroBannerCarousel.getCurrentItem();
+                    int nextItem = (currentItem + 1) % bannerCarouselAdapter.getItemCount();
+                    binding.customerHeroBannerCarousel.setCurrentItem(nextItem, true);
+                    carouselHandler.postDelayed(this, 4000);
+                }
+            }
+        };
+    }
+
+    private void startCarouselAutoScroll() {
+        stopCarouselAutoScroll();
+        if (carouselHandler != null && carouselRunnable != null) {
+            carouselHandler.postDelayed(carouselRunnable, 4000);
+        }
+    }
+
+    private void stopCarouselAutoScroll() {
+        if (carouselHandler != null && carouselRunnable != null) {
+            carouselHandler.removeCallbacks(carouselRunnable);
+        }
     }
 }

@@ -101,47 +101,17 @@
                 android:paddingHorizontal="@dimen/screen_padding"
                 android:paddingVertical="@dimen/space_16">
 
-                <!-- Hero Store Banner Card -->
-                <com.google.android.material.card.MaterialCardView
-                    style="@style/Widget.TechFix.ShadowCard"
+                <!-- Hero Store Banner Carousel Container -->
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="16dp"
-                    app:cardBackgroundColor="@color/surface">
+                    android:layout_height="160dp"
+                    android:layout_marginBottom="16dp">
 
-                    <LinearLayout
+                    <androidx.viewpager2.widget.ViewPager2
+                        android:id="@+id/customerHeroBannerCarousel"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:background="@drawable/bg_hero_card"
-                        android:orientation="vertical"
-                        android:padding="20dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="EXPRESS WORKSHOP"
-                            android:textColor="@color/techfix_sky"
-                            android:textSize="11sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:text="Smart Repairs, Done Right"
-                            android:textColor="@color/white"
-                            android:textSize="20sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="4dp"
-                            android:text="Certified technicians &amp; genuine replacement parts in Colombo &amp; Galle."
-                            android:textColor="@color/techfix_sky"
-                            android:textSize="14sp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                        android:layout_height="160dp" />
+                </RelativeLayout>
 
                 <!-- Round Categories Selector Header -->
                 <TextView

@@ -12,6 +12,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.os.Handler;
+import android.os.Looper;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
@@ -21,7 +23,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.techfix.app.R;
+import com.techfix.app.adapters.BannerCarouselAdapter;
 import com.techfix.app.adapters.SampleImageAdapter;
 import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.DatabaseHelper;
@@ -30,6 +34,7 @@ import com.techfix.app.database.ServiceDAO;
 import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
 import com.techfix.app.databinding.ActivityHomeBinding;
+import com.techfix.app.models.BannerItem;
 import com.techfix.app.models.Service;
 import com.techfix.app.models.SparePart;
 import com.techfix.app.models.UserRole;
@@ -66,6 +71,11 @@ public class HomeActivity extends AppCompatActivity {
 
     // Showcase gallery adapter
     private SampleImageAdapter sampleImageAdapter;
+
+    // Hero banner carousel auto-scroll handler & runnable
+    private final Handler carouselHandler = new Handler(Looper.getMainLooper());
+    private Runnable carouselRunnable;
+    private BannerCarouselAdapter bannerCarouselAdapter;
 
     // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES"
     private String currentCategory = "ALL";
@@ -216,6 +226,7 @@ public class HomeActivity extends AppCompatActivity {
         setupRoundCategories();
         setupPartsPanel();
         setupBookingForm();
+        setupBannerCarousel();
 
         // 5. Initial load of all available repair services
         selectCategory("ALL");
@@ -230,6 +241,13 @@ public class HomeActivity extends AppCompatActivity {
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
         selectCategory(currentCategory != null ? currentCategory : "ALL");
         updateNavAccountItem();
+        startCarouselAutoScroll();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        stopCarouselAutoScroll();
     }
 
     @Override
@@ -895,9 +913,73 @@ public class HomeActivity extends AppCompatActivity {
         startActivity(mapIntent);
     }
 
+    /**
+     * Setup Hero Store Banner Swipable ViewPager2 Carousel with auto-scroll.
+     */
+    private void setupBannerCarousel() {
+        List<BannerItem> banners = new ArrayList<>();
+        banners.add(new BannerItem(
+                "EXPRESS WORKSHOP",
+                "Smart Repairs, Done Right",
+                "Certified technicians & genuine replacement parts in Colombo & Galle.",
+                R.drawable.hero_banner_1,
+                0xFFB5A5FB
+        ));
+        banners.add(new BannerItem(
+                "ORIGINAL PARTS",
+                "100% Genuine Components",
+                "Direct inventory of authentic laptop & smartphone parts with full warranty.",
+                R.drawable.hero_banner_2,
+                0xFF80D8FF
+        ));
+        banners.add(new BannerItem(
+                "SAME DAY SERVICE",
+                "Fast Repair Turnaround",
+                "Most screen & battery replacements completed in under 2 hours.",
+                R.drawable.hero_banner_3,
+                0xFFA7FFEB
+        ));
+        banners.add(new BannerItem(
+                "EXCLUSIVE PROMO",
+                "10% Off Online Bookings",
+                "Schedule your repair service online today and save on your total bill.",
+                R.drawable.hero_banner_4,
+                0xFFFF80AB
+        ));
+
+        bannerCarouselAdapter = new BannerCarouselAdapter(banners);
+        binding.heroBannerCarousel.setAdapter(bannerCarouselAdapter);
+
+        carouselRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (binding != null && binding.heroBannerCarousel != null && bannerCarouselAdapter != null && bannerCarouselAdapter.getItemCount() > 0) {
+                    int currentItem = binding.heroBannerCarousel.getCurrentItem();
+                    int nextItem = (currentItem + 1) % bannerCarouselAdapter.getItemCount();
+                    binding.heroBannerCarousel.setCurrentItem(nextItem, true);
+                    carouselHandler.postDelayed(this, 4000);
+                }
+            }
+        };
+    }
+
+    private void startCarouselAutoScroll() {
+        stopCarouselAutoScroll();
+        if (carouselHandler != null && carouselRunnable != null) {
+            carouselHandler.postDelayed(carouselRunnable, 4000);
+        }
+    }
+
+    private void stopCarouselAutoScroll() {
+        if (carouselHandler != null && carouselRunnable != null) {
+            carouselHandler.removeCallbacks(carouselRunnable);
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        stopCarouselAutoScroll();
         FirebaseSyncManager.getInstance().removeListener(syncListener);
     }
 }
