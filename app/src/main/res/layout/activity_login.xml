@@ -15,7 +15,7 @@
         android:orientation="vertical"
         android:gravity="center_vertical"
         android:paddingHorizontal="24dp"
-        android:paddingVertical="36dp">
+        android:paddingVertical="32dp">
 
         <!-- App Logo Emblem & Brand Header -->
         <LinearLayout
@@ -110,7 +110,7 @@
                     style="@style/Widget.TechFix.TextInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
+                    android:layout_marginTop="14dp"
                     android:hint="Email Address">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -140,11 +140,11 @@
                 <com.google.android.material.progressindicator.LinearProgressIndicator
                     android:id="@+id/passwordStrength"
                     android:layout_width="match_parent"
-                    android:layout_height="5dp"
+                    android:layout_height="4dp"
                     android:layout_marginTop="10dp"
                     android:max="4"
                     android:visibility="gone"
-                    app:trackCornerRadius="3dp"
+                    app:trackCornerRadius="2dp"
                     app:indicatorColor="@color/primary"
                     app:trackColor="@color/chip_bg" />
 
@@ -153,8 +153,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="4dp"
-                    android:text="Password strength"
-                    android:textAppearance="@style/TextAppearance.Material3.LabelSmall"
+                    android:text="Password Strength"
+                    android:textAppearance="@style/TextAppearance.TechFix.LabelSmall"
+                    android:textSize="12sp"
                     android:textColor="@color/muted_text"
                     android:visibility="gone" />
 
@@ -166,9 +167,9 @@
                     android:layout_gravity="end"
                     android:layout_marginTop="10dp"
                     android:padding="4dp"
-                    android:text="Forgot password?"
+                    android:text="Forgot Password?"
                     android:textColor="@color/primary"
-                    android:textSize="13sp"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
                 <!-- Action Button -->
@@ -186,15 +187,12 @@
         <!-- Switch between Sign In and Sign Up -->
         <Button
             android:id="@+id/switchAuthButton"
-            style="@style/Widget.Material3.Button.TextButton"
+            style="@style/Widget.TechFix.Button.Text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="14dp"
-            android:textColor="@color/primary"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:text="Don't have an account? Sign up" />
+            android:text="Don't have an account? Sign Up" />
 
     </LinearLayout>
 </ScrollView>

@@ -26,6 +26,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_card_pill"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="Docket #001"
                 android:textColor="@color/primary" />
 
@@ -40,6 +42,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_field"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="IN PROGRESS" />
         </LinearLayout>
 
@@ -49,6 +53,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="@color/ink"
             android:textSize="17sp"
             android:textStyle="bold" />
@@ -59,9 +65,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:lineSpacingExtra="2dp"
             android:textColor="@color/muted_text"
-            android:textSize="13sp" />
+            android:textSize="14sp" />
 
         <!-- Divider Line -->
         <View
@@ -75,6 +83,8 @@
             android:id="@+id/docketMeta"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textColor="@color/primary"
             android:textSize="12sp"
             android:textStyle="bold" />

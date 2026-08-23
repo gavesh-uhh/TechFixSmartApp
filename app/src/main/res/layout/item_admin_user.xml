@@ -41,9 +41,11 @@
                     android:id="@+id/userName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:text="John Doe"
                     android:textColor="@color/ink"
-                    android:textSize="16sp"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -51,6 +53,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:text="john@example.com"
                     android:textColor="@color/muted_text"
                     android:textSize="12sp" />
@@ -59,7 +63,9 @@
                     android:id="@+id/userPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="1dp"
+                    android:layout_marginTop="2dp"
+                    android:maxLines="1"
+                    android:ellipsize="end"
                     android:text="0771234567"
                     android:textColor="@color/muted_text"
                     android:textSize="12sp" />
@@ -72,6 +78,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_card_pill"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="2 REPAIRS"
                 android:textColor="@color/primary" />
         </LinearLayout>

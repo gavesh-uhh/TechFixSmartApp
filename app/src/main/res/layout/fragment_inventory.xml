@@ -24,7 +24,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="18dp">
+                android:padding="20dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -58,7 +58,7 @@
                             android:layout_height="wrap_content"
                             android:text="Parts &amp; Inventory"
                             android:textColor="@color/ink"
-                            android:textSize="18sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -74,13 +74,13 @@
                         android:id="@+id/btnAddPartButton"
                         style="@style/Widget.TechFix.Button.Filled"
                         android:layout_width="wrap_content"
-                        android:layout_height="42dp"
+                        android:layout_height="48dp"
                         android:insetTop="0dp"
                         android:insetBottom="0dp"
                         android:minWidth="0dp"
                         android:paddingHorizontal="14dp"
                         android:text="+ Add Part"
-                        android:textSize="13sp" />
+                        android:textSize="14sp" />
                 </LinearLayout>
 
                 <!-- Branch Filter Row -->
@@ -105,16 +105,16 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="6dp"
-                        android:text="Branch Filter:"
+                        android:text="Branch:"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <Spinner
                         android:id="@+id/inventoryBranchSpinner"
                         style="@style/Widget.TechFix.Spinner"
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="52dp"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1" />
                 </LinearLayout>
@@ -162,7 +162,7 @@
                 android:layout_marginTop="4dp"
                 android:text="Tap '+ Add Part' above to record stock items."
                 android:textColor="@color/muted_text"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Parts RecyclerView -->

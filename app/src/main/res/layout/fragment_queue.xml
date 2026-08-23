@@ -32,7 +32,7 @@
                     style="@style/Widget.TechFix.Input"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Search docket #, customer, device, or phone..."
+                    android:hint="Search Docket #, Customer, Device, or Phone…"
                     android:inputType="text"
                     android:maxLines="1" />
 
@@ -57,14 +57,14 @@
                         android:layout_marginStart="6dp"
                         android:text="Sort Order:"
                         android:textColor="@color/ink"
-                        android:textSize="13sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <Spinner
                         android:id="@+id/sortQueueSpinner"
                         style="@style/Widget.TechFix.Spinner"
                         android:layout_width="0dp"
-                        android:layout_height="48dp"
+                        android:layout_height="52dp"
                         android:layout_marginStart="8dp"
                         android:layout_weight="1" />
                 </LinearLayout>
@@ -91,8 +91,8 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_filter_pill_selected"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp"
-                    android:text="All Dockets"
+                    android:paddingVertical="12dp"
+                    android:text="ALL DOCKETS"
                     android:textColor="@color/white" />
 
                 <TextView
@@ -103,8 +103,8 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_filter_pill"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp"
-                    android:text="Active"
+                    android:paddingVertical="12dp"
+                    android:text="ACTIVE"
                     android:textColor="@color/ink" />
 
                 <TextView
@@ -115,8 +115,8 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_filter_pill"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp"
-                    android:text="Received"
+                    android:paddingVertical="12dp"
+                    android:text="RECEIVED"
                     android:textColor="@color/ink" />
 
                 <TextView
@@ -127,8 +127,8 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_filter_pill"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp"
-                    android:text="In Repair"
+                    android:paddingVertical="12dp"
+                    android:text="IN REPAIR"
                     android:textColor="@color/ink" />
 
                 <TextView
@@ -139,8 +139,8 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_filter_pill"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp"
-                    android:text="Ready for Pickup"
+                    android:paddingVertical="12dp"
+                    android:text="READY FOR PICKUP"
                     android:textColor="@color/ink" />
 
                 <TextView
@@ -151,8 +151,8 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_filter_pill"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp"
-                    android:text="Completed"
+                    android:paddingVertical="12dp"
+                    android:text="COMPLETED"
                     android:textColor="@color/ink" />
 
                 <TextView
@@ -163,8 +163,8 @@
                     android:layout_marginStart="8dp"
                     android:background="@drawable/bg_filter_pill"
                     android:paddingHorizontal="14dp"
-                    android:paddingVertical="8dp"
-                    android:text="Unpaid"
+                    android:paddingVertical="12dp"
+                    android:text="UNPAID"
                     android:textColor="@color/ink" />
             </LinearLayout>
         </HorizontalScrollView>
@@ -232,7 +232,7 @@
                 android:layout_marginTop="4dp"
                 android:text="All repairs are either finished or filtered out."
                 android:textColor="@color/muted_text"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Docket List RecyclerView -->
@@ -285,7 +285,7 @@
                         android:id="@+id/statusSpinner"
                         style="@style/Widget.TechFix.Spinner"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="52dp"
                         android:layout_marginStart="6dp"
                         android:layout_weight="2" />
                 </LinearLayout>
