@@ -101,12 +101,9 @@ public class CustomerActivity extends AppCompatActivity {
             });
 
     // Photo picker launcher (Gallery)
-    private final ActivityResultLauncher<String[]> photoPickerLauncher =
-            registerForActivityResult(new ActivityResultContracts.OpenDocument(), (Uri uri) -> {
+    private final ActivityResultLauncher<String> photoPickerLauncher =
+            registerForActivityResult(new ActivityResultContracts.GetContent(), (Uri uri) -> {
                 if (uri != null) {
-                    try {
-                        getContentResolver().takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    } catch (SecurityException ignored) { }
                     onPhotoReady(uri);
                 }
             });
@@ -133,21 +130,22 @@ public class CustomerActivity extends AppCompatActivity {
         selectedPhotoUri = uri;
         binding.customerPhotoPreview.setImageURI(uri);
         binding.customerPhotoPreviewContainer.setVisibility(View.VISIBLE);
-        binding.customerPhotoStatus.setText("Photo attached: " + uri.getLastPathSegment());
-        binding.customerPhotoStatus.setTextColor(ContextCompat.getColor(this, R.color.primary));
+        binding.customerPhotoStatus.setText("Photo attached");
+        binding.customerPhotoStatus.setTextColor(ContextCompat.getColor(this, R.color.success));
     }
 
     private void showPhotoOptionsDialog() {
-        String[] options = {"Choose from Gallery", "Take a Photo with Camera"};
+        CharSequence[] options = {"Take Photo with Camera", "Choose from Gallery"};
         new AlertDialog.Builder(this)
                 .setTitle("Attach Device Photo")
                 .setItems(options, (dialog, which) -> {
                     if (which == 0) {
-                        photoPickerLauncher.launch(new String[]{"image/*"});
-                    } else if (which == 1) {
                         checkCameraPermissionAndLaunch();
+                    } else if (which == 1) {
+                        photoPickerLauncher.launch("image/*");
                     }
                 })
+                .setNegativeButton("Cancel", null)
                 .show();
     }
 
