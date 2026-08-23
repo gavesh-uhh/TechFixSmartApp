@@ -22,8 +22,10 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.techfix.app.R;
+import com.techfix.app.adapters.SampleImageAdapter;
 import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.DatabaseHelper;
+import com.techfix.app.database.SampleRepairDAO;
 import com.techfix.app.database.ServiceDAO;
 import com.techfix.app.database.SparePartDAO;
 import com.techfix.app.database.TechnicianDAO;
@@ -59,7 +61,11 @@ public class HomeActivity extends AppCompatActivity {
     private ServiceDAO serviceDAO;
     private SparePartDAO sparePartDAO;
     private AppointmentDAO appointmentDAO;
+    private SampleRepairDAO sampleRepairDAO;
     private SessionManager session;
+
+    // Showcase gallery adapter
+    private SampleImageAdapter sampleImageAdapter;
 
     // Currently selected category filter: "ALL", "PHONES", "COMPUTERS", "SCREENS", "BATTERIES"
     private String currentCategory = "ALL";
@@ -71,6 +77,7 @@ public class HomeActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 loadAvailableServices(currentCategory);
                 loadAvailableParts();
+                loadSampleShowcase();
             });
         }
     };
@@ -196,6 +203,7 @@ public class HomeActivity extends AppCompatActivity {
         serviceDAO = new ServiceDAO(dbHelper);
         sparePartDAO = new SparePartDAO(dbHelper);
         appointmentDAO = new AppointmentDAO(dbHelper);
+        sampleRepairDAO = new SampleRepairDAO(dbHelper);
         session = new SessionManager(this);
 
         // 3. Initialize Firebase Cloud Sync (Offline-First auto-sync when online)
@@ -217,6 +225,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         session = new SessionManager(this);
+        loadSampleShowcase();
         showStorePanel();
         binding.bottomNavigation.setSelectedItemId(R.id.nav_home_store);
         selectCategory(currentCategory != null ? currentCategory : "ALL");
@@ -731,6 +740,24 @@ public class HomeActivity extends AppCompatActivity {
         binding.servicesHeaderTitle.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
         binding.servicesHeaderSubtitle.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
         binding.servicesContainer.setVisibility(count > 0 ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * Load sample repaired-device images published by staff into the customer showcase gallery.
+     */
+    private void loadSampleShowcase() {
+        if (binding.samplesContainer.getAdapter() == null) {
+            sampleImageAdapter = new SampleImageAdapter();
+            binding.samplesContainer.setLayoutManager(
+                    new androidx.recyclerview.widget.LinearLayoutManager(this, androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL, false));
+            binding.samplesContainer.setAdapter(sampleImageAdapter);
+        }
+        List<com.techfix.app.models.SampleRepair> samples = sampleRepairDAO.all();
+        sampleImageAdapter.submit(samples);
+        boolean hasSamples = !samples.isEmpty();
+        binding.samplesHeaderTitle.setVisibility(hasSamples ? View.VISIBLE : View.GONE);
+        binding.samplesContainer.setVisibility(hasSamples ? View.VISIBLE : View.GONE);
+        binding.samplesEmptyText.setVisibility(hasSamples ? View.GONE : View.VISIBLE);
     }
 
     /**

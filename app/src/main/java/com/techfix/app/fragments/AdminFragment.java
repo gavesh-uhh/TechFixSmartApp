@@ -157,10 +157,11 @@ public class AdminFragment extends Fragment {
         int servicesCount = serviceDAO.list().size();
         int techsCount = technicianDAO.all().size();
 
-        binding.dbDiagnosticsText.setText("• Primary Branches: Colombo & Galle Workshops\n"
-                + "• Cloud Sync: Connected & up to date\n"
-                + "• Active Records: " + appointmentsCount + " repairs · " + customersCount + " customers · "
-                + partsCount + " spare parts · " + servicesCount + " services · " + techsCount + " technicians");
+        binding.dbDiagnosticsText.setText("• SQLite Database: v6 (techfix.db)\n"
+                + "• Records: " + appointmentsCount + " repairs, " + customersCount + " customers, "
+                + partsCount + " parts, " + servicesCount + " services, " + techsCount + " technicians\n"
+                + "• Cloud Sync: Firebase Auth & Firestore enabled\n"
+                + "• Branches: Colombo Branch, Galle Branch");
     }
 
     private void refreshCustomers(String query) {

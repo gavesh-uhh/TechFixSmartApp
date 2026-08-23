@@ -24,4 +24,8 @@ public class SampleRepairDAO {
         v.put("title", title); v.put("service", service); v.put("imageUri", imageUri);
         return helper.getWritableDatabase().insert("samples", null, v);
     }
+
+    public int delete(long id) {
+        return helper.getWritableDatabase().delete("samples", "id = ?", new String[]{String.valueOf(id)});
+    }
 }

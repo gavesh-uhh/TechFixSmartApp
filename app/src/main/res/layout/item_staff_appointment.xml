@@ -24,8 +24,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@color/ink"
-                android:textSize="16sp"
+                android:textSize="17sp"
                 android:textStyle="bold" />
 
             <TextView
@@ -38,22 +40,26 @@
 
         <TextView
             android:id="@+id/queueCustomer"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:maxLines="3"
+            android:ellipsize="end"
             android:lineSpacingExtra="2dp"
             android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginVertical="10dp"
+            android:layout_marginVertical="12dp"
             android:background="@color/line" />
 
         <TextView
             android:id="@+id/queueMeta"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="2"
+            android:ellipsize="end"
             android:textColor="@color/primary"
             android:textSize="12sp"
             android:textStyle="bold" />

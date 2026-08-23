@@ -18,7 +18,19 @@ import com.techfix.app.models.SampleRepair;
 /** Gallery adapter for sample repaired-device images. */
 public class SampleImageAdapter extends RecyclerView.Adapter<SampleImageAdapter.Holder> {
 
+    /** Optional long-press callback (used by staff to remove showcases). */
+    public interface OnSampleLongClickListener {
+        void onSampleLongClick(SampleRepair sample);
+    }
+
     private final List<SampleRepair> items = new ArrayList<>();
+    private final OnSampleLongClickListener longClickListener;
+
+    public SampleImageAdapter() { this(null); }
+
+    public SampleImageAdapter(OnSampleLongClickListener longClickListener) {
+        this.longClickListener = longClickListener;
+    }
 
     public void submit(List<SampleRepair> next) { items.clear(); items.addAll(next); notifyDataSetChanged(); }
 
@@ -33,16 +45,55 @@ public class SampleImageAdapter extends RecyclerView.Adapter<SampleImageAdapter.
         SampleRepair item = items.get(position);
         holder.title.setText(item.title);
         holder.service.setText(item.service);
-        if (item.imageUri.isEmpty()) {
-            holder.image.setImageResource(android.R.drawable.ic_menu_gallery);
+        loadBitmap(holder.image, item.imageUri);
+
+        if (longClickListener != null) {
+            holder.itemView.setOnLongClickListener(v -> {
+                longClickListener.onSampleLongClick(item);
+                return true;
+            });
         } else {
-            try (java.io.InputStream in = holder.image.getContext().getContentResolver().openInputStream(Uri.parse(item.imageUri))) {
-                Bitmap bmp = BitmapFactory.decodeStream(in);
-                holder.image.setImageBitmap(bmp);
-            } catch (Exception e) {
-                holder.image.setImageResource(android.R.drawable.ic_menu_report_image);
+            holder.itemView.setOnLongClickListener(null);
+        }
+        holder.itemView.setLongClickable(longClickListener != null);
+    }
+
+    private void loadBitmap(ImageView target, String uri) {
+        if (uri == null || uri.isEmpty()) {
+            target.setImageResource(android.R.drawable.ic_menu_gallery);
+            return;
+        }
+        try {
+            BitmapFactory.Options bounds = new BitmapFactory.Options();
+            bounds.inJustDecodeBounds = true;
+            try (java.io.InputStream in = target.getContext().getContentResolver().openInputStream(Uri.parse(uri))) {
+                BitmapFactory.decodeStream(in, null, bounds);
+            }
+            BitmapFactory.Options opts = new BitmapFactory.Options();
+            opts.inSampleSize = calculateInSampleSize(bounds, 720, 720);
+            try (java.io.InputStream in = target.getContext().getContentResolver().openInputStream(Uri.parse(uri))) {
+                Bitmap bmp = BitmapFactory.decodeStream(in, null, opts);
+                if (bmp != null) {
+                    target.setImageBitmap(bmp);
+                } else {
+                    target.setImageResource(android.R.drawable.ic_menu_report_image);
+                }
+            }
+        } catch (Exception e) {
+            target.setImageResource(android.R.drawable.ic_menu_report_image);
+        }
+    }
+
+    private static int calculateInSampleSize(BitmapFactory.Options options, int reqWidth, int reqHeight) {
+        int height = options.outHeight;
+        int width = options.outWidth;
+        int inSampleSize = 1;
+        if (height > reqHeight || width > reqWidth) {
+            while (height / (inSampleSize * 2) >= reqHeight && width / (inSampleSize * 2) >= reqWidth) {
+                inSampleSize *= 2;
             }
         }
+        return inSampleSize;
     }
 
     @Override
@@ -59,4 +110,3 @@ public class SampleImageAdapter extends RecyclerView.Adapter<SampleImageAdapter.
         }
     }
 }
-

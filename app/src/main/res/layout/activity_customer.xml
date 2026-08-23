@@ -30,6 +30,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Welcome!"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:textColor="@color/ink"
                 android:textSize="22sp"
                 android:textStyle="bold" />
@@ -39,9 +41,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:text="Customer Hub"
                 android:textColor="@color/muted_text"
-                android:textSize="13sp" />
+                android:textSize="14sp" />
         </LinearLayout>
 
         <!-- Quick Log Out Button -->
@@ -109,7 +113,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="EXPRESS WORKSHOP"
-                            android:textColor="#D8CEEE"
+                            android:textColor="@color/techfix_sky"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -127,8 +131,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Certified technicians &amp; genuine replacement parts in Colombo &amp; Galle."
-                            android:textColor="#D8CEEE"
-                            android:textSize="13sp" />
+                            android:textColor="@color/techfix_sky"
+                            android:textSize="14sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -157,7 +161,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/customerCircleCatAll"
@@ -170,6 +175,7 @@
                                 android:id="@+id/customerIconCatAll"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Browse all repair categories"
                                 android:src="@drawable/ic_cat_all" />
                         </FrameLayout>
 
@@ -196,7 +202,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/customerCircleCatPhones"
@@ -209,6 +216,7 @@
                                 android:id="@+id/customerIconCatPhones"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Phone repair services"
                                 android:src="@drawable/ic_cat_phones" />
                         </FrameLayout>
 
@@ -234,7 +242,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/customerCircleCatComputers"
@@ -247,6 +256,7 @@
                                 android:id="@+id/customerIconCatComputers"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Computer repair services"
                                 android:src="@drawable/ic_cat_computers" />
                         </FrameLayout>
 
@@ -272,7 +282,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/customerCircleCatScreens"
@@ -285,6 +296,7 @@
                                 android:id="@+id/customerIconCatScreens"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Screen repair services"
                                 android:src="@drawable/ic_cat_screens" />
                         </FrameLayout>
 
@@ -310,7 +322,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/customerCircleCatBatteries"
@@ -323,6 +336,7 @@
                                 android:id="@+id/customerIconCatBatteries"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Battery replacement services"
                                 android:src="@drawable/ic_cat_batteries" />
                         </FrameLayout>
 
@@ -363,6 +377,33 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical" />
 
+                <!-- Showcase Samples Gallery Header -->
+                <TextView
+                    android:id="@+id/customerSamplesHeaderTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp"
+                    android:layout_marginBottom="10dp"
+                    android:text="Recent Repair Showcases"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <!-- Samples Gallery Carousel -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/customerSamplesContainer"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clipToPadding="false"
+                    android:paddingBottom="8dp" />
+
+                <!-- Samples Empty State -->
+                <TextView
+                    android:id="@+id/customerSamplesEmptyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No repair showcases published yet. Check back soon!"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
                 <!-- Hardware Parts Section Header -->
                 <TextView
                     android:layout_width="wrap_content"
@@ -397,7 +438,7 @@
                             style="@style/Widget.TechFix.Input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Search spare part name..."
+                            android:hint="Search Spare Part Name…"
                             android:inputType="text"
                             android:maxLines="1" />
 
@@ -421,14 +462,14 @@
                                 android:layout_marginStart="6dp"
                                 android:text="Branch:"
                                 android:textColor="@color/ink"
-                                android:textSize="13sp"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <Spinner
                                 android:id="@+id/customerPartsBranchSpinner"
                                 style="@style/Widget.TechFix.Spinner"
                                 android:layout_width="0dp"
-                                android:layout_height="48dp"
+                                android:layout_height="52dp"
                                 android:layout_marginStart="8dp"
                                 android:layout_weight="1" />
                         </LinearLayout>
@@ -449,8 +490,9 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="No parts found matching query"
-                        android:textColor="@color/muted_text"
-                        android:textSize="14sp" />
+                        android:textColor="@color/ink"
+                        android:textSize="16sp"
+                        android:textStyle="bold" />
                 </LinearLayout>
 
                 <!-- Parts Container -->
@@ -497,8 +539,8 @@
                             android:layout_height="wrap_content"
                             android:background="@drawable/bg_filter_pill_selected"
                             android:paddingHorizontal="14dp"
-                            android:paddingVertical="8dp"
-                            android:text="All Repairs"
+                            android:paddingVertical="12dp"
+                            android:text="ALL REPAIRS"
                             android:textColor="@color/white" />
 
                         <TextView
@@ -509,7 +551,7 @@
                             android:layout_marginStart="8dp"
                             android:background="@drawable/bg_filter_pill"
                             android:paddingHorizontal="14dp"
-                            android:paddingVertical="8dp"
+                            android:paddingVertical="12dp"
                             android:text="Active"
                             android:textColor="@color/ink" />
 
@@ -521,7 +563,7 @@
                             android:layout_marginStart="8dp"
                             android:background="@drawable/bg_filter_pill"
                             android:paddingHorizontal="14dp"
-                            android:paddingVertical="8dp"
+                            android:paddingVertical="12dp"
                             android:text="Completed"
                             android:textColor="@color/ink" />
                     </LinearLayout>
@@ -558,7 +600,7 @@
                         android:layout_marginTop="16dp"
                         android:text="No repairs booked yet"
                         android:textColor="@color/ink"
-                        android:textSize="18sp"
+                        android:textSize="16sp"
                         android:textStyle="bold" />
 
                     <TextView
@@ -568,7 +610,7 @@
                         android:gravity="center"
                         android:text="Book an appointment to get your phone or computer repaired by our certified technicians."
                         android:textColor="@color/muted_text"
-                        android:textSize="13sp" />
+                        android:textSize="14sp" />
 
                     <Button
                         android:id="@+id/emptyBookButton"
@@ -604,10 +646,12 @@
                         android:padding="20dp">
 
                         <TextView
-                            style="@style/Widget.TechFix.SectionTitle"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Outstanding Invoice" />
+                            android:text="Outstanding Invoice"
+                            android:textColor="@color/ink"
+                            android:textSize="17sp"
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/paymentSummaryText"
@@ -660,67 +704,12 @@
                     android:text="3 simple steps to schedule your device diagnosis &amp; fix."
                     android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
-                <!-- Visual Step Indicator Progress Bar -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:layout_marginBottom="8dp"
-                    android:gravity="center_vertical"
-                    android:orientation="horizontal">
-
-                    <!-- Step 1 Circle -->
-                    <TextView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:background="@drawable/bg_step_active"
-                        android:gravity="center"
-                        android:text="1"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="2dp"
-                        android:layout_weight="1"
-                        android:background="@color/primary" />
-
-                    <!-- Step 2 Circle -->
-                    <TextView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:background="@drawable/bg_step_active"
-                        android:gravity="center"
-                        android:text="2"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="2dp"
-                        android:layout_weight="1"
-                        android:background="@color/primary" />
-
-                    <!-- Step 3 Circle -->
-                    <TextView
-                        android:layout_width="28dp"
-                        android:layout_height="28dp"
-                        android:background="@drawable/bg_step_active"
-                        android:gravity="center"
-                        android:text="3"
-                        android:textColor="@color/white"
-                        android:textSize="12sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
                 <!-- STEP 1 CARD: Device & Service -->
                 <com.google.android.material.card.MaterialCardView
                     style="@style/Widget.TechFix.ShadowCard"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp">
+                    android:layout_marginTop="14dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -733,7 +722,7 @@
                             android:layout_height="wrap_content"
                             android:text="Step 1 • Device &amp; Service"
                             android:textColor="@color/primary"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -750,7 +739,7 @@
                             android:layout_height="wrap_content"
                             android:text="Service Required"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -767,7 +756,7 @@
                             android:layout_marginTop="14dp"
                             android:text="Device Category"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -784,7 +773,7 @@
                             android:layout_marginTop="14dp"
                             android:text="Device Brand &amp; Model"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -817,7 +806,7 @@
                             android:layout_height="wrap_content"
                             android:text="Step 2 • Issue Details &amp; Photo"
                             android:textColor="@color/primary"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -834,7 +823,7 @@
                             android:layout_height="wrap_content"
                             android:text="Problem Description"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -844,7 +833,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:gravity="top"
-                            android:hint="Describe the damage, symptoms, or malfunction..."
+                            android:hint="Describe the damage, symptoms, or malfunction…"
                             android:inputType="textMultiLine"
                             android:minLines="3" />
 
@@ -855,7 +844,7 @@
                             android:layout_marginTop="14dp"
                             android:text="Device Photo (Optional)"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <LinearLayout
@@ -917,7 +906,7 @@
 
                             <Button
                                 android:id="@+id/customerRemovePhotoButton"
-                                style="@style/Widget.Material3.Button.TextButton"
+                                style="@style/Widget.TechFix.Button.Text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top|end"
@@ -946,7 +935,7 @@
                             android:layout_height="wrap_content"
                             android:text="Step 3 • Branch &amp; Confirm"
                             android:textColor="@color/primary"
-                            android:textSize="15sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
@@ -963,7 +952,7 @@
                             android:layout_height="wrap_content"
                             android:text="Preferred Workshop Branch"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -980,7 +969,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="18dp"
-                            android:text="Confirm &amp; Schedule Repair" />
+                            android:text="Submit Repair Request" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -1052,9 +1041,11 @@
                                     android:id="@+id/profileNameText"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
                                     android:text="Customer Name"
                                     android:textColor="@color/ink"
-                                    android:textSize="18sp"
+                                    android:textSize="17sp"
                                     android:textStyle="bold" />
 
                                 <TextView
@@ -1062,9 +1053,11 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="2dp"
+                                    android:maxLines="1"
+                                    android:ellipsize="end"
                                     android:text="email@example.com"
                                     android:textColor="@color/muted_text"
-                                    android:textSize="13sp" />
+                                    android:textSize="14sp" />
                             </LinearLayout>
                         </LinearLayout>
 
@@ -1073,9 +1066,11 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="12dp"
+                            android:maxLines="1"
+                            android:ellipsize="end"
                             android:text="Phone: Not provided"
                             android:textColor="@color/muted_text"
-                            android:textSize="13sp" />
+                            android:textSize="14sp" />
 
                         <TextView
                             android:layout_width="wrap_content"
@@ -1083,17 +1078,18 @@
                             android:layout_marginTop="6dp"
                             android:text="Account Type: Verified Customer"
                             android:textColor="@color/primary"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <Button
                             android:id="@+id/profileLogoutButton"
-                            style="@style/Widget.TechFix.Secondary"
+                            style="@style/Widget.TechFix.Button.Outlined"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="16dp"
                             android:text="Log Out of Account"
-                            android:textColor="@color/error" />
+                            android:textColor="@color/error"
+                            app:strokeColor="@color/error" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -1138,17 +1134,18 @@
                             android:layout_height="wrap_content"
                             android:text="24/7 Helpline &amp; Workshop Support"
                             android:textColor="@color/ink"
-                            android:textSize="16sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:lineSpacingExtra="3dp"
+                            android:autoLink="phone|email"
+                            android:lineSpacingExtra="2dp"
                             android:text="Call our helpline: 011 234 5678\nEmail support: support@techfix.lk\nOpen Daily: 9:00 AM - 7:00 PM"
                             android:textColor="@color/muted_text"
-                            android:textSize="13sp" />
+                            android:textSize="14sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -1166,7 +1163,7 @@
         app:elevation="8dp"
         app:itemIconTint="@color/nav_item_color"
         app:itemTextColor="@color/nav_item_color"
-        app:labelVisibilityMode="unlabeled"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_customer" />
 
 </LinearLayout>

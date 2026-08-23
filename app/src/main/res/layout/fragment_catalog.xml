@@ -32,7 +32,7 @@
                 android:id="@+id/catalogBranchSpinner"
                 style="@style/Widget.TechFix.Spinner"
                 android:layout_width="wrap_content"
-                android:layout_height="46dp"
+                android:layout_height="52dp"
                 android:minWidth="140dp" />
         </LinearLayout>
 
@@ -70,8 +70,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="Make this repair available for customers to book in store."
-                    android:textColor="@color/muted_text"
-                    android:textSize="12sp" />
+                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
                 <EditText
                     android:id="@+id/newServiceName"
@@ -87,20 +86,19 @@
                     android:layout_marginTop="10dp"
                     android:orientation="horizontal">
 
-                    <EditText
-                        android:id="@+id/newServiceCategory"
-                        style="@style/Widget.TechFix.Input"
+                    <Spinner
+                        android:id="@+id/newServiceCategorySpinner"
+                        style="@style/Widget.TechFix.Spinner"
                         android:layout_width="0dp"
-                        android:layout_height="wrap_content"
+                        android:layout_height="52dp"
                         android:layout_marginEnd="6dp"
-                        android:layout_weight="1"
-                        android:hint="Category (e.g. Mobile phone)" />
+                        android:layout_weight="1" />
 
                     <Spinner
                         android:id="@+id/newServiceBranchSpinner"
                         style="@style/Widget.TechFix.Spinner"
                         android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                        android:layout_height="52dp"
                         android:layout_marginStart="6dp"
                         android:layout_weight="1" />
                 </LinearLayout>
@@ -111,7 +109,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:hint="Required Part (optional e.g. Phone display)" />
+                    android:hint="Required Part (optional, e.g. Phone Display)" />
 
                 <EditText
                     android:id="@+id/newServicePrice"
@@ -177,21 +175,28 @@
                     android:layout_marginTop="14dp"
                     android:hint="Technician Full Name (e.g. Ravindu Perera)" />
 
-                <EditText
-                    android:id="@+id/newTechBranch"
-                    style="@style/Widget.TechFix.Input"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:hint="Branch (Colombo branch / Galle branch)" />
+                    android:orientation="horizontal">
 
-                <EditText
-                    android:id="@+id/newTechSkill"
-                    style="@style/Widget.TechFix.Input"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:hint="Skill (Mobile phone / Laptop / computer)" />
+                    <Spinner
+                        android:id="@+id/newTechBranchSpinner"
+                        style="@style/Widget.TechFix.Spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_marginEnd="6dp"
+                        android:layout_weight="1" />
+
+                    <Spinner
+                        android:id="@+id/newTechSkillSpinner"
+                        style="@style/Widget.TechFix.Spinner"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_marginStart="6dp"
+                        android:layout_weight="1" />
+                </LinearLayout>
 
                 <Button
                     android:id="@+id/addTechButton"
@@ -236,7 +241,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="14dp"
-                    android:hint="Showcase Title (e.g. MacBook Liquid Damage Recovered)" />
+                    android:hint="Showcase Title (e.g. MacBook Water Fix)" />
 
                 <Button
                     android:id="@+id/addSampleButton"
@@ -245,6 +250,38 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:text="Attach Photo &amp; Publish Showcase" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Published Showcases"
+                    style="@style/Widget.TechFix.SectionTitle" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Long-press a showcase to remove it from the gallery."
+                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/samplesList"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:nestedScrollingEnabled="false"
+                    android:layout_marginTop="12dp" />
+
+                <TextView
+                    android:id="@+id/emptySamplesText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="No showcases published yet."
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

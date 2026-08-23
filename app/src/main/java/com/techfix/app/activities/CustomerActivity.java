@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.techfix.app.R;
 import com.techfix.app.adapters.AppointmentAdapter;
 import com.techfix.app.adapters.BranchAdapter;
+import com.techfix.app.adapters.SampleImageAdapter;
 import com.techfix.app.database.AppointmentDAO;
 import com.techfix.app.database.BranchDAO;
 import com.techfix.app.database.DatabaseHelper;
@@ -260,6 +261,7 @@ public class CustomerActivity extends AppCompatActivity {
         refreshRepairs();
         loadCustomerServices(currentCategory);
         loadCustomerParts();
+        loadCustomerShowcase();
     }
 
     @Override
@@ -432,6 +434,24 @@ public class CustomerActivity extends AppCompatActivity {
 
         loadCustomerServices("ALL");
         loadCustomerParts();
+        loadCustomerShowcase();
+    }
+
+    /**
+     * Load sample repaired-device images published by staff into the customer showcase gallery.
+     */
+    private void loadCustomerShowcase() {
+        if (binding.customerSamplesContainer.getAdapter() == null) {
+            binding.customerSamplesContainer.setLayoutManager(
+                    new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            binding.customerSamplesContainer.setAdapter(new SampleImageAdapter());
+        }
+        List<SampleRepair> samples = sampleRepairDAO.all();
+        ((SampleImageAdapter) binding.customerSamplesContainer.getAdapter()).submit(samples);
+        boolean hasSamples = !samples.isEmpty();
+        binding.customerSamplesHeaderTitle.setVisibility(hasSamples ? View.VISIBLE : View.GONE);
+        binding.customerSamplesContainer.setVisibility(hasSamples ? View.VISIBLE : View.GONE);
+        binding.customerSamplesEmptyText.setVisibility(hasSamples ? View.GONE : View.VISIBLE);
     }
 
     private void selectCategory(String categoryKey) {

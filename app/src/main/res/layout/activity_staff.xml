@@ -36,6 +36,8 @@
             <TextView
                 android:id="@+id/staffEmailText"
                 android:layout_width="wrap_content"
+                android:maxLines="1"
+                android:ellipsize="end"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="2dp"
                 android:text="staff@techfix.lk • Workshop Control Center"
@@ -46,26 +48,25 @@
         <!-- Customer Store Mode Button -->
         <Button
             android:id="@+id/staffHomeStoreButton"
-            style="@style/Widget.Material3.Button.TonalButton"
+            style="@style/Widget.TechFix.Button.Secondary"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="48dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
             android:minWidth="0dp"
             android:paddingHorizontal="12dp"
             android:text="Store"
             android:textColor="@color/primary"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            app:backgroundTint="@color/primary_container"
-            app:cornerRadius="12dp" />
+            app:strokeColor="@color/lilac_200" />
 
         <!-- Log Out Button -->
         <Button
             android:id="@+id/staffLogoutButton"
-            style="@style/Widget.Material3.Button.TonalButton"
+            style="@style/Widget.TechFix.Button.Secondary"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
+            android:layout_height="48dp"
             android:layout_marginStart="8dp"
             android:insetTop="0dp"
             android:insetBottom="0dp"
@@ -73,10 +74,9 @@
             android:paddingHorizontal="12dp"
             android:text="Log Out"
             android:textColor="@color/error"
-            android:textSize="13sp"
+            android:textSize="14sp"
             android:textStyle="bold"
-            app:backgroundTint="@color/error_container"
-            app:cornerRadius="12dp" />
+            app:strokeColor="@color/error" />
     </LinearLayout>
 
     <!-- Divider Line -->
@@ -101,7 +101,7 @@
         app:elevation="8dp"
         app:itemIconTint="@color/nav_item_color"
         app:itemTextColor="@color/nav_item_color"
-        app:labelVisibilityMode="unlabeled"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_staff" />
 
 </LinearLayout>

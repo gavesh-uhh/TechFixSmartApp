@@ -4,7 +4,7 @@
     style="@style/Widget.TechFix.ShadowCard"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="14dp"
+    android:layout_marginBottom="12dp"
     android:clickable="true"
     android:focusable="true">
 
@@ -25,25 +25,10 @@
                 android:id="@+id/serviceCategoryText"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Mobile phone"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="Mobile Phone"
                 android:textColor="@color/primary"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="•"
-                android:textColor="@color/muted_text"
-                android:textSize="12sp" />
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:text="★ 4.9"
-                android:textColor="@color/warning"
                 android:textSize="12sp"
                 android:textStyle="bold" />
 
@@ -55,7 +40,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="90-Day Warranty"
+                android:text="90-DAY WARRANTY"
                 android:textColor="@color/success"
                 android:textSize="11sp"
                 android:textStyle="bold" />
@@ -95,19 +80,23 @@
                     android:id="@+id/serviceNameText"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Screen replacement"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    android:text="Screen Replacement"
                     android:textColor="@color/ink"
                     android:textSize="17sp"
                     android:textStyle="bold" />
 
                 <TextView
                     android:id="@+id/servicePartText"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="3dp"
-                    android:text="Includes genuine OEM display"
+                    android:layout_marginTop="4dp"
+                    android:maxLines="2"
+                    android:ellipsize="end"
+                    android:text="Includes Genuine OEM Display"
                     android:textColor="@color/muted_text"
-                    android:textSize="13sp" />
+                    android:textSize="14sp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -115,8 +104,7 @@
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
-            android:layout_marginTop="14dp"
-            android:layout_marginBottom="12dp"
+            android:layout_marginVertical="12dp"
             android:background="@color/line" />
 
         <!-- Bottom Row: Price Callout & Clean Book Button -->
@@ -145,7 +133,7 @@
                     android:layout_height="wrap_content"
                     android:text="Rs 8,500"
                     android:textColor="@color/primary"
-                    android:textSize="18sp"
+                    android:textSize="17sp"
                     android:textStyle="bold" />
             </LinearLayout>
 
@@ -156,10 +144,12 @@
                 android:layout_height="wrap_content"
                 android:background="@drawable/bg_filter_pill_selected"
                 android:paddingHorizontal="16dp"
-                android:paddingVertical="9dp"
-                android:text="Book Repair"
+                android:paddingVertical="10dp"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:text="BOOK REPAIR"
                 android:textColor="@color/white"
-                android:textSize="12sp"
+                android:textSize="11sp"
                 android:textStyle="bold" />
         </LinearLayout>
 

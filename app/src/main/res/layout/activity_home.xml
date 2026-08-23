@@ -49,18 +49,11 @@
             android:id="@+id/homeDashboardButton"
             style="@style/Widget.Material3.Button.TonalButton"
             android:layout_width="wrap_content"
-            android:layout_height="38dp"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            android:minWidth="0dp"
-            android:paddingHorizontal="12dp"
-            android:text="Admin Dash"
-            android:textColor="@color/primary"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:backgroundTint="@color/primary_container"
-            app:cornerRadius="12dp"
-            android:visibility="gone" />
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:text="Computer &amp; Mobile Phone Repairs"
+            android:textColor="@color/muted_text"
+            android:textSize="14sp" />
     </LinearLayout>
 
     <!-- Divider Line -->
@@ -110,7 +103,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="EXPRESS WORKSHOP"
-                            android:textColor="#D8CEEE"
+                            android:textColor="@color/techfix_sky"
                             android:textSize="11sp"
                             android:textStyle="bold" />
 
@@ -128,8 +121,8 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:text="Certified technicians &amp; genuine replacement parts in Colombo &amp; Galle."
-                            android:textColor="#D8CEEE"
-                            android:textSize="13sp" />
+                            android:textColor="@color/techfix_sky"
+                            android:textSize="14sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -158,7 +151,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/circleCatAll"
@@ -171,6 +165,7 @@
                                 android:id="@+id/iconCatAll"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Browse all repair categories"
                                 android:src="@drawable/ic_cat_all" />
                         </FrameLayout>
 
@@ -197,7 +192,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/circleCatPhones"
@@ -210,6 +206,7 @@
                                 android:id="@+id/iconCatPhones"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Phone repair services"
                                 android:src="@drawable/ic_cat_phones" />
                         </FrameLayout>
 
@@ -235,7 +232,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/circleCatComputers"
@@ -248,6 +246,7 @@
                                 android:id="@+id/iconCatComputers"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Computer repair services"
                                 android:src="@drawable/ic_cat_computers" />
                         </FrameLayout>
 
@@ -273,7 +272,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/circleCatScreens"
@@ -286,6 +286,7 @@
                                 android:id="@+id/iconCatScreens"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Screen repair services"
                                 android:src="@drawable/ic_cat_screens" />
                         </FrameLayout>
 
@@ -311,7 +312,8 @@
                         android:orientation="vertical"
                         android:gravity="center_horizontal"
                         android:clickable="true"
-                        android:focusable="true">
+                        android:focusable="true"
+                        android:foreground="?attr/selectableItemBackground">
 
                         <FrameLayout
                             android:id="@+id/circleCatBatteries"
@@ -324,6 +326,7 @@
                                 android:id="@+id/iconCatBatteries"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:contentDescription="Battery replacement services"
                                 android:src="@drawable/ic_cat_batteries" />
                         </FrameLayout>
 
@@ -368,6 +371,7 @@
 
                 <!-- Showcase Samples Gallery Header -->
                 <TextView
+                    android:id="@+id/samplesHeaderTitle"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="24dp"
@@ -375,13 +379,23 @@
                     android:text="Recent Workshop Showcases"
                     style="@style/Widget.TechFix.SectionTitle" />
 
-                <!-- Samples Gallery Container -->
-                <LinearLayout
+                <!-- Samples Gallery Carousel -->
+                <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/samplesContainer"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingBottom="24dp" />
+                    android:clipToPadding="false"
+                    android:paddingBottom="8dp" />
+
+                <!-- Samples Empty State -->
+                <TextView
+                    android:id="@+id/samplesEmptyText"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:paddingBottom="24dp"
+                    android:text="No repair showcases published yet. Check back soon!"
+                    android:textAlignment="center"
+                    android:textAppearance="@style/TextAppearance.TechFix.Body" />
 
             </LinearLayout>
         </ScrollView>
@@ -418,7 +432,7 @@
                             style="@style/Widget.TechFix.Input"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:hint="Search spare part name (e.g. Screen, Battery)..."
+                            android:hint="Search Spare Part Name…"
                             android:inputType="text"
                             android:maxLines="1" />
 
@@ -440,16 +454,16 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="6dp"
-                                android:text="Branch Filter:"
+                                android:text="Branch:"
                                 android:textColor="@color/ink"
-                                android:textSize="13sp"
+                                android:textSize="14sp"
                                 android:textStyle="bold" />
 
                             <Spinner
                                 android:id="@+id/homePartsBranchSpinner"
                                 style="@style/Widget.TechFix.Spinner"
                                 android:layout_width="0dp"
-                                android:layout_height="48dp"
+                                android:layout_height="52dp"
                                 android:layout_marginStart="8dp"
                                 android:layout_weight="1" />
                         </LinearLayout>
@@ -535,7 +549,7 @@
                             android:layout_height="wrap_content"
                             android:text="Select Repair Service"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -552,7 +566,7 @@
                             android:layout_marginTop="14dp"
                             android:text="Device Category"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -569,7 +583,7 @@
                             android:layout_marginTop="14dp"
                             android:text="Device Brand &amp; Model"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -588,7 +602,7 @@
                             android:layout_marginTop="14dp"
                             android:text="Issue Description"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <EditText
@@ -598,7 +612,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
                             android:gravity="top"
-                            android:hint="Describe the problem..."
+                            android:hint="Describe the problem…"
                             android:inputType="textMultiLine"
                             android:minLines="3" />
 
@@ -609,7 +623,7 @@
                             android:layout_marginTop="14dp"
                             android:text="Workshop Branch"
                             android:textColor="@color/ink"
-                            android:textSize="13sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <Spinner
@@ -679,7 +693,7 @@
 
                             <Button
                                 android:id="@+id/removePhotoButton"
-                                style="@style/Widget.Material3.Button.TextButton"
+                                style="@style/Widget.TechFix.Button.Text"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_gravity="top|end"
@@ -694,7 +708,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="20dp"
-                            android:text="Schedule Repair Appointment" />
+                            android:text="Submit Repair Request" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
@@ -734,16 +748,17 @@
                             android:layout_height="wrap_content"
                             android:text="Colombo Flagship Workshop"
                             android:textColor="@color/ink"
-                            android:textSize="18sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
+                            android:autoLink="phone"
                             android:text="123 Galle Road, Bambalapitiya, Colombo 04\nPhone: 011 234 5678\nOpen Daily: 9:00 AM - 7:00 PM"
                             android:textColor="@color/muted_text"
-                            android:textSize="13sp" />
+                            android:textSize="14sp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -758,7 +773,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="6dp"
                                 android:layout_weight="1"
-                                android:text="Book Here" />
+                                android:text="Book Now" />
 
                             <Button
                                 android:id="@+id/btnColomboMap"
@@ -792,16 +807,17 @@
                             android:layout_height="wrap_content"
                             android:text="Galle Service Center"
                             android:textColor="@color/ink"
-                            android:textSize="18sp"
+                            android:textSize="17sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="4dp"
+                            android:autoLink="phone"
                             android:text="45 Main Street, Galle Fort, Galle\nPhone: 091 223 4567\nOpen Daily: 9:00 AM - 6:00 PM"
                             android:textColor="@color/muted_text"
-                            android:textSize="13sp" />
+                            android:textSize="14sp" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -816,7 +832,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginEnd="6dp"
                                 android:layout_weight="1"
-                                android:text="Book Here" />
+                                android:text="Book Now" />
 
                             <Button
                                 android:id="@+id/btnGalleMap"
@@ -844,7 +860,7 @@
         app:elevation="8dp"
         app:itemIconTint="@color/nav_item_color"
         app:itemTextColor="@color/nav_item_color"
-        app:labelVisibilityMode="unlabeled"
+        app:labelVisibilityMode="labeled"
         app:menu="@menu/bottom_nav_home" />
 
 </LinearLayout>
